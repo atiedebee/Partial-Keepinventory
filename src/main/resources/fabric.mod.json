@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "partial-keepinv",
+  "version": "0.1.0",
+
+  "name": "Partial Keepinventory",
+  "description": "A mod that makes keepinventory a little more flexible",
+  "authors": [
+    "atiedebee"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/atiedebee/partial-keepinv"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/partial-keepinv/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.atie.partialKeepinventory.partialKeepinventory"
+    ]
+  },
+  "mixins": [
+    "partial-keepinv.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.11",
+    "fabric-api": "*",
+    "minecraft": "~1.19.3",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "partial-keepinv.midnightconfig.enableMod": "Enabled",
+  "partial-keepinv.midnightconfig.partialKeepinvMode": "Drop behaviour",
+  "partial-keepinv.midnightconfig.inventoryDroprate": "Droprate",
+  "partial-keepinv.midnightconfig.commonDroprate": "Common Droprate",
+  "partial-keepinv.midnightconfig.uncommonDroprate": "Uncommon Droprate",
+  "partial-keepinv.midnightconfig.rareDroprate": "Rare Droprate",
+  "partial-keepinv.midnightconfig.epicDroprate": "Epic Droprate",
+  "partial-keepinv.midnightconfig.enum.KeepinvMode.VANILLA": "Vanilla",
+  "partial-keepinv.midnightconfig.enum.KeepinvMode.PERCENTAGE": "Percentage",
+  "partial-keepinv.midnightconfig.enum.KeepinvMode.RARITY": "Rarity"
+
+}
