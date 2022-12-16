@@ -46,7 +46,7 @@ public abstract class PlayerInventoryMixin {
 
 
     private void dropInventoryEqually(List<ItemStack> stacks) {
-        HashMap<Integer, ItemStack> itemDropCount = new HashMap<>(stacks.size());
+        HashMap<Item, ItemStack> itemDropCount = new HashMap<>(stacks.size());
 
         for (ItemStack stack : stacks) {
 
@@ -63,14 +63,14 @@ public abstract class PlayerInventoryMixin {
             }
 
             if (!stack.isEmpty()) {
-                int itemHashcode = stack.getItem().hashCode();
+                Item itemAsKey = stack.getItem();
                 int stackCount = stack.getCount();
 
-                ItemStack item = itemDropCount.get(itemHashcode);
-                if (item == null) item = new ItemStack(stack.getItem());
+                ItemStack itemstack = itemDropCount.get(itemAsKey);
+                if (itemstack == null) itemstack = new ItemStack(stack.getItem());
 
-                item.setCount(item.getCount() + stackCount);
-                itemDropCount.put(itemHashcode, item);
+                itemstack.setCount(itemstack.getCount() + stackCount);
+                itemDropCount.put(itemAsKey, itemstack);
             }
         }
         itemDropCount.forEach(
@@ -83,7 +83,7 @@ public abstract class PlayerInventoryMixin {
         );
 
         for (ItemStack stack : stacks) {
-            var itemToDrop = itemDropCount.get(stack.getItem().hashCode());
+            var itemToDrop = itemDropCount.get(stack.getItem());
 
             if (itemToDrop != null) {
                 int dropAmount = Math.min(stack.getCount(), itemToDrop.getCount());
