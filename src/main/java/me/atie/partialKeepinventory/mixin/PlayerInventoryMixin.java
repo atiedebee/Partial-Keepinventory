@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.HashMap;
 import java.util.List;
 
+import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG;
+
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin {
     @Shadow @Final
@@ -31,15 +33,15 @@ public abstract class PlayerInventoryMixin {
 
     private double dropPercentageFromRarity(ItemStack item) {
 
-        if(partialKeepinventory.CONFIG.partialKeepinvMode() != partialKeepinventory.KeepinvMode.RARITY ) {
-            return partialKeepinventory.CONFIG.inventoryDroprate() / 100.0;
+        if(CONFIG.partialKeepinvMode() != partialKeepinventory.KeepinvMode.RARITY ) {
+            return CONFIG.inventoryDroprate() / 100.0;
         }
 
         double droprate =  switch( item.getRarity() ){
-            case COMMON -> partialKeepinventory.CONFIG.commonDroprate();
-            case UNCOMMON -> partialKeepinventory.CONFIG.uncommonDroprate();
-            case RARE -> partialKeepinventory.CONFIG.rareDroprate();
-            case EPIC -> partialKeepinventory.CONFIG.epicDroprate();
+            case COMMON -> CONFIG.commonDroprate();
+            case UNCOMMON -> CONFIG.uncommonDroprate();
+            case RARE -> CONFIG.rareDroprate();
+            case EPIC -> CONFIG.epicDroprate();
         };
 
         return droprate / 100.0;
@@ -47,11 +49,18 @@ public abstract class PlayerInventoryMixin {
 
 
 
+    @SuppressWarnings("UnusedAssignment")
     private void dropInventoryEqually(List<ItemStack> stacks) {
         HashMap<Item, ItemStack> itemDropCount = new HashMap<>(stacks.size());
 
-        for (ItemStack stack : stacks) {
 
+
+        if(CONFIG.perPlayerKeepinventory().contains(this.player.getEntityName())) {
+            // Don't drop if the player is in the list of players to "save"
+            return;
+        }
+
+        for (ItemStack stack : stacks) {
             //for future use
             boolean dontDrop = false;
             if (dontDrop) {
@@ -107,7 +116,7 @@ public abstract class PlayerInventoryMixin {
     public void dropSome(CallbackInfo ci) {
 
 
-        if( partialKeepinventory.CONFIG.enableMod() ) {
+        if( CONFIG.enableMod() ) {
             dropInventoryEqually(this.main);
             dropInventoryEqually(this.armor);
             dropInventoryEqually(this.offHand);

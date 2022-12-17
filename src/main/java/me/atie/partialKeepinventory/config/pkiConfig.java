@@ -3,6 +3,10 @@ package me.atie.partialKeepinventory.config;
 
 import io.wispforest.owo.config.Option;
 import io.wispforest.owo.config.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static me.atie.partialKeepinventory.partialKeepinventory.KeepinvMode;
 
 
@@ -30,7 +34,7 @@ public class pkiConfig  {
     @RangeConstraint(min = 0, max = 100)
     public int epicDroprate = 100;
 
-//    public List<String> perPlayerKeepinventory = new ArrayList<>();
+    public List<String> perPlayerKeepinventory = new ArrayList<>();
 
 
 }

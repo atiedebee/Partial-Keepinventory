@@ -1,11 +1,14 @@
 package me.atie.partialKeepinventory.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import me.atie.partialKeepinventory.partialKeepinventory;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+
+import java.util.List;
 
 import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -18,6 +21,10 @@ public class pkiCommandRegistration {
                         "Keepinventory mode is set to " + CONFIG.partialKeepinvMode().toString().toLowerCase()
                 ), true);
 
+    }
+
+    private static boolean isValidUsername(String name) {
+        return name.matches("^\\w{3,16}$");
     }
 
     public static void registerCommands() {
@@ -137,60 +144,67 @@ public class pkiCommandRegistration {
                                 })
                         )
                 )
-//                .then(literal("savedPlayers")
-//                        .then(literal("list")
-//                                .executes(ctx -> {
-//                                    ctx.getSource().sendMessage(Text.literal("Players with regular keepinventory:"));
-//                                    for(var name: CONFIG.perPlayerKeepinventory() ){
-//                                        ctx.getSource().sendMessage( Text.literal(" " + name));
-//                                    }
-//                                    return 1;
-//                                })
-//                        )
-//                        .then(literal("add")
-//                                .then(argument("name", StringArgumentType.greedyString())
-//                                        .executes(ctx -> {
-//                                            String name = StringArgumentType.getString(ctx, "name");
-//                                            List<String> savedPlayers = CONFIG.perPlayerKeepinventory();
-//
-//                                            if( savedPlayers.contains(name) ){
-//                                                ctx.getSource().sendFeedback(Text.literal(name + " is already in the list"), true);
-//                                                return 0;
-//                                            }
-//                                            savedPlayers.add(name);
-//                                            ctx.getSource().sendFeedback(Text.literal("added " + name + " to the saved players"), true);
-//                                            CONFIG.perPlayerKeepinventory(savedPlayers);
-//                                            CONFIG.save();
-//                                            return 1;
-//                                        })
-//                                )
-//                        )
-//                        .then(literal("remove")
-//                                .then(argument("name", StringArgumentType.greedyString())
-//                                        .executes(ctx -> {
-//                                            String name = StringArgumentType.getString(ctx, "name");
-//                                            List<String> savedPlayers = CONFIG.perPlayerKeepinventory();
-//
-//                                            if( !savedPlayers.contains(name) ){
-//                                                ctx.getSource().sendFeedback(Text.literal(name + " isn't in the list"), true);
-//                                                return 0;
-//                                            }
-//                                            savedPlayers.remove(name);
-//                                            ctx.getSource().sendFeedback(Text.literal("removed " + name + " from the saved players"), true);
-//                                            CONFIG.perPlayerKeepinventory(savedPlayers);
-//                                            CONFIG.save();
-//                                            return 1;
-//                                        })
-//                                )
-//                        )
-//
-//                )
+                .then(literal("savedPlayers")
+                        .then(literal("list")
+                                .executes(ctx -> {
+                                    ctx.getSource().sendMessage(Text.literal("Players with regular keepinventory:"));
+                                    for(var name: CONFIG.perPlayerKeepinventory() ){
+                                        ctx.getSource().sendMessage( Text.literal(" " + name));
+                                    }
+                                    return 1;
+                                })
+                        )
+                        .then(literal("add")
+                                .then(argument("name", StringArgumentType.greedyString())
+                                        .executes(ctx -> {
+                                            String name = StringArgumentType.getString(ctx, "name");
+                                            List<String> savedPlayers = CONFIG.perPlayerKeepinventory();
+
+                                            if( !isValidUsername(name)){
+                                                ctx.getSource().sendFeedback(Text.literal(name + " isn't a valid username"), false);
+                                                return 0;
+                                            }
+
+                                            if( savedPlayers.contains(name) ){
+                                                ctx.getSource().sendFeedback(Text.literal(name + " is already in the list"), false);
+                                                return 0;
+                                            }
+                                            savedPlayers.add(name);
+                                            ctx.getSource().sendFeedback(Text.literal("added " + name + " to the saved players"), true);
+                                            CONFIG.perPlayerKeepinventory(savedPlayers);
+                                            CONFIG.save();
+                                            return 1;
+                                        })
+                                )
+                        )
+                        .then(literal("remove")
+                                .then(argument("name", StringArgumentType.greedyString())
+                                        .executes(ctx -> {
+                                            String name = StringArgumentType.getString(ctx, "name");
+                                            List<String> savedPlayers = CONFIG.perPlayerKeepinventory();
+
+                                            if( !savedPlayers.contains(name) ){
+                                                ctx.getSource().sendFeedback(Text.literal(name + " isn't in the list"), true);
+                                                return 0;
+                                            }
+                                            savedPlayers.remove(name);
+                                            ctx.getSource().sendFeedback(Text.literal("removed " + name + " from the saved players"), true);
+                                            CONFIG.perPlayerKeepinventory(savedPlayers);
+                                            CONFIG.save();
+                                            return 1;
+                                        })
+                                )
+                        )
+
+                )
                 .executes(ctx -> {
                     ctx.getSource().sendMessage(Text.literal(
-                                    "> /partialKeepinventory [enable|disable]\n" +
-                                    "Set the drop behaviour\n" +
-                                    "> /partialKeepinventory mode [percentage|rarity]\n" +
-                                    "> /partialKeepinventory droprate [inventory|common|uncommon|rare|epic] <percentage>\n"
+                            """
+                                    > /partialKeepinventory [enable|disable]
+                                    Set the drop behaviour
+                                    > /partialKeepinventory mode [percentage|rarity]
+                                    > /partialKeepinventory droprate [inventory|common|uncommon|rare|epic] <percentage>
+                                    """
                     ));
                     return 1;
                 })
