@@ -1,13 +1,19 @@
 {
-  "partial-keepinv.midnightconfig.enableMod": "Enabled",
-  "partial-keepinv.midnightconfig.partialKeepinvMode": "Drop behaviour",
-  "partial-keepinv.midnightconfig.inventoryDroprate": "Droprate",
-  "partial-keepinv.midnightconfig.commonDroprate": "Common Droprate",
-  "partial-keepinv.midnightconfig.uncommonDroprate": "Uncommon Droprate",
-  "partial-keepinv.midnightconfig.rareDroprate": "Rare Droprate",
-  "partial-keepinv.midnightconfig.epicDroprate": "Epic Droprate",
-  "partial-keepinv.midnightconfig.enum.KeepinvMode.VANILLA": "Vanilla",
-  "partial-keepinv.midnightconfig.enum.KeepinvMode.PERCENTAGE": "Percentage",
-  "partial-keepinv.midnightconfig.enum.KeepinvMode.RARITY": "Rarity"
+  "text.config.pki-config.title": "Partial Keepinventory",
+  "text.config.pki-config.option.enableMod": "Enabled",
+
+  "text.config.pki-config.option.partialKeepinvMode": "Drop behaviour",
+  "text.config.pki-config.enum.keepinvMode.percentage": "Percentage",
+  "text.config.pki-config.enum.keepinvMode.rarity": "Rarity",
+
+  "text.config.pki-config.section.Percentage based": "Percentage based",
+  "text.config.pki-config.option.inventoryDroprate": "Droprate",
+
+  "text.config.pki-config.section.Rarity based": "Rarity based",
+  "text.config.pki-config.option.commonDroprate": "Common Droprate",
+  "text.config.pki-config.option.uncommonDroprate": "Uncommon Droprate",
+  "text.config.pki-config.option.rareDroprate": "Rare Droprate",
+  "text.config.pki-config.option.epicDroprate": "Epic Droprate",
+  "text.config.pki-config.option.perPlayerKeepinventory": "Per player Keepinventory"
 
 }

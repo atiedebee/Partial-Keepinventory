@@ -13,4 +13,17 @@ Take this fancy todo list
 | Per-item configurable droprates | Planned         |
  
 
+## Commands
 
+Enable/disable the mod
+> /partialKeepinventory [enable|disable]
+
+Get info about the mod
+> /partialKeepinventory info
+
+Set the drop behaviour
+> /partialKeepinventory mode [percentage|rarity]
+
+
+Set droprate for the inventory/rarities (0-100)
+> /partialKeepinventory droprate [inventory|common|uncommon|rare|epic] <percentage>

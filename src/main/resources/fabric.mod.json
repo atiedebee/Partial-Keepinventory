@@ -13,7 +13,7 @@
     "sources": "https://github.com/atiedebee/partial-keepinv"
   },
 
-  "license": "CC0-1.0",
+  "license": "BSD-3-Clause",
   "icon": "assets/partial-keepinv/icon.png",
 
   "environment": "*",
@@ -30,7 +30,8 @@
     "fabricloader": ">=0.14.11",
     "fabric-api": "*",
     "minecraft": "~1.19.3",
-    "java": ">=17"
+    "java": ">=17",
+    "owo-lib":">=0.9.3"
   },
   "suggests": {
     "another-mod": "*"

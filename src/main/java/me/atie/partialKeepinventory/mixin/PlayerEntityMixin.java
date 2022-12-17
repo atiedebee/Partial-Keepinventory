@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.mixin;
 
-import me.atie.partialKeepinventory.config.pkiConfig;
+import me.atie.partialKeepinventory.partialKeepinventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import org.spongepowered.asm.mixin.Final;
@@ -15,9 +15,10 @@ public abstract class PlayerEntityMixin  {
 
     @Shadow @Final private PlayerInventory inventory;
 
+
     @Inject(method = "dropInventory()V", at = @At("HEAD"), cancellable = true)
     public void dropInventory(CallbackInfo ci){
-        if (pkiConfig.enableMod) {
+        if (partialKeepinventory.CONFIG.enableMod()) {
             this.inventory.dropAll();
             ci.cancel();
         }

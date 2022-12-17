@@ -1,12 +1,11 @@
 package me.atie.partialKeepinventory.mixin;
 
-import me.atie.partialKeepinventory.config.pkiConfig;
 import me.atie.partialKeepinventory.partialKeepinventory;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,16 +31,18 @@ public abstract class PlayerInventoryMixin {
 
     private double dropPercentageFromRarity(ItemStack item) {
 
-        if( pkiConfig.partialKeepinvMode != partialKeepinventory.KeepinvMode.RARITY ) {
-            return pkiConfig.inventoryDroprate / 100.0;
+        if(partialKeepinventory.CONFIG.partialKeepinvMode() != partialKeepinventory.KeepinvMode.RARITY ) {
+            return partialKeepinventory.CONFIG.inventoryDroprate() / 100.0;
         }
 
-        return switch( item.getRarity() ){
-            case COMMON -> pkiConfig.commonDroprate;
-            case UNCOMMON -> pkiConfig.uncommonDroprate;
-            case RARE -> pkiConfig.rareDroprate;
-            case EPIC -> pkiConfig.epicDroprate;
+        double droprate =  switch( item.getRarity() ){
+            case COMMON -> partialKeepinventory.CONFIG.commonDroprate();
+            case UNCOMMON -> partialKeepinventory.CONFIG.uncommonDroprate();
+            case RARE -> partialKeepinventory.CONFIG.rareDroprate();
+            case EPIC -> partialKeepinventory.CONFIG.epicDroprate();
         };
+
+        return droprate / 100.0;
     }
 
 
@@ -51,7 +52,7 @@ public abstract class PlayerInventoryMixin {
 
         for (ItemStack stack : stacks) {
 
-            //to be changed later
+            //for future use
             boolean dontDrop = false;
             if (dontDrop) {
                 continue;
@@ -104,7 +105,9 @@ public abstract class PlayerInventoryMixin {
 
     @Inject(method = "dropAll()V", at = @At("HEAD"), cancellable = true)
     public void dropSome(CallbackInfo ci) {
-        if( pkiConfig.enableMod ) {
+
+
+        if( partialKeepinventory.CONFIG.enableMod() ) {
             dropInventoryEqually(this.main);
             dropInventoryEqually(this.armor);
             dropInventoryEqually(this.offHand);
