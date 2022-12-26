@@ -3,6 +3,7 @@ package me.atie.partialKeepinventory.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import me.atie.partialKeepinventory.StatementInterpreter;
 import me.atie.partialKeepinventory.partialKeepinventory;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
@@ -63,6 +64,13 @@ public class pkiCommandRegistration {
                         .then(literal("rarity")
                                 .executes(ctx -> {
                                     CONFIG.partialKeepinvMode(partialKeepinventory.KeepinvMode.RARITY);
+                                    modeMessage(ctx);
+                                    return 1;
+                                })
+                        )
+                        .then(literal("custom")
+                                .executes(ctx -> {
+                                    CONFIG.partialKeepinvMode(partialKeepinventory.KeepinvMode.CUSTOM);
                                     modeMessage(ctx);
                                     return 1;
                                 })
@@ -194,6 +202,26 @@ public class pkiCommandRegistration {
                                             return 1;
                                         })
                                 )
+                        )
+
+                )
+                .then(literal("expression")
+                        .then(literal("set")
+                                .then(argument("expression", StringArgumentType.greedyString())
+                                    .executes(ctx -> {
+                                        String expression = StringArgumentType.getString(ctx, "expression");
+                                        ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expression + "\""));
+                                        CONFIG.expression(expression);
+                                        CONFIG.save();
+                                        return 1;
+                                    })
+                                )
+                        )
+                        .then(literal("help")
+                                .executes(ctx -> {
+                                    ctx.getSource().sendMessage(Text.literal(StatementInterpreter.info));
+                                    return 1;
+                                })
                         )
 
                 )

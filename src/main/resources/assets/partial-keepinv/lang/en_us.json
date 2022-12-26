@@ -5,6 +5,7 @@
   "text.config.pki-config.option.partialKeepinvMode": "Drop behaviour",
   "text.config.pki-config.enum.keepinvMode.percentage": "Percentage",
   "text.config.pki-config.enum.keepinvMode.rarity": "Rarity",
+  "text.config.pki-config.enum.keepinvMode.custom": "Custom",
 
   "text.config.pki-config.section.Percentage based": "Percentage based",
   "text.config.pki-config.option.inventoryDroprate": "Droprate",
@@ -14,6 +15,8 @@
   "text.config.pki-config.option.uncommonDroprate": "Uncommon Droprate",
   "text.config.pki-config.option.rareDroprate": "Rare Droprate",
   "text.config.pki-config.option.epicDroprate": "Epic Droprate",
-  "text.config.pki-config.option.perPlayerKeepinventory": "Per player Keepinventory"
+  "text.config.pki-config.option.perPlayerKeepinventory": "Per player Keepinventory",
 
+  "text.config.pki-config.section.Custom droprate": "Custom droprate",
+  "text.config.pki-config.option.expression": "Droprate Formula"
 }
