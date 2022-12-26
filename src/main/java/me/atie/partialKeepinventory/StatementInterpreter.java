@@ -9,25 +9,24 @@ import redempt.crunch.CompiledExpression;
 import redempt.crunch.Crunch;
 import redempt.crunch.functional.EvaluationEnvironment;
 
-
-import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG;
+import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
 
 public class StatementInterpreter {
 
     public static final String info =  """
-                Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.\n
+                Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.
                 Percentages are from 0.0 - 1.0
                 Variables:
-                        - spawnDistance:                distance from player to spawnpoint 
+                        - spawnDistance:                distance from player to spawnpoint
                         - spawnX, spawnY, spawnZ:       spawn coordinates
                         - playerX, playerY, playerZ:    player coordinates
-                        - rarityPercent:                get droprate from rarity as set in the config.                                
+                        - rarityPercent:                get droprate from rarity as set in the config.
                         - isEpic, isRare, isCommon, isUncommon:
                                                         return 1.0 if true
                         - dropPercent:                  inventory droprate as set in the config
                  """;
 
-    private ServerPlayerEntity player;
+    private final ServerPlayerEntity player;
     private ItemStack item;
     EvaluationEnvironment env;
     CompiledExpression cx;
@@ -39,14 +38,14 @@ public class StatementInterpreter {
 
         final BlockPos spawnPos = getPlayerSpawn();
 
-        env.addLazyVariable("spawnDistance", () -> getSpawnDistance());//todo: check if this.player == null
-        env.addLazyVariable("spawnX", () -> spawnPos.getX());
-        env.addLazyVariable("spawnY", () -> spawnPos.getY());
-        env.addLazyVariable("spawnZ", () -> spawnPos.getZ());
+        env.addLazyVariable("spawnDistance", this::getSpawnDistance);
+        env.addLazyVariable("spawnX", spawnPos::getX);
+        env.addLazyVariable("spawnY", spawnPos::getY);
+        env.addLazyVariable("spawnZ", spawnPos::getZ);
 
-        env.addLazyVariable("playerX", () -> this.player.getX());
-        env.addLazyVariable( "playerY", () -> this.player.getY());
-        env.addLazyVariable( "playerZ", () -> this.player.getZ());
+        env.addLazyVariable("playerX", this.player::getX);
+        env.addLazyVariable( "playerY", this.player::getY);
+        env.addLazyVariable( "playerZ", this.player::getZ);
 
 
         env.addLazyVariable( "rarityPercent", () -> dropPercentageFromRarity(item));
@@ -55,12 +54,12 @@ public class StatementInterpreter {
         env.addLazyVariable( "isUncommon",  () -> item.getRarity().equals(Rarity.UNCOMMON) ? 1.0 : 0.0);
         env.addLazyVariable( "isCommon", () -> item.getRarity().equals(Rarity.COMMON) ? 1.0 : 0.0);
 
-        env.addLazyVariable( "dropPercent", () -> CONFIG.inventoryDroprate() / 100.0);
+        env.addLazyVariable( "dropPercent", () -> CONFIG_COMPONENT.inventoryDroprate() / 100.0);
 
         env.addFunction("max", 2, (a) -> Math.max(a[0], a[1]));
         env.addFunction("min", 2, (a) -> Math.min(a[0], a[1]));
 
-            cx = Crunch.compileExpression(expression, env);
+        cx = Crunch.compileExpression(expression, env);
     }
 
     private BlockPos getPlayerSpawn(){
@@ -74,10 +73,10 @@ public class StatementInterpreter {
 
     private double dropPercentageFromRarity(ItemStack item){
         double droprate =  switch( item.getRarity() ){
-            case COMMON -> CONFIG.commonDroprate();
-            case UNCOMMON -> CONFIG.uncommonDroprate();
-            case RARE -> CONFIG.rareDroprate();
-            case EPIC -> CONFIG.epicDroprate();
+            case COMMON -> CONFIG_COMPONENT.getCommonDroprate();
+            case UNCOMMON -> CONFIG_COMPONENT.getUncommonDroprate();
+            case RARE -> CONFIG_COMPONENT.getRareDroprate();
+            case EPIC -> CONFIG_COMPONENT.getEpicDroprate();
         };
 
         return droprate / 100.0;

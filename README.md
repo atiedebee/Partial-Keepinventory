@@ -6,7 +6,7 @@ Take this fancy todo list
 
 | Feature                         | State                    |
 |---------------------------------|--------------------------|
-| Per player keepinventory        | Done                     |
+| Per player keepinventory        | Planned                  |
 | Percentage based droprates      | Done                     |
 | Rarity based droprates          | Done                     |
 | Custom formulas for droprates   | Working, still worked on |
@@ -16,29 +16,33 @@ Take this fancy todo list
 ## Commands
 
 Enable/disable the mod
-> /partialKeepinventory [enable|disable]
+> /pki [enable|disable]
 
 Get info about the mod
-> /partialKeepinventory info
+> /pki info
 
 Set the drop behaviour
-> /partialKeepinventory mode [percentage|rarity|custom]
+> /pki mode [percentage|rarity|custom]
 
 
 Set droprate for the inventory/rarities (0-100)
-> /partialKeepinventory droprate [inventory|common|uncommon|rare|epic] <percentage>
+> /pki droprate [inventory|common|uncommon|rare|epic] <percentage>
 
-List players who will get the normal keepinventory behaviour
-> /partialKeepinventory savedPlayers list
+[//]: # (saved players are currently being worked on with an actual working config)
+[//]: # (List players who will get the normal keepinventory behaviour)
 
-Remove/add players who get normal keepinventory behaviour
-> /partialKeepinventory savedPlayers [add|remove] <name>
+[//]: # (> /pki savedPlayers list)
+
+[//]: # ()
+[//]: # (Remove/add players who get normal keepinventory behaviour)
+
+[//]: # (> /pki savedPlayers [add|remove] <name>)
 
 Set the custom expression
-> /partialKeepinventory expression set [expression]
+> /pki expression set [expression]
 
 Get information on variables for custom expressions
-> /partialKeepinventory expression help
+> /pki expression help
 
 ### Expression presets:
 

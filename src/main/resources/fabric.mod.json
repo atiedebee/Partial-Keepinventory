@@ -9,7 +9,6 @@
     "atiedebee"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/atiedebee/partial-keepinv"
   },
 
@@ -17,11 +16,16 @@
   "icon": "assets/partial-keepinv/icon.png",
 
   "environment": "*",
+
   "entrypoints": {
     "main": [
       "me.atie.partialKeepinventory.partialKeepinventory"
+    ],
+    "cardinal-components": [
+        "me.atie.partialKeepinventory.component.pkiComponentList"
     ]
   },
+
   "mixins": [
     "partial-keepinv.mixins.json"
   ],
@@ -30,10 +34,16 @@
     "fabricloader": ">=0.14.11",
     "fabric-api": "*",
     "minecraft": "~1.19.3",
-    "java": ">=17",
-    "owo-lib":">=0.9.3"
+    "java": ">=17"
   },
+
   "suggests": {
     "another-mod": "*"
+  },
+
+  "custom": {
+    "cardinal-components": [
+      "partial-keepinv:config"
+    ]
   }
 }

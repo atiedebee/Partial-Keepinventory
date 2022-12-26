@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG;
+import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
 
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin {
@@ -37,27 +38,26 @@ public abstract class PlayerInventoryMixin {
 
     private double dropPercentageFromRarity(ItemStack item) {
 
-        switch( CONFIG.partialKeepinvMode() ){
-            case CUSTOM:
+        switch (CONFIG_COMPONENT.partialKeepinvMode()) {
+            case CUSTOM -> {
                 double d;
-                    d = statementInterpreter.getResult(item);
-                    partialKeepinventory.LOGGER.info("result is " + d);
-                    return d;
-
-            case PERCENTAGE:
-                return CONFIG.inventoryDroprate() / 100.0;
-
-            case RARITY:
-                double droprate =  switch( item.getRarity() ){
-                    case COMMON -> CONFIG.commonDroprate();
-                    case UNCOMMON -> CONFIG.uncommonDroprate();
-                    case RARE -> CONFIG.rareDroprate();
-                    case EPIC -> CONFIG.epicDroprate();
+                d = statementInterpreter.getResult(item);
+                partialKeepinventory.LOGGER.info("result is " + d);
+                return d;
+            }
+            case PERCENTAGE -> {
+                return CONFIG_COMPONENT.inventoryDroprate() / 100.0;
+            }
+            case RARITY -> {
+                double droprate = switch (item.getRarity()) {
+                    case COMMON -> CONFIG_COMPONENT.getCommonDroprate();
+                    case UNCOMMON -> CONFIG_COMPONENT.getUncommonDroprate();
+                    case RARE -> CONFIG_COMPONENT.getRareDroprate();
+                    case EPIC -> CONFIG_COMPONENT.getEpicDroprate();
                 };
-
                 return droprate / 100.0;
-            default:
-                throw new IllegalStateException("Unexpected value: " + CONFIG.partialKeepinvMode());
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + CONFIG_COMPONENT.partialKeepinvMode());
         }
     }
 
@@ -70,7 +70,7 @@ public abstract class PlayerInventoryMixin {
 
 
         for (ItemStack stack : stacks) {
-            //for future use
+            //for future use, keep this
             boolean dontDrop = false;
             if (dontDrop) {
                 continue;
@@ -123,20 +123,22 @@ public abstract class PlayerInventoryMixin {
     @Inject(method = "dropAll()V", at = @At("HEAD"), cancellable = true)
     public void dropSome(CallbackInfo ci) {
 
-        if( CONFIG.enableMod() ) {
+        if( CONFIG_COMPONENT.isEnabled() ) {
             ci.cancel(); //if the mod is enabled we make sure we don't have the function call dropInventory and friends
+// TODO working per player keepinventory
+//            if(CONFIG.perPlayerKeepinventory().contains(this.player.getEntityName())) {
+//                // Don't drop if the player is in the list of players to "save"
+//                return;
+//            }
 
-            if(CONFIG.perPlayerKeepinventory().contains(this.player.getEntityName())) {
-                // Don't drop if the player is in the list of players to "save"
-                return;
-            }
-
-            if( CONFIG.partialKeepinvMode() == partialKeepinventory.KeepinvMode.CUSTOM) {
+            if( CONFIG_COMPONENT.partialKeepinvMode() == partialKeepinventory.KeepinvMode.CUSTOM) {
                 try{
                     statementInterpreter = new StatementInterpreter( (ServerPlayerEntity)this.player, "HI" );
                 }catch (Exception e) {
-                    partialKeepinventory.LOGGER.error("Failed loading custom expression, resorting to percentage based drop behaviour");
-                    CONFIG.partialKeepinvMode(partialKeepinventory.KeepinvMode.PERCENTAGE);
+                    String ErrorMessage = "Failed loading custom expression, resorting to percentage based drop behaviour";
+                    partialKeepinventory.LOGGER.error(ErrorMessage);
+                    this.player.getCommandSource().sendFeedback(Text.literal(ErrorMessage), true);
+                    CONFIG_COMPONENT.partialKeepinvMode(partialKeepinventory.KeepinvMode.PERCENTAGE);
                 }
             }
 
