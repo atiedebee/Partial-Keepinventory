@@ -20,6 +20,11 @@ public class partialKeepinventory implements ModInitializer {
 		PERCENTAGE, RARITY, CUSTOM
 	}
 
+	public enum KeepXPMode {
+		PERCENTAGE, VANILLA
+	}
+
+
 	public static pkiComponent CONFIG_COMPONENT = null;
 
 	public static String getID(){

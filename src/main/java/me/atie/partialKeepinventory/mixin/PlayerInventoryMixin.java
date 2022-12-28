@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.mixin;
 
-import me.atie.partialKeepinventory.StatementInterpreter;
+import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.partialKeepinventory;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,14 +34,14 @@ public abstract class PlayerInventoryMixin {
     @Shadow @Final
     public PlayerEntity player;
 
-    private static StatementInterpreter statementInterpreter;
+    private static InventoryDroprateFormula inventoryDroprateFormula;
 
     private double dropPercentageFromRarity(ItemStack item) {
 
         switch (CONFIG_COMPONENT.partialKeepinvMode()) {
             case CUSTOM -> {
                 double d;
-                d = statementInterpreter.getResult(item);
+                d = inventoryDroprateFormula.getResult(item);
                 partialKeepinventory.LOGGER.info("result is " + d);
                 return d;
             }
@@ -126,6 +126,7 @@ public abstract class PlayerInventoryMixin {
         if( CONFIG_COMPONENT.isEnabled() ) {
             ci.cancel(); //if the mod is enabled we make sure we don't have the function call dropInventory and friends
 // TODO working per player keepinventory
+
 //            if(CONFIG.perPlayerKeepinventory().contains(this.player.getEntityName())) {
 //                // Don't drop if the player is in the list of players to "save"
 //                return;
@@ -133,7 +134,7 @@ public abstract class PlayerInventoryMixin {
 
             if( CONFIG_COMPONENT.partialKeepinvMode() == partialKeepinventory.KeepinvMode.CUSTOM) {
                 try{
-                    statementInterpreter = new StatementInterpreter( (ServerPlayerEntity)this.player, "HI" );
+                    inventoryDroprateFormula = new InventoryDroprateFormula( (ServerPlayerEntity)this.player, CONFIG_COMPONENT.getExpression() );
                 }catch (Exception e) {
                     String ErrorMessage = "Failed loading custom expression, resorting to percentage based drop behaviour";
                     partialKeepinventory.LOGGER.error(ErrorMessage);

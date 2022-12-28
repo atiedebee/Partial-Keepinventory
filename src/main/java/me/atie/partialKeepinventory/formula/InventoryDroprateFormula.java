@@ -1,17 +1,16 @@
-package me.atie.partialKeepinventory;
+package me.atie.partialKeepinventory.formula;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import redempt.crunch.CompiledExpression;
 import redempt.crunch.Crunch;
 import redempt.crunch.functional.EvaluationEnvironment;
 
 import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
 
-public class StatementInterpreter {
+public class InventoryDroprateFormula extends DroprateFormula {
 
     public static final String info =  """
                 Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.
@@ -28,10 +27,10 @@ public class StatementInterpreter {
 
     private final ServerPlayerEntity player;
     private ItemStack item;
-    EvaluationEnvironment env;
-    CompiledExpression cx;
+    private EvaluationEnvironment env;
+    private CompiledExpression cx;
 
-    public StatementInterpreter(ServerPlayerEntity player, String expression) {
+    public InventoryDroprateFormula(ServerPlayerEntity player, String expression) {
         env = new EvaluationEnvironment();
 
         this.player = player;
@@ -62,13 +61,7 @@ public class StatementInterpreter {
         cx = Crunch.compileExpression(expression, env);
     }
 
-    private BlockPos getPlayerSpawn(){
-        BlockPos pos = this.player.getSpawnPointPosition();
-        if (pos == null) {
-            pos = this.player.getWorld().getSpawnPos();
-        }
-        return pos;
-    }
+
 
 
     private double dropPercentageFromRarity(ItemStack item){
@@ -81,16 +74,6 @@ public class StatementInterpreter {
 
         return droprate / 100.0;
     }
-
-
-    private double getSpawnDistance() {
-        Vec3d spawnPos = getPlayerSpawn().toCenterPos();
-        Vec3d playerPos = this.player.getPos();
-
-        return playerPos.distanceTo(spawnPos);
-    }
-
-
 
 
     public double getResult(ItemStack itemStack) {

@@ -4,7 +4,6 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import me.atie.partialKeepinventory.partialKeepinventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
@@ -12,14 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static me.atie.partialKeepinventory.partialKeepinventory.*;
+
 public class pkiComponent implements Component, AutoSyncedComponent {
     public static final ComponentKey<pkiComponent> configKey = ComponentRegistry.getOrCreate(
-            new Identifier(partialKeepinventory.getID(), "config"),
+            new Identifier(getID(), "config"),
             pkiComponent.class);
+
 
     // ----- General -----
     private boolean enableMod = true;
-    private partialKeepinventory.KeepinvMode partialKeepinvMode = partialKeepinventory.KeepinvMode.PERCENTAGE;
+    private KeepinvMode keepinvMode = KeepinvMode.PERCENTAGE;
 
     // ----- Droprates -----
     private int inventoryDroprate = 100;
@@ -34,6 +36,7 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     private List<UUID> perPlayerKeepinventory = new ArrayList<>();
 
+
 //                    Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.\n
 //                    Percentages are from 0.0 - 1.0
 //                    Variables:
@@ -46,6 +49,15 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 //                            - dropPercent:                  inventory droprate as set in the config
     private String expression = new String();
 
+    // ----- XP -----
+    private KeepXPMode keepxpMode = KeepXPMode.VANILLA;
+    private int xpLoss = 50;
+    private int xpDrop = 50;
+
+
+    ///////////////////////
+    // Getters & Setters //
+    ///////////////////////
 
     public boolean isEnabled() {
         return enableMod;
@@ -53,16 +65,16 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public void enableMod(boolean enableMod) {
         this.enableMod = enableMod;
-        configKey.sync(partialKeepinventory.keyProvider);
+        configKey.sync(keyProvider);
     }
 
-    public partialKeepinventory.KeepinvMode partialKeepinvMode() {
-        return partialKeepinvMode;
+    public KeepinvMode partialKeepinvMode() {
+        return keepinvMode;
     }
 
-    public void partialKeepinvMode(partialKeepinventory.KeepinvMode partialKeepinvMode) {
-        this.partialKeepinvMode = partialKeepinvMode;
-        configKey.sync(partialKeepinventory.keyProvider);
+    public void partialKeepinvMode(KeepinvMode partialKeepinvMode) {
+        this.keepinvMode = partialKeepinvMode;
+        configKey.sync(keyProvider);
     }
 
     public int inventoryDroprate() {
@@ -71,7 +83,7 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public void inventoryDroprate(int inventoryDroprate) {
         this.inventoryDroprate = inventoryDroprate;
-        configKey.sync(partialKeepinventory.keyProvider);
+        configKey.sync(keyProvider);
     }
 
     public int getCommonDroprate() {
@@ -80,7 +92,7 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public void setCommonDroprate(int commonDroprate) {
         this.commonDroprate = commonDroprate;
-        configKey.sync(partialKeepinventory.keyProvider);
+        configKey.sync(keyProvider);
     }
 
     public int getUncommonDroprate() {
@@ -89,7 +101,7 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public void setUncommonDroprate(int uncommonDroprate) {
         this.uncommonDroprate = uncommonDroprate;
-        configKey.sync(partialKeepinventory.keyProvider);
+        configKey.sync(keyProvider);
     }
 
     public int getRareDroprate() {
@@ -98,7 +110,7 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public void setRareDroprate(int rareDroprate) {
         this.rareDroprate = rareDroprate;
-        configKey.sync(partialKeepinventory.keyProvider);
+        configKey.sync(keyProvider);
     }
 
     public int getEpicDroprate() {
@@ -107,7 +119,7 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public void setEpicDroprate(int epicDroprate) {
         this.epicDroprate = epicDroprate;
-        configKey.sync(partialKeepinventory.keyProvider);
+        configKey.sync(keyProvider);
     }
 
     public List<UUID> getPerPlayerKeepinventory() {
@@ -116,7 +128,7 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public void setPerPlayerKeepinventory(List<UUID> perPlayerKeepinventory) {
         this.perPlayerKeepinventory = perPlayerKeepinventory;
-        configKey.sync(partialKeepinventory.keyProvider);
+        configKey.sync(keyProvider);
     }
 
     public String getExpression() {
@@ -125,8 +137,42 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public void setExpression(String expression) {
         this.expression = expression;
-        configKey.sync(partialKeepinventory.keyProvider);
+        configKey.sync(keyProvider);
     }
+
+
+    public int getXpDrop() {
+        return xpDrop;
+    }
+
+    public void setXpDrop(int xpDrop) {
+        this.xpDrop = xpDrop;
+        configKey.sync(keyProvider);
+    }
+
+    public int getXpLoss() {
+        return xpLoss;
+    }
+
+    public void setXpLoss(int xpLoss) {
+        this.xpLoss = xpLoss;
+        configKey.sync(keyProvider);
+    }
+
+    public KeepXPMode getKeepxpMode() {
+        return keepxpMode;
+    }
+
+    public void setKeepxpMode(KeepXPMode keepxpMode) {
+        this.keepxpMode = keepxpMode;
+        configKey.sync(keyProvider);
+    }
+
+
+    //////////////////////
+    // Actual functions //
+    //////////////////////
+
 
     @Override
     public void readFromNbt(NbtCompound nbt) {
@@ -138,7 +184,6 @@ public class pkiComponent implements Component, AutoSyncedComponent {
         uncommonDroprate = nbt.getInt("uncommonDR");
         rareDroprate = nbt.getInt("rareDR");
         epicDroprate = nbt.getInt("epicDR");
-
 
 
     }
@@ -158,5 +203,4 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     public pkiComponent(){
     }
-
 }

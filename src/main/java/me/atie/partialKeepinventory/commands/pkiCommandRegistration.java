@@ -3,7 +3,7 @@ package me.atie.partialKeepinventory.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import me.atie.partialKeepinventory.StatementInterpreter;
+import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.partialKeepinventory;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
@@ -165,7 +165,7 @@ public class pkiCommandRegistration {
                                 })
                         )
                 )
-                //TODO working list of saved players that isnt too bandwidth heavy
+                //TODO working list of saved players that isn't too bandwidth heavy
 //                .then(literal("savedPlayers")
 //                        .then(literal("list")
 //                                .executes(ctx -> {
@@ -235,7 +235,7 @@ public class pkiCommandRegistration {
                         )
                         .then(literal("help")
                                 .executes(ctx -> {
-                                    ctx.getSource().sendMessage(Text.literal(StatementInterpreter.info));
+                                    ctx.getSource().sendMessage(Text.literal(InventoryDroprateFormula.info));
                                     return 1;
                                 })
                         )
