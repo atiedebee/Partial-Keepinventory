@@ -21,7 +21,9 @@ public class pkiComponent implements Component, AutoSyncedComponent {
 
     // ----- General -----
     private boolean enableMod = true;
-    private KeepinvMode keepinvMode = KeepinvMode.PERCENTAGE;
+    private KeepinvMode keepinvMode = KeepinvMode.STATIC;
+    private final KeepinvMode[] keepinvModeValues = KeepinvMode.values();
+
 
     // ----- Droprates -----
     private int inventoryDroprate = 100;
@@ -37,22 +39,29 @@ public class pkiComponent implements Component, AutoSyncedComponent {
     private List<UUID> perPlayerKeepinventory = new ArrayList<>();
 
 
-//                    Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.\n
-//                    Percentages are from 0.0 - 1.0
-//                    Variables:
-//                            - spawnDistance:                distance from player to spawnpoint
-//                            - spawnX, spawnY, spawnZ:       spawn coordinates
-//                            - playerX, playerY, playerZ:    player coordinates
-//                            - rarityPercent:                get droprate from rarity as set in the config.
-//                            - isEpic, isRare, isCommon, isUncommon:
-//                                                            return 1.0 if true
-//                            - dropPercent:                  inventory droprate as set in the config
+//    Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.
+//    Percentages are from 0.0 - 1.0
+//    Variables:
+//            - spawnDistance:                distance from player to spawnpoint
+//            - spawnX, spawnY, spawnZ:       spawn coordinates
+//            - playerX, playerY, playerZ:    player coordinates
+//            - rarityPercent:                get droprate from rarity as set in the config.
+//            - isEpic, isRare, isCommon, isUncommon:
+//                                            return 1.0 if true
+//            - dropPercent:                  inventory droprate as set in the config
     private String expression = new String();
 
     // ----- XP -----
     private KeepXPMode keepxpMode = KeepXPMode.VANILLA;
+    private final KeepXPMode[] keepxpModeValues = KeepXPMode.values();
+
+    // How much of the XP that the player has is lost
     private int xpLoss = 50;
+
+    // How much of the XP that the player loses should be dropped
     private int xpDrop = 50;
+
+    private String xpExpression = new String();
 
 
     ///////////////////////
@@ -159,6 +168,15 @@ public class pkiComponent implements Component, AutoSyncedComponent {
         configKey.sync(keyProvider);
     }
 
+    public String getXpExpression() {
+        return this.xpExpression;
+    }
+
+    public void setXpExpression(String xpExpression) {
+        this.xpExpression = xpExpression;
+        configKey.sync(keyProvider);
+    }
+
     public KeepXPMode getKeepxpMode() {
         return keepxpMode;
     }
@@ -178,6 +196,10 @@ public class pkiComponent implements Component, AutoSyncedComponent {
     public void readFromNbt(NbtCompound nbt) {
         enableMod = nbt.getBoolean("enable");
         expression = nbt.getString("expression");
+        xpExpression = nbt.getString("xpExpression"); //not used yet
+
+        keepinvMode = keepinvModeValues[ nbt.getInt("keepinvMode") ];
+        keepxpMode = keepxpModeValues[ nbt.getInt("keepxpMode") ];
 
         inventoryDroprate = nbt.getInt("invDR");
         commonDroprate = nbt.getInt("commonDR");
@@ -185,20 +207,29 @@ public class pkiComponent implements Component, AutoSyncedComponent {
         rareDroprate = nbt.getInt("rareDR");
         epicDroprate = nbt.getInt("epicDR");
 
+        xpDrop = nbt.getInt("xpDrop");
+        xpLoss = nbt.getInt("xpLoss");
+
 
     }
 
     @Override
     public void writeToNbt(NbtCompound nbt) {
-
         nbt.putBoolean("enable", enableMod);
         nbt.putString("expression", expression);
+        nbt.putString("xpExpression", xpExpression);
+
+        nbt.putInt("keepinvMode", keepinvMode.ordinal());
+        nbt.putInt("keepxpMode", keepxpMode.ordinal());
 
         nbt.putInt("invDR", inventoryDroprate);
         nbt.putInt("commonDR", commonDroprate);
         nbt.putInt("uncommonDR", uncommonDroprate);
         nbt.putInt("rareDR", rareDroprate);
         nbt.putInt("epicDR", epicDroprate);
+
+        nbt.putInt("xpDrop", xpDrop);
+        nbt.putInt("xpLoss", xpLoss);
     }
 
     public pkiComponent(){

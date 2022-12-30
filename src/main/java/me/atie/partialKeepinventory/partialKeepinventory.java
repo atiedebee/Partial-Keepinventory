@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
 public class partialKeepinventory implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("partialKeepinventory");
 	public enum KeepinvMode {
-		PERCENTAGE, RARITY, CUSTOM
+		STATIC, RARITY, CUSTOM, VANILLA
 	}
 
 	public enum KeepXPMode {
-		PERCENTAGE, VANILLA
+		STATIC_LEVEL, STATIC_POINTS, VANILLA
 	}
 
 
@@ -46,7 +46,8 @@ public class partialKeepinventory implements ModInitializer {
 	public void onInitialize() {
 		pkiCommandRegistration.registerCommands();
 
-		// init scoreboard thingy
+
+		// init the settings for a player when they join.
 		ServerPlayConnectionEvents.JOIN.register( (handler, sender, server) -> {
 			keyProvider = server.getScoreboard();
 			CONFIG_COMPONENT = configKey.get(keyProvider);

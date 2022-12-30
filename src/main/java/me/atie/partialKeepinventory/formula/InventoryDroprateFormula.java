@@ -4,7 +4,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
-import redempt.crunch.CompiledExpression;
 import redempt.crunch.Crunch;
 import redempt.crunch.functional.EvaluationEnvironment;
 
@@ -27,8 +26,6 @@ public class InventoryDroprateFormula extends DroprateFormula {
 
     private final ServerPlayerEntity player;
     private ItemStack item;
-    private EvaluationEnvironment env;
-    private CompiledExpression cx;
 
     public InventoryDroprateFormula(ServerPlayerEntity player, String expression) {
         env = new EvaluationEnvironment();
