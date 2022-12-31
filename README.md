@@ -5,7 +5,6 @@ Take this fancy list of things I'm working on.
 
 | Feature                         | State                    |
 |---------------------------------|--------------------------|
-| Per player keepinventory        | Planned                  |
 | Custom formulas for droprates   | Working, still worked on |
 | Per-item configurable droprates | Planned                  |
 | Custom formulas for experience  | Planned, work started    |
@@ -21,27 +20,23 @@ Get info about the mod
 > /pki info
 
 Set the drop behaviour
-> /pki mode [percentage|rarity|custom]
+> /pki inv mode [vanilla / static / rarity / custom]
 
 
 Set droprate for the inventory/rarities (0-100)
-> /pki droprate [inventory|common|uncommon|rare|epic] <percentage>
+> /pki inv droprate [static / common / uncommon / rare / epic] <percentage>
 
-[//]: # (saved players are currently being worked on with an actual working config)
-[//]: # (List players who will get the normal keepinventory behaviour)
+List players who will get the normal keepinventory behaviour
+> /pki savedPlayers list
 
-[//]: # (> /pki savedPlayers list)
-
-[//]: # ()
-[//]: # (Remove/add players who get normal keepinventory behaviour)
-
-[//]: # (> /pki savedPlayers [add|remove] <name>)
+Remove/add players who get normal keepinventory behaviour
+> /pki savedPlayers [add / remove] <name>
 
 Set the custom droprate formula
-> /pki expression set [expression]
+> /pki inv expression set [expression]
 
 Get information on variables for custom formulas
-> /pki expression help
+> /pki inv expression help
 
 ---
 

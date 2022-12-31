@@ -56,5 +56,4 @@ public class partialKeepinventory implements ModInitializer {
 
 		} );
 	}
-
 }

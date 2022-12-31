@@ -14,11 +14,11 @@ import net.minecraft.util.Identifier;
 import static me.atie.partialKeepinventory.partialKeepinventory.*;
 
 public class pkiScoreboardComponent implements Component, AutoSyncedComponent {
-    public static final ComponentKey<pkiScoreboardComponent> configKey = ComponentRegistry.getOrCreate(
+    private static final ComponentKey<pkiScoreboardComponent> configKey = ComponentRegistry.getOrCreate(
             new Identifier(getID(), "config"),
             pkiScoreboardComponent.class);
 
-    public static final ComponentKey<pkiTeamComponent> savedPlayersKey = ComponentRegistry.getOrCreate(
+    private static final ComponentKey<pkiTeamComponent> savedPlayersKey = ComponentRegistry.getOrCreate(
             new Identifier(partialKeepinventory.getID(), "saved-players"),
             pkiTeamComponent.class
     );

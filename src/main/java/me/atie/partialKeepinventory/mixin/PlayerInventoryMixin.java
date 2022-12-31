@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.util.Inventory.shouldDropInventory;
 
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin {
@@ -122,15 +123,17 @@ public abstract class PlayerInventoryMixin {
         if( CONFIG_COMPONENT.isEnabled() && CONFIG_COMPONENT.partialKeepinvMode() != KeepinvMode.VANILLA ) {
             ci.cancel(); //if the mod is enabled we make sure we don't have the function call dropInventory and friends
 
-            if(CONFIG_COMPONENT.savedPlayersTeam.getPlayerList().contains(this.player.getEntityName())) {
-                // Don't drop if the player is in the list of players to "save"
+            if( !shouldDropInventory( (ServerPlayerEntity)this.player) ) {
+                // Don't drop
                 return;
             }
 
             if( CONFIG_COMPONENT.partialKeepinvMode() == KeepinvMode.CUSTOM) {
+
                 try{
                     inventoryDroprateFormula = new InventoryDroprateFormula( (ServerPlayerEntity)this.player, CONFIG_COMPONENT.getExpression() );
-                }catch (Exception e) {
+                }
+                catch (Exception e) {
                     String ErrorMessage = "Failed loading custom expression, resorting to percentage based drop behaviour";
                     partialKeepinventory.LOGGER.error(ErrorMessage);
                     this.player.getCommandSource().sendFeedback(Text.literal(ErrorMessage), true);

@@ -2,6 +2,7 @@ package me.atie.partialKeepinventory.mixin;
 
 import me.atie.partialKeepinventory.formula.XpDroprateFormula;
 import me.atie.partialKeepinventory.partialKeepinventory;
+import me.atie.partialKeepinventory.util.Experience;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -39,7 +40,7 @@ public abstract class PlayerEntityMixin  {
 
     @Inject(method = "getXpToDrop()I", at = @At("HEAD"), cancellable = true)
     public void customXpDrop(CallbackInfoReturnable<Integer> cir) {
-        if( !CONFIG_COMPONENT.isEnabled() || CONFIG_COMPONENT.getKeepxpMode() == partialKeepinventory.KeepXPMode.VANILLA){
+        if( !CONFIG_COMPONENT.isEnabled() || CONFIG_COMPONENT.getKeepxpMode() == partialKeepinventory.KeepXPMode.VANILLA || !Experience.shouldDropExperience((ServerPlayerEntity) (Object)this)){
             return;
         }
 
