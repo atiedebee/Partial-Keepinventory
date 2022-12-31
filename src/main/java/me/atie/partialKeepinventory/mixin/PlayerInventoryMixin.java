@@ -121,12 +121,11 @@ public abstract class PlayerInventoryMixin {
 
         if( CONFIG_COMPONENT.isEnabled() && CONFIG_COMPONENT.partialKeepinvMode() != KeepinvMode.VANILLA ) {
             ci.cancel(); //if the mod is enabled we make sure we don't have the function call dropInventory and friends
-// TODO working per player keepinventory
 
-//            if(CONFIG.perPlayerKeepinventory().contains(this.player.getEntityName())) {
-//                // Don't drop if the player is in the list of players to "save"
-//                return;
-//            }
+            if(CONFIG_COMPONENT.savedPlayersTeam.getPlayerList().contains(this.player.getEntityName())) {
+                // Don't drop if the player is in the list of players to "save"
+                return;
+            }
 
             if( CONFIG_COMPONENT.partialKeepinvMode() == KeepinvMode.CUSTOM) {
                 try{

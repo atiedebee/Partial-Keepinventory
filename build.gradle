@@ -39,10 +39,13 @@ dependencies {
 	// crunch, for expression evaluation
 	implementation "com.github.Redempt:Crunch:${project.crunch_version}"
 	include "com.github.Redempt:Crunch:${project.crunch_version}"
-
+//TODO THIS IS NOT OK ASK FOR HELP FOR JAR IN JAR BUILDS
 	// cardinal components
+	modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinalcomponents_version}"
 	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cardinalcomponents_version}"
+	include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinalcomponents_version}"
 	include "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cardinalcomponents_version}"
+
 }
 
 processResources {

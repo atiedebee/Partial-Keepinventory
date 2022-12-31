@@ -4,20 +4,29 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import me.atie.partialKeepinventory.partialKeepinventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.Team;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 import static me.atie.partialKeepinventory.partialKeepinventory.*;
 
-public class pkiComponent implements Component, AutoSyncedComponent {
-    public static final ComponentKey<pkiComponent> configKey = ComponentRegistry.getOrCreate(
+public class pkiScoreboardComponent implements Component, AutoSyncedComponent {
+    public static final ComponentKey<pkiScoreboardComponent> configKey = ComponentRegistry.getOrCreate(
             new Identifier(getID(), "config"),
-            pkiComponent.class);
+            pkiScoreboardComponent.class);
 
+    public static final ComponentKey<pkiTeamComponent> savedPlayersKey = ComponentRegistry.getOrCreate(
+            new Identifier(partialKeepinventory.getID(), "saved-players"),
+            pkiTeamComponent.class
+    );
+
+
+    public Scoreboard scoreboard;
+    public MinecraftServer server;
+    public Team savedPlayersTeam;
 
     // ----- General -----
     private boolean enableMod = true;
@@ -35,8 +44,6 @@ public class pkiComponent implements Component, AutoSyncedComponent {
     private int rareDroprate = 100;
 
     private int epicDroprate = 100;
-
-    private List<UUID> perPlayerKeepinventory = new ArrayList<>();
 
 
 //    Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.
@@ -131,14 +138,6 @@ public class pkiComponent implements Component, AutoSyncedComponent {
         configKey.sync(keyProvider);
     }
 
-    public List<UUID> getPerPlayerKeepinventory() {
-        return perPlayerKeepinventory;
-    }
-
-    public void setPerPlayerKeepinventory(List<UUID> perPlayerKeepinventory) {
-        this.perPlayerKeepinventory = perPlayerKeepinventory;
-        configKey.sync(keyProvider);
-    }
 
     public String getExpression() {
         return expression;
@@ -232,6 +231,22 @@ public class pkiComponent implements Component, AutoSyncedComponent {
         nbt.putInt("xpLoss", xpLoss);
     }
 
-    public pkiComponent(){
+    public pkiScoreboardComponent(Scoreboard scoreboard, MinecraftServer server){
+        this.scoreboard = scoreboard;
+        this.server = server;
+
+        partialKeepinventory.LOGGER.info(scoreboard.toString());
+
     }
+
+    public void updateTeam(){
+        Team savedPlayersKeyProvider = server.getScoreboard().getPlayerTeam("pkiSAVED_PLAYERS");
+        if(savedPlayersKeyProvider == null){
+            savedPlayersKeyProvider = server.getScoreboard().addTeam("pkiSAVED_PLAYERS");
+        }
+        SAVED_PLAYERS = CONFIG_COMPONENT.savedPlayersKey.get(savedPlayersKeyProvider);
+
+        this.savedPlayersTeam = SAVED_PLAYERS.team;
+    }
+
 }

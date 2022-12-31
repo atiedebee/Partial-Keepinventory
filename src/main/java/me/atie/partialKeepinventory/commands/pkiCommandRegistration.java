@@ -6,10 +6,14 @@ import com.mojang.brigadier.context.CommandContext;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.partialKeepinventory;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+
+import java.util.Collection;
 
 import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -205,61 +209,52 @@ public class pkiCommandRegistration {
                             )
                     )
                     //TODO working list of saved players that isn't too bandwidth heavy
-    //                .then(literal("savedPlayers")
-    //                        .then(literal("list")
-    //                                .executes(ctx -> {
-    //                                    ctx.getSource().sendMessage(Text.literal("Players with regular keepinventory:"));
-    //                                    for(var name: CONFIG_COMPONENT.getPerPlayerKeepinventory() ){
-    //                                        ctx.getSource().sendMessage( Text.literal(" " + name));
-    //                                    }
-    //                                    return 1;
-    //                                })
-    //                        )
-    //                        .then(literal("add")
-    //                                .then(argument("players", EntityArgumentType.player())
-    //                                        .executes(ctx -> {
-    //                                            Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(ctx, "players");
-    //                                            List<UUID> savedPlayers = CONFIG_COMPONENT.getPerPlayerKeepinventory();
-    //                                            String message = new String("");
-    //                                            for( var player: players ){
-    //                                                UUID uuid = player.getUuid();
-    //                                                if( !savedPlayers.contains(uuid) ){
-    //                                                    savedPlayers.add(uuid);
-    //                                                }
-    //                                                message += player.getEntityName() + ", "; //fancy formatting
-    //                                            };
-    //
-    //                                            ctx.getSource().sendFeedback(Text.literal("added " + message + "to the saved players"), true);
-    //                                            CONFIG_COMPONENT.setPerPlayerKeepinventory(savedPlayers);
-    //                                            return 1;
-    //                                        })
-    //                                )
-    //                        )
-    //                        .then(literal("remove")
-    //                                .then(argument("players", StringArgumentType.greedyString())
-    //                                        .executes(ctx -> {
-    //                                            Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(ctx, "players");                                            List<UUID> savedPlayers = CONFIG_COMPONENT.getPerPlayerKeepinventory();
-    //                                            String message = new String("");
-    //
-    //                                            for( var player : players ) {
-    //                                                UUID uuid = player.getUuid();
-    //                                                String name = player.getEntityName();
-    //
-    //                                                if (!savedPlayers.contains(uuid)) {
-    //                                                    ctx.getSource().sendFeedback(Text.literal( name + " isn't in the list"), true);
-    //                                                    return 0;
-    //                                                }
-    //                                                savedPlayers.remove(uuid);
-    //                                                message += name + ", ";
-    //                                            }
-    //                                            ctx.getSource().sendFeedback(Text.literal("removed " + message + "from the saved players"), true);
-    //                                            CONFIG_COMPONENT.setPerPlayerKeepinventory(savedPlayers);
-    //                                            return 1;
-    //                                        })
-    //                                )
-    //                        )
-    //
-    //                )
+                    .then(literal("savedPlayers")
+                            .then(literal("list")
+                                    .executes(ctx -> {
+                                        ctx.getSource().sendMessage(Text.literal("Players with regular keepinventory:"));
+                                        for(var name: CONFIG_COMPONENT.savedPlayersTeam.getPlayerList() ){
+                                            ctx.getSource().sendMessage( Text.literal("> " + name));
+                                        }
+                                        return 1;
+                                    })
+                            )
+                            .then(literal("add")
+                                    .then(argument("players", EntityArgumentType.players())
+                                            .executes(ctx -> {
+                                                Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(ctx, "players");
+                                                String message = new String("");
+
+
+                                                for( var player: players ){
+                                                    CONFIG_COMPONENT.scoreboard.addPlayerToTeam(player.getEntityName(), CONFIG_COMPONENT.savedPlayersTeam);
+                                                    message += player.getEntityName() + ", "; //fancy formatting
+                                                }
+
+                                                ctx.getSource().sendFeedback(Text.literal("added " + message + "to the saved players"), true);
+                                                return 1;
+                                            })
+                                    )
+                            )
+                            .then(literal("remove")
+                                    .then(argument("player", StringArgumentType.greedyString())
+                                            .executes(ctx -> {
+                                                String name = StringArgumentType.getString(ctx, "player");
+
+
+                                                try{
+                                                    CONFIG_COMPONENT.scoreboard.removePlayerFromTeam(name, CONFIG_COMPONENT.savedPlayersTeam);
+                                                    ctx.getSource().sendFeedback(Text.literal("removed " + name + "from the saved players"), true);
+                                                }
+                                                catch(Exception e) {
+                                                    ctx.getSource().sendFeedback(Text.literal(name + " isn't in the list"), false);
+                                                }
+                                                return 1;
+                                            })
+                                    )
+                            )
+
+                    )
                     .then(literal("expression")
                             .then(literal("set")
                                     .then(argument("expression", StringArgumentType.greedyString())
