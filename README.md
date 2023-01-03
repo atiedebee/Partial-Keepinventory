@@ -27,10 +27,10 @@ Set droprate for the inventory/rarities (0-100)
 > /pki inv droprate [static / common / uncommon / rare / epic] <percentage>
 
 List players who will get the normal keepinventory behaviour
-> /pki savedPlayers list
+> /pki inv savedPlayers list
 
 Remove/add players who get normal keepinventory behaviour
-> /pki savedPlayers [add / remove] <name>
+> /pki inv savedPlayers [add / remove] <name>
 
 Set the custom droprate formula
 > /pki inv expression set [expression]
