@@ -235,12 +235,10 @@ public class pkiScoreboardComponent implements Component, AutoSyncedComponent {
         this.scoreboard = scoreboard;
         this.server = server;
 
-        partialKeepinventory.LOGGER.info(scoreboard.toString());
-
     }
 
     public void updateTeam(){
-        Team savedPlayersKeyProvider = server.getScoreboard().getPlayerTeam("pkiSAVED_PLAYERS");
+        Team savedPlayersKeyProvider = server.getScoreboard().getTeam("pkiSAVED_PLAYERS");
         if(savedPlayersKeyProvider == null){
             savedPlayersKeyProvider = server.getScoreboard().addTeam("pkiSAVED_PLAYERS");
         }
