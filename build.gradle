@@ -22,10 +22,11 @@ repositories {
 		name = "Ladysnake Mods"
 		url = 'https://ladysnake.jfrog.io/artifactory/mods'
 	}
+	maven { url = "https://maven.terraformersmc.com/releases/" }
+
+
 
 }
-
-//cardinal-components-world
 
 dependencies {
 	// To change the versions see the gradle.properties file
@@ -39,14 +40,18 @@ dependencies {
 	// crunch, for expression evaluation
 	implementation "com.github.Redempt:Crunch:${project.crunch_version}"
 	include "com.github.Redempt:Crunch:${project.crunch_version}"
-//TODO THIS IS NOT OK ASK FOR HELP FOR JAR IN JAR BUILDS
+
 	// cardinal components
 	modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinalcomponents_version}"
 	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cardinalcomponents_version}"
 	include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinalcomponents_version}"
 	include "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cardinalcomponents_version}"
 
-}
+	// modmenu
+	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+
+	//apache beanutils
+	implementation 'commons-beanutils:commons-beanutils:1.9.4'}
 
 processResources {
 	inputs.property "version", project.version

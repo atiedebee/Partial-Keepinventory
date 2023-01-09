@@ -1,3 +1,17 @@
 {
-  "gamerule.creativeKeepInventory": "Keep inventory in creative"
+  "gamerule.creativeKeepInventory": "Keep inventory in creative",
+  "partial-keepinv.KeepinvMode.STATIC": "Static",
+  "partial-keepinv.KeepinvMode.VANILLA": "Vanilla",
+  "partial-keepinv.KeepinvMode.CUSTOM": "Custom",
+  "partial-keepinv.KeepinvMode.RARITY": "Rarity",
+  "partial-keepinv.True": "True",
+  "partial-keepinv.False": "False",
+  "partial-keepinv.gui.error.server_req": "You need to be on a server to access these settings.",
+  "partial-keepinv.gui.header.inv": "Inventory Settings",
+
+  "partial-keepinv.gui.slider.static": "Static",
+  "partial-keepinv.gui.slider.common": "Common",
+  "partial-keepinv.gui.slider.uncommon": "Uncommon",
+  "partial-keepinv.gui.slider.rare": "Rare",
+  "partial-keepinv.gui.slider.epic": "Epic"
 }

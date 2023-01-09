@@ -2,7 +2,7 @@ package me.atie.partialKeepinventory.util;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
 
 public class Experience {
 

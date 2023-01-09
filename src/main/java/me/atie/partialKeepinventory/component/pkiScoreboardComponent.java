@@ -1,188 +1,100 @@
 package me.atie.partialKeepinventory.component;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import me.atie.partialKeepinventory.partialKeepinventory;
+import me.atie.partialKeepinventory.KeepXPMode;
+import me.atie.partialKeepinventory.KeepinvMode;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
 
-import static me.atie.partialKeepinventory.partialKeepinventory.*;
+import static me.atie.partialKeepinventory.PartialKeepInventory.SAVED_PLAYERS;
 
-public class pkiScoreboardComponent implements Component, AutoSyncedComponent {
-    private static final ComponentKey<pkiScoreboardComponent> configKey = ComponentRegistry.getOrCreate(
-            new Identifier(getID(), "config"),
-            pkiScoreboardComponent.class);
-
-    private static final ComponentKey<pkiTeamComponent> savedPlayersKey = ComponentRegistry.getOrCreate(
-            new Identifier(partialKeepinventory.getID(), "saved-players"),
-            pkiTeamComponent.class
-    );
-
+public class pkiScoreboardComponent extends pkiSettings implements Component, AutoSyncedComponent {
 
     public Scoreboard scoreboard;
     public MinecraftServer server;
     public Team savedPlayersTeam;
-
-    // ----- General -----
-    private boolean enableMod = true;
-    private KeepinvMode keepinvMode = KeepinvMode.STATIC;
-    private final KeepinvMode[] keepinvModeValues = KeepinvMode.values();
-
-
-    // ----- Droprates -----
-    private int inventoryDroprate = 100;
-
-    private int commonDroprate = 100;
-
-    private int uncommonDroprate = 100;
-
-    private int rareDroprate = 100;
-
-    private int epicDroprate = 100;
-
-
-//    Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.
-//    Percentages are from 0.0 - 1.0
-//    Variables:
-//            - spawnDistance:                distance from player to spawnpoint
-//            - spawnX, spawnY, spawnZ:       spawn coordinates
-//            - playerX, playerY, playerZ:    player coordinates
-//            - rarityPercent:                get droprate from rarity as set in the config.
-//            - isEpic, isRare, isCommon, isUncommon:
-//                                            return 1.0 if true
-//            - dropPercent:                  inventory droprate as set in the config
-    private String expression = new String();
-
-    // ----- XP -----
-    private KeepXPMode keepxpMode = KeepXPMode.VANILLA;
-    private final KeepXPMode[] keepxpModeValues = KeepXPMode.values();
-
-    // How much of the XP that the player has is lost
-    private int xpLoss = 50;
-
-    // How much of the XP that the player loses should be dropped
-    private int xpDrop = 50;
-
-    private String xpExpression = new String();
 
 
     ///////////////////////
     // Getters & Setters //
     ///////////////////////
 
-    public boolean isEnabled() {
-        return enableMod;
+    @Override
+    public void setEnableMod(boolean enableMod) {
+        super.setEnableMod(enableMod);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public void enableMod(boolean enableMod) {
-        this.enableMod = enableMod;
-        configKey.sync(keyProvider);
+
+    @Override
+    public void setPartialKeepinvMode(KeepinvMode partialKeepinvMode) {
+        super.setPartialKeepinvMode(partialKeepinvMode);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public KeepinvMode partialKeepinvMode() {
-        return keepinvMode;
+    @Override
+    public void setInventoryDroprate(int inventoryDroprate) {
+        super.setInventoryDroprate(inventoryDroprate);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public void partialKeepinvMode(KeepinvMode partialKeepinvMode) {
-        this.keepinvMode = partialKeepinvMode;
-        configKey.sync(keyProvider);
-    }
-
-    public int inventoryDroprate() {
-        return inventoryDroprate;
-    }
-
-    public void inventoryDroprate(int inventoryDroprate) {
-        this.inventoryDroprate = inventoryDroprate;
-        configKey.sync(keyProvider);
-    }
-
-    public int getCommonDroprate() {
-        return commonDroprate;
-    }
-
+    @Override
     public void setCommonDroprate(int commonDroprate) {
-        this.commonDroprate = commonDroprate;
-        configKey.sync(keyProvider);
+        super.setCommonDroprate(commonDroprate);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public int getUncommonDroprate() {
-        return uncommonDroprate;
-    }
-
+    @Override
     public void setUncommonDroprate(int uncommonDroprate) {
-        this.uncommonDroprate = uncommonDroprate;
-        configKey.sync(keyProvider);
+        super.setUncommonDroprate(uncommonDroprate);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public int getRareDroprate() {
-        return rareDroprate;
-    }
-
+    @Override
     public void setRareDroprate(int rareDroprate) {
-        this.rareDroprate = rareDroprate;
-        configKey.sync(keyProvider);
+        super.setRareDroprate(rareDroprate);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public int getEpicDroprate() {
-        return epicDroprate;
-    }
-
+    @Override
     public void setEpicDroprate(int epicDroprate) {
-        this.epicDroprate = epicDroprate;
-        configKey.sync(keyProvider);
+        super.setEpicDroprate(epicDroprate);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
 
-    public String getExpression() {
-        return expression;
-    }
-
+    @Override
     public void setExpression(String expression) {
-        this.expression = expression;
-        configKey.sync(keyProvider);
+        super.setExpression(expression);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
 
-    public int getXpDrop() {
-        return xpDrop;
-    }
-
+    @Override
     public void setXpDrop(int xpDrop) {
-        this.xpDrop = xpDrop;
-        configKey.sync(keyProvider);
+        super.setXpDrop(xpDrop);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public int getXpLoss() {
-        return xpLoss;
-    }
-
+    @Override
     public void setXpLoss(int xpLoss) {
-        this.xpLoss = xpLoss;
-        configKey.sync(keyProvider);
+        super.setXpLoss(xpLoss);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public String getXpExpression() {
-        return this.xpExpression;
-    }
-
+    @Override
     public void setXpExpression(String xpExpression) {
-        this.xpExpression = xpExpression;
-        configKey.sync(keyProvider);
+        super.setXpExpression(xpExpression);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
-    public KeepXPMode getKeepxpMode() {
-        return keepxpMode;
-    }
-
+    @Override
     public void setKeepxpMode(KeepXPMode keepxpMode) {
-        this.keepxpMode = keepxpMode;
-        configKey.sync(keyProvider);
+        super.setKeepxpMode(keepxpMode);
+        pkiComponentList.configKey.sync(scoreboard);
     }
 
 
@@ -190,12 +102,16 @@ public class pkiScoreboardComponent implements Component, AutoSyncedComponent {
     // Actual functions //
     //////////////////////
 
+    public void sync() {
+        pkiComponentList.configKey.sync(scoreboard);
+    }
+
 
     @Override
     public void readFromNbt(NbtCompound nbt) {
         enableMod = nbt.getBoolean("enable");
-        expression = nbt.getString("expression");
-        xpExpression = nbt.getString("xpExpression"); //not used yet
+        expression = new StringBuffer(nbt.getString("expression"));
+        xpExpression = new StringBuffer(nbt.getString("xpExpression")); //not used yet
 
         keepinvMode = keepinvModeValues[ nbt.getInt("keepinvMode") ];
         keepxpMode = keepxpModeValues[ nbt.getInt("keepxpMode") ];
@@ -215,8 +131,8 @@ public class pkiScoreboardComponent implements Component, AutoSyncedComponent {
     @Override
     public void writeToNbt(NbtCompound nbt) {
         nbt.putBoolean("enable", enableMod);
-        nbt.putString("expression", expression);
-        nbt.putString("xpExpression", xpExpression);
+        nbt.putString("expression", String.valueOf(expression));
+        nbt.putString("xpExpression", String.valueOf(xpExpression));
 
         nbt.putInt("keepinvMode", keepinvMode.ordinal());
         nbt.putInt("keepxpMode", keepxpMode.ordinal());
@@ -234,15 +150,19 @@ public class pkiScoreboardComponent implements Component, AutoSyncedComponent {
     public pkiScoreboardComponent(Scoreboard scoreboard, MinecraftServer server){
         this.scoreboard = scoreboard;
         this.server = server;
-
     }
 
-    public void updateTeam(){
-        Team savedPlayersKeyProvider = server.getScoreboard().getTeam("pkiSAVED_PLAYERS");
-        if(savedPlayersKeyProvider == null){
-            savedPlayersKeyProvider = server.getScoreboard().addTeam("pkiSAVED_PLAYERS");
+    public void update() {
+//        this.scoreboard = PartialKeepInventory.server.getScoreboard();
+        updateTeam();
+    }
+
+    private void updateTeam(){
+        Team savedPlayersTeam = scoreboard.getTeam(pkiTeamComponent.teamName);
+        if(savedPlayersTeam == null){
+            savedPlayersTeam = scoreboard.addTeam(pkiTeamComponent.teamName);
         }
-        SAVED_PLAYERS = CONFIG_COMPONENT.savedPlayersKey.get(savedPlayersKeyProvider);
+        SAVED_PLAYERS = pkiComponentList.savedPlayersKey.get(savedPlayersTeam);
 
         this.savedPlayersTeam = SAVED_PLAYERS.team;
     }

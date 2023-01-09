@@ -8,7 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public class pkiTeamComponent implements Component, AutoSyncedComponent {
     public final Team team;
-
+    public static final String teamName = "pkiSAVED_PLAYERS";
 
     public pkiTeamComponent(Team team){
         this.team = team;

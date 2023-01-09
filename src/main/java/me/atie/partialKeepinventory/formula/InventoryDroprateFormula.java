@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import redempt.crunch.Crunch;
 import redempt.crunch.functional.EvaluationEnvironment;
 
-import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
 
 public class InventoryDroprateFormula extends DroprateFormula {
 
@@ -50,7 +50,7 @@ public class InventoryDroprateFormula extends DroprateFormula {
         env.addLazyVariable( "isUncommon",  () -> item.getRarity().equals(Rarity.UNCOMMON) ? 1.0 : 0.0);
         env.addLazyVariable( "isCommon", () -> item.getRarity().equals(Rarity.COMMON) ? 1.0 : 0.0);
 
-        env.addLazyVariable( "dropPercent", () -> CONFIG_COMPONENT.inventoryDroprate() / 100.0);
+        env.addLazyVariable( "dropPercent", () -> CONFIG_COMPONENT.getInventoryDroprate() / 100.0);
 
         env.addFunction("max", 2, (a) -> Math.max(a[0], a[1]));
         env.addFunction("min", 2, (a) -> Math.min(a[0], a[1]));

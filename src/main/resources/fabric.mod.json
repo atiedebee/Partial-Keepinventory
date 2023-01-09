@@ -19,10 +19,13 @@
 
   "entrypoints": {
     "main": [
-      "me.atie.partialKeepinventory.partialKeepinventory"
+      "me.atie.partialKeepinventory.PartialKeepInventory"
     ],
     "cardinal-components": [
         "me.atie.partialKeepinventory.component.pkiComponentList"
+    ],
+    "modmenu": [
+      "me.atie.partialKeepinventory.impl.SettingsGUI"
     ]
   },
 
@@ -38,7 +41,7 @@
   },
 
   "suggests": {
-    "another-mod": "*"
+    "modmenu": ">=5.0.2"
   },
 
   "custom": {

@@ -4,7 +4,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import redempt.crunch.Crunch;
 
-import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
 
 public class XpDroprateFormula extends DroprateFormula {
 

@@ -1,7 +1,8 @@
 package me.atie.partialKeepinventory.mixin;
 
+import me.atie.partialKeepinventory.KeepXPMode;
+import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.formula.XpDroprateFormula;
-import me.atie.partialKeepinventory.partialKeepinventory;
 import me.atie.partialKeepinventory.util.Experience;
 import me.atie.partialKeepinventory.util.Inventory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -11,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin {
@@ -25,10 +26,10 @@ public abstract class ServerPlayerEntityMixin {
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     public void keepXP(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        if( !alive && CONFIG_COMPONENT.isEnabled() ){
+        if( !alive && CONFIG_COMPONENT.getEnableMod() ){
 
 
-            if( CONFIG_COMPONENT.getKeepxpMode() != partialKeepinventory.KeepXPMode.VANILLA &&  Experience.shouldDropExperience(oldPlayer)) {
+            if( CONFIG_COMPONENT.getKeepxpMode() != KeepXPMode.VANILLA &&  Experience.shouldDropExperience(oldPlayer)) {
                 switch( CONFIG_COMPONENT.getKeepxpMode() ) {
                     case STATIC_LEVEL -> Experience.removeXpLevels(XpDroprateFormula.getLevelsToLoseStatic(oldPlayer), (ServerPlayerEntity) (Object)this);
 
@@ -38,7 +39,7 @@ public abstract class ServerPlayerEntityMixin {
                 }
             }
 
-            if( CONFIG_COMPONENT.partialKeepinvMode() != partialKeepinventory.KeepinvMode.VANILLA && !Inventory.shouldDropInventory(oldPlayer) ) {
+            if( CONFIG_COMPONENT.getPartialKeepinvMode() != KeepinvMode.VANILLA && !Inventory.shouldDropInventory(oldPlayer) ) {
                 ((ServerPlayerEntity)(Object)this).getInventory().clone(oldPlayer.getInventory());
             }
 

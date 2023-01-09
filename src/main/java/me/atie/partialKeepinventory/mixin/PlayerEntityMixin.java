@@ -1,7 +1,8 @@
 package me.atie.partialKeepinventory.mixin;
 
+import me.atie.partialKeepinventory.KeepXPMode;
+import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.XpDroprateFormula;
-import me.atie.partialKeepinventory.partialKeepinventory;
 import me.atie.partialKeepinventory.util.Experience;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -14,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static me.atie.partialKeepinventory.partialKeepinventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin  {
@@ -40,7 +41,7 @@ public abstract class PlayerEntityMixin  {
 
     @Inject(method = "getXpToDrop()I", at = @At("HEAD"), cancellable = true)
     public void customXpDrop(CallbackInfoReturnable<Integer> cir) {
-        if( !CONFIG_COMPONENT.isEnabled() || CONFIG_COMPONENT.getKeepxpMode() == partialKeepinventory.KeepXPMode.VANILLA || !Experience.shouldDropExperience((ServerPlayerEntity) (Object)this)){
+        if( !CONFIG_COMPONENT.getEnableMod() || CONFIG_COMPONENT.getKeepxpMode() == KeepXPMode.VANILLA || !Experience.shouldDropExperience((ServerPlayerEntity) (Object)this)){
             return;
         }
 
@@ -77,12 +78,12 @@ public abstract class PlayerEntityMixin  {
     @Inject(method = "dropInventory()V", at = @At("HEAD"), cancellable = true)
     public void dropInventory(CallbackInfo ci) {
 
-        if( this.isCreative() && player.getWorld().getGameRules().getBoolean(partialKeepinventory.creativeKeepInventory) ) {
+        if( this.isCreative() && player.getWorld().getGameRules().getBoolean(PartialKeepInventory.creativeKeepInventory) ) {
             ci.cancel();
             return;
         }
 
-        if( !CONFIG_COMPONENT.isEnabled() ){
+        if( !CONFIG_COMPONENT.getEnableMod() ){
             return;
         }
 
