@@ -48,7 +48,7 @@ public abstract class PlayerEntityMixin  {
         updateTotalExperience();
 
         int dropAmount = switch (CONFIG_COMPONENT.getKeepxpMode()) {
-            case STATIC_LEVEL -> {
+            case STATIC_LEVELS -> {
                 int levels_lost = XpDroprateFormula.getLevelsToLoseStatic((ServerPlayerEntity) player);
                 int levels_dropped = XpDroprateFormula.getLevelDropStatic(levels_lost);
                 int xp_dropped = 0;
@@ -77,7 +77,6 @@ public abstract class PlayerEntityMixin  {
 
     @Inject(method = "dropInventory()V", at = @At("HEAD"), cancellable = true)
     public void dropInventory(CallbackInfo ci) {
-
         if( this.isCreative() && player.getWorld().getGameRules().getBoolean(PartialKeepInventory.creativeKeepInventory) ) {
             ci.cancel();
             return;

@@ -10,8 +10,6 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import java.util.Collection;
@@ -56,15 +54,6 @@ public class pkiCommandRegistration {
                         )
                         .then(literal("info").executes(
                                 ctx -> {
-
-                                    ctx.getSource().sendMessage(
-                                            Text.literal("Please submit any issues or requests you have on github.\n\n")
-                                                    .setStyle(
-                                                            Style.EMPTY
-                                                                    .withClickEvent(
-                                                                            new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/atiedebee/Partial-Keepinventory"))
-                                                    )
-                                    );
                                     String message = "Mod " + (CONFIG_COMPONENT.getEnableMod() ? "enabled" : "disabled") + "\n";
 
                                     message += "---Inventory---\n" + ">Keepinventory mode: " + CONFIG_COMPONENT.getPartialKeepinvMode().toString() + "\n";
@@ -91,7 +80,7 @@ public class pkiCommandRegistration {
                                     message += "\n---XP---\n";
                                     message += ">Mode: " + CONFIG_COMPONENT.getKeepxpMode().toString() + "\n";
                                     message += switch (CONFIG_COMPONENT.getKeepxpMode()) {
-                                        case STATIC_POINTS, STATIC_LEVEL -> "" +
+                                        case STATIC_POINTS, STATIC_LEVELS -> "" +
                                                 ">Loss percentage: " + CONFIG_COMPONENT.getXpLoss() + "%\n" +
                                                 ">Drop percentage: " + CONFIG_COMPONENT.getXpDrop() + "%\n";
                                         case VANILLA -> "";
@@ -287,7 +276,7 @@ public class pkiCommandRegistration {
                                         )
                                         .then(literal("static-level")
                                                 .executes(ctx -> {
-                                                    CONFIG_COMPONENT.setKeepxpMode(KeepXPMode.STATIC_LEVEL);
+                                                    CONFIG_COMPONENT.setKeepxpMode(KeepXPMode.STATIC_LEVELS);
                                                     ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG_COMPONENT.getKeepxpMode().toString()));
                                                     return 1;
                                                 })

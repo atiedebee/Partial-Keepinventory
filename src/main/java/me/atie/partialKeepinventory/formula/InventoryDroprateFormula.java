@@ -1,5 +1,6 @@
 package me.atie.partialKeepinventory.formula;
 
+import me.atie.partialKeepinventory.PartialKeepInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Rarity;
@@ -24,15 +25,15 @@ public class InventoryDroprateFormula extends DroprateFormula {
                         - dropPercent:                  inventory droprate as set in the config
                  """;
 
-    private final ServerPlayerEntity player;
     private ItemStack item;
 
     public InventoryDroprateFormula(ServerPlayerEntity player, String expression) {
+        super(player);
         env = new EvaluationEnvironment();
 
-        this.player = player;
-
         final BlockPos spawnPos = getPlayerSpawn();
+
+        PartialKeepInventory.LOGGER.info(expression);
 
         env.addLazyVariable("spawnDistance", this::getSpawnDistance);
         env.addLazyVariable("spawnX", spawnPos::getX);

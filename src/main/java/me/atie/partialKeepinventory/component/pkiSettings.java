@@ -2,8 +2,18 @@ package me.atie.partialKeepinventory.component;
 
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
+import me.atie.partialKeepinventory.PartialKeepInventory;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
 
 public class pkiSettings {
+
+
+    public static Identifier updateServerConfig = new Identifier(PartialKeepInventory.getID(), "update-config");
+    public static Identifier serverConfigUpdated = new Identifier(PartialKeepInventory.getID(), "config-updated");
+    public static Identifier requestServerConfig = new Identifier(PartialKeepInventory.getID(), "config-request");
+    public static Identifier sendServerConfig = new Identifier(PartialKeepInventory.getID(), "config-send");
+
     // ----- General -----
     protected boolean enableMod = true;
     protected KeepinvMode keepinvMode = KeepinvMode.STATIC;
@@ -112,6 +122,9 @@ public class pkiSettings {
     }
 
     public void setExpression(String expression) {
+        if( expression.length() > this.expression.capacity())
+            this.expression.ensureCapacity(expression.length());
+
         this.expression.replace(0, this.expression.capacity(), expression);
     }
     public void setExpression(StringBuffer expression) {
@@ -156,6 +169,28 @@ public class pkiSettings {
         this.keepxpMode = keepxpMode;
     }
 
+    public void packetWriter(PacketByteBuf buf){
+        buf.writeBoolean(enableMod);
+        buf.writeIntArray(new int[]{ inventoryDroprate, commonDroprate, uncommonDroprate, rareDroprate, epicDroprate,
+                                    xpDrop, xpLoss} );
+        buf.writeString(expression.toString());
+        buf.writeEnumConstant(keepinvMode);
+        buf.writeEnumConstant(keepxpMode);
+    }
 
+    public void packetReader(PacketByteBuf buf){
+        enableMod = buf.readBoolean();
+        final int[] droprates = buf.readIntArray();
+        inventoryDroprate = droprates[0];
+        commonDroprate = droprates[1];
+        uncommonDroprate = droprates[2];
+        rareDroprate = droprates[3];
+        epicDroprate = droprates[4];
+        xpDrop = droprates[5];
+        xpLoss = droprates[6];
+        setExpression(buf.readString());
+        keepinvMode = buf.readEnumConstant(KeepinvMode.class);
+        keepxpMode = buf.readEnumConstant(KeepXPMode.class);
+    }
 
 }

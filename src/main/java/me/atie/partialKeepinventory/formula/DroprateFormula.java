@@ -9,10 +9,14 @@ import redempt.crunch.functional.EvaluationEnvironment;
 // Doing this the OOP way for fun.
 
 public class DroprateFormula {
-    protected ServerPlayerEntity player = null;
+    protected final ServerPlayerEntity player;
 
     protected EvaluationEnvironment env = null;
     protected CompiledExpression cx = null;
+
+    public DroprateFormula(ServerPlayerEntity player) {
+        this.player = player;
+    }
 
     protected BlockPos getPlayerSpawn(){
         BlockPos pos = this.player.getSpawnPointPosition();

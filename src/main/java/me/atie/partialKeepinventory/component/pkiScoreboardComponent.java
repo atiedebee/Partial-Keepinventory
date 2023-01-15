@@ -4,7 +4,13 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
@@ -102,6 +108,17 @@ public class pkiScoreboardComponent extends pkiSettings implements Component, Au
     // Actual functions //
     //////////////////////
 
+    @Environment(EnvType.CLIENT)
+    public static void updateServerConfig(pkiSettings settings) {
+        if(MinecraftClient.getInstance().getServer() == null) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            settings.packetWriter(buf);
+
+            ClientPlayNetworking.send(updateServerConfig, buf);
+        }
+    }
+
+
     public void sync() {
         pkiComponentList.configKey.sync(scoreboard);
     }
@@ -152,11 +169,13 @@ public class pkiScoreboardComponent extends pkiSettings implements Component, Au
         this.server = server;
     }
 
+
+    @Environment(EnvType.SERVER)
     public void update() {
-//        this.scoreboard = PartialKeepInventory.server.getScoreboard();
         updateTeam();
     }
 
+    @Environment(EnvType.SERVER)
     private void updateTeam(){
         Team savedPlayersTeam = scoreboard.getTeam(pkiTeamComponent.teamName);
         if(savedPlayersTeam == null){

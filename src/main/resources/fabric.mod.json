@@ -21,11 +21,17 @@
     "main": [
       "me.atie.partialKeepinventory.PartialKeepInventory"
     ],
+    "client": [
+      "me.atie.partialKeepinventory.ClientInitializer"
+    ],
+    "server": [
+      "me.atie.partialKeepinventory.ServerInitializer"
+    ],
     "cardinal-components": [
         "me.atie.partialKeepinventory.component.pkiComponentList"
     ],
     "modmenu": [
-      "me.atie.partialKeepinventory.impl.SettingsGUI"
+      "me.atie.partialKeepinventory.gui.SettingsGUI"
     ]
   },
 

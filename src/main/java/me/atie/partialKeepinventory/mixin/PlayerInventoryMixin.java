@@ -9,7 +9,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,9 +35,8 @@ public abstract class PlayerInventoryMixin {
     public DefaultedList<ItemStack> armor;
     @Shadow @Final
     public DefaultedList<ItemStack> offHand;
-    @Shadow @Final
-    public PlayerEntity player;
 
+    @Shadow @Final public PlayerEntity player;
     private static InventoryDroprateFormula inventoryDroprateFormula;
 
     private double dropPercentageFromRarity(ItemStack item) {
@@ -120,6 +121,7 @@ public abstract class PlayerInventoryMixin {
     @Inject(method = "dropAll()V", at = @At("HEAD"), cancellable = true)
     public void dropSome(CallbackInfo ci) {
 
+
         if( CONFIG_COMPONENT.getEnableMod() && CONFIG_COMPONENT.getPartialKeepinvMode() != KeepinvMode.VANILLA ) {
             ci.cancel(); //if the mod is enabled we make sure we don't have the function call dropInventory and friends
 
@@ -134,9 +136,9 @@ public abstract class PlayerInventoryMixin {
                     inventoryDroprateFormula = new InventoryDroprateFormula( (ServerPlayerEntity)this.player, CONFIG_COMPONENT.getExpression().toString() );
                 }
                 catch (Exception e) {
-                    String ErrorMessage = "Failed loading custom expression, resorting to percentage based drop behaviour";
-                    PartialKeepInventory.LOGGER.error(ErrorMessage);
-                    this.player.getCommandSource().sendFeedback(Text.literal(ErrorMessage), true);
+                    String ErrorMessage = "Failed loading custom expression: \"" + CONFIG_COMPONENT.getExpression() + "\"\nResorting to percentage based drop behaviour";
+                    PartialKeepInventory.LOGGER.error(ErrorMessage + "\n" + e.getMessage());
+                    this.player.getCommandSource().sendFeedback(Text.literal(ErrorMessage).setStyle(Style.EMPTY.withColor(Formatting.RED)), true);
                     CONFIG_COMPONENT.setPartialKeepinvMode(KeepinvMode.STATIC);
                 }
             }

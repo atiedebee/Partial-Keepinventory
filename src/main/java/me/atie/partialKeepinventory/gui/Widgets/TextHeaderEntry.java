@@ -1,14 +1,17 @@
-package me.atie.partialKeepinventory.impl.ModmenuGUI;
+package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.PartialKeepInventory;
-import me.atie.partialKeepinventory.impl.SettingsGUI;
+import me.atie.partialKeepinventory.gui.SettingsGUI;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
-public class TextHeaderEntry extends EntryImpl implements Entry {
+import java.util.List;
+
+public class TextHeaderEntry extends Entry {
     private final TextWidget textWidget;
 
     public TextHeaderEntry(TextRenderer textRenderer, Text name, int yPos) {
@@ -24,7 +27,6 @@ public class TextHeaderEntry extends EntryImpl implements Entry {
     @Override
     public int updateY(int y) {
         textWidget.setY(y);
-        PartialKeepInventory.LOGGER.info("Updated textheader Y to: " + y);
         return super.updateY(y);
     }
 
@@ -33,6 +35,21 @@ public class TextHeaderEntry extends EntryImpl implements Entry {
         if(!hidden) {
             textWidget.render(matrices, mouseX, mouseY, delta);
         }
+    }
+
+    @Override
+    public <T extends Element & Selectable> List<T> getSelectables(){
+        return null;
+    }
+
+
+    @Override
+    public void updateDimensions(int windowWidth) {
+        int width = windowWidth - 2 * SettingsGUI.sideMargin;
+        int x = SettingsGUI.sideMargin;
+
+        textWidget.setPos(x, yPos);
+        textWidget.setWidth(width);
     }
 
     public TextWidget getTextWidget() {

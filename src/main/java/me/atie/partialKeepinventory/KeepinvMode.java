@@ -13,4 +13,22 @@ public enum KeepinvMode {
         return Text.translatable(PartialKeepInventory.getID() + ".KeepinvMode." + this);
     }
 
+    public KeepinvMode next() {
+        return switch (this) {
+            case STATIC -> RARITY;
+            case RARITY -> CUSTOM;
+            case CUSTOM -> VANILLA;
+            case VANILLA -> STATIC;
+        };
+    }
+
+    public KeepinvMode previous() {
+        return switch (this) {
+            case STATIC -> VANILLA;
+            case VANILLA -> CUSTOM;
+            case CUSTOM -> RARITY;
+            case RARITY -> STATIC;
+        };
+    }
+
 }

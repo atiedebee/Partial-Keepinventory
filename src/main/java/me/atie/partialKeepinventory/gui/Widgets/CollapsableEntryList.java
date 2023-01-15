@@ -1,15 +1,19 @@
-package me.atie.partialKeepinventory.impl.ModmenuGUI;
+package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.impl.SettingsGUI;
+import me.atie.partialKeepinventory.gui.SettingsGUI;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
+import java.util.List;
+
 /**
  * List of entries that may be collapsed
  */
-public class CollapsableEntryList extends EntryList implements Entry {//TODO collapsable widget, also one that works without button
+public class CollapsableEntryList extends EntryList {
     private final EntryList parent;
     private final ButtonWidgetEntry buttonWidgetEntry;
     private boolean collapsed;
@@ -40,8 +44,7 @@ public class CollapsableEntryList extends EntryList implements Entry {//TODO col
             y = super.updateY(y);
         }
         else{
-            buttonWidgetEntry.setY(yPos);
-            y = SettingsGUI.nextElementY(y);
+            y = buttonWidgetEntry.updateY(yPos);
         }
         return y;
     }
@@ -68,7 +71,8 @@ public class CollapsableEntryList extends EntryList implements Entry {//TODO col
         return buttonWidgetEntry.getButtonWidget();
     }
 
-    private class ButtonWidgetEntry extends EntryImpl implements Entry {
+
+    private static class ButtonWidgetEntry extends Entry {
         private final ButtonWidget buttonWidget;
         public ButtonWidgetEntry(ButtonWidget buttonWidget) {
             super(buttonWidget.getY());
@@ -88,6 +92,11 @@ public class CollapsableEntryList extends EntryList implements Entry {//TODO col
         }
 
         @Override
+        public <T extends Element & Selectable> List<T> getSelectables(){
+            return List.of((T)buttonWidget);
+        }
+
+        @Override
         public int getY() {
             return super.getY();
         }
@@ -96,6 +105,11 @@ public class CollapsableEntryList extends EntryList implements Entry {//TODO col
         public int updateY(int y) {
             this.buttonWidget.setY(y);
             return super.updateY(y);
+        }
+
+        @Override
+        public void updateDimensions(int windowWidth){
+
         }
 
         public void setY(int y){

@@ -31,7 +31,7 @@ public abstract class ServerPlayerEntityMixin {
 
             if( CONFIG_COMPONENT.getKeepxpMode() != KeepXPMode.VANILLA &&  Experience.shouldDropExperience(oldPlayer)) {
                 switch( CONFIG_COMPONENT.getKeepxpMode() ) {
-                    case STATIC_LEVEL -> Experience.removeXpLevels(XpDroprateFormula.getLevelsToLoseStatic(oldPlayer), (ServerPlayerEntity) (Object)this);
+                    case STATIC_LEVELS -> Experience.removeXpLevels(XpDroprateFormula.getLevelsToLoseStatic(oldPlayer), (ServerPlayerEntity) (Object)this);
 
                     case STATIC_POINTS -> ((ServerPlayerEntity) (Object) this).addExperience(-1 * XpDroprateFormula.getPointsToLoseStatic(oldPlayer));
 

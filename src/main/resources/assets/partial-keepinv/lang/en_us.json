@@ -7,11 +7,28 @@
   "partial-keepinv.True": "True",
   "partial-keepinv.False": "False",
   "partial-keepinv.gui.error.server_req": "You need to be on a server to access these settings.",
-  "partial-keepinv.gui.header.inv": "Inventory Settings",
 
+  "partial-keepinv.gui.modenabled.true": "Mod Enabled",
+  "partial-keepinv.gui.modenabled.false": "Mod Disabled",
+  "partial-keepinv.gui.menu.close": "Close",
+  "partial-keepinv.gui.menu.inventory": "Inventory",
+  "partial-keepinv.gui.menu.experience": "Experience",
+
+  "partial-keepinv.gui.text.partialinvmode": "KeepInventory mode",
+  "partial-keepinv.gui.header.inv": "Inventory Settings",
   "partial-keepinv.gui.slider.static": "Static",
   "partial-keepinv.gui.slider.common": "Common",
   "partial-keepinv.gui.slider.uncommon": "Uncommon",
   "partial-keepinv.gui.slider.rare": "Rare",
-  "partial-keepinv.gui.slider.epic": "Epic"
+  "partial-keepinv.gui.slider.epic": "Epic",
+  "partial-keepinv.gui.textfield.invexpression": "Formula",
+
+  "partial-keepinv.gui.header.xp": "Experience Settings",
+  "partial-keepinv.gui.text.partialxpmode": "KeepXP Mode",
+  "partial-keepinv.KeepXpMode.STATIC_POINTS": "Points",
+  "partial-keepinv.KeepXpMode.STATIC_LEVELS": "Levels",
+  "partial-keepinv.KeepXpMode.VANILLA": "Vanilla",
+  "partial-keepinv.gui.slider.xploss": "XP Loss",
+  "partial-keepinv.gui.slider.xpdrop": "XP Drop"
+
 }

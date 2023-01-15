@@ -1,38 +1,38 @@
-package me.atie.partialKeepinventory.impl.ModmenuGUI;
+package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.impl.SettingsGUI;
+import me.atie.partialKeepinventory.gui.SettingsGUI;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class SliderEntry extends EntryImpl implements Entry{
+public class SliderEntry extends Entry {
     final private TextWidget nameWidget;
     final private SliderWidget sliderWidget;
-
-    final private Supplier<Double> get;
+    final private TextRenderer textRenderer;
     final private Consumer<Double> set;
-    final private Function<Double, Text> toText;
 
 
     public SliderEntry(TextRenderer textRenderer, Text name, Supplier<Double> getter, Consumer<Double> setter, Function<Double, Text> toText, int yPos, float min, float max) {
         super(yPos);
-        this.get = getter;
         this.set = setter;
-        this.toText = toText;
+        this.textRenderer = textRenderer;
 
         int w = MinecraftClient.getInstance().getWindow().getScaledWidth();
 
         int nameWidth = textRenderer.getWidth(name);
         nameWidget = new TextWidget(SettingsGUI.sideMargin, yPos, nameWidth, 20, name, textRenderer);
 
-        double val = get.get();
+        double val = getter.get();
         sliderWidget = new SliderWidget(w - SettingsGUI.sliderWidth - SettingsGUI.sideMargin, yPos, SettingsGUI.sliderWidth, 20, toText.apply(val), val) {
             @Override
             protected void updateMessage() {
@@ -47,13 +47,31 @@ public class SliderEntry extends EntryImpl implements Entry{
         };
     }
 
+    @Override
     public int updateY(int y){
         nameWidget.setY(y);
         sliderWidget.setY(y);
         return super.updateY(y);
     }
 
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    @Override
+    public <T extends Element & Selectable> List<T> getSelectables(){
+        return List.of( (T)getSliderWidget() );
+    }
+
+
+    @Override
+    public void updateDimensions(int windowWidth) {
+        int nameWidth = textRenderer.getWidth(nameWidget.getMessage());
+
+        nameWidget.setWidth(nameWidth);
+        nameWidget.setX(SettingsGUI.sideMargin);
+
+        sliderWidget.setWidth(SettingsGUI.sliderWidth);
+        sliderWidget.setX(windowWidth - SettingsGUI.sliderWidth - SettingsGUI.sideMargin);
+    }
+
+        public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if(!hidden) {
             this.nameWidget.render(matrices, mouseX, mouseY, delta);
             this.sliderWidget.render(matrices, mouseX, mouseY, delta);
@@ -73,7 +91,7 @@ public class SliderEntry extends EntryImpl implements Entry{
 
 
         private Text name = Text.literal("placeholder name");
-        private TextRenderer textRenderer;
+        private final TextRenderer textRenderer;
 
         private float min = 0.0f;
         private float max = 1.0f;

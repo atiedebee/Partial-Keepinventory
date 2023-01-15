@@ -1,28 +1,31 @@
-package me.atie.partialKeepinventory.impl.ModmenuGUI;
+package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.impl.SettingsGUI;
+import me.atie.partialKeepinventory.gui.SettingsGUI;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class ButtonEntry<T> extends EntryImpl implements Entry {
+public class ButtonEntry<T> extends Entry {
     private final TextWidget nameWidget;
     private final ButtonWidget buttonWidget;
+    private final TextRenderer textRenderer;
 
     private final Supplier<T> get;
     private final Consumer<T> set;
     private final Function<T, Text> toText;
 
     private final Function<T, T> nextVal;
-
 
     private void onPress(ButtonWidget b){
         T newVal = get.get();
@@ -39,6 +42,7 @@ public class ButtonEntry<T> extends EntryImpl implements Entry {
         get = getter;
         set = setter;
 
+        this.textRenderer = textRenderer;
         this.toText = toText;
         this.nextVal = nextVal;
 
@@ -68,6 +72,18 @@ public class ButtonEntry<T> extends EntryImpl implements Entry {
         }
     }
 
+    @Override
+    public <T extends Element & Selectable> List<T> getSelectables(){
+        return List.of((T)this.getButtonWidget());
+    }
+
+    @Override
+    public void updateDimensions(int windowWidth) {
+        buttonWidget.setX(windowWidth - SettingsGUI.buttonWidth - SettingsGUI.sideMargin);
+        nameWidget.setX(SettingsGUI.sideMargin);
+        nameWidget.setWidth(textRenderer.getWidth(nameWidget.getMessage()));
+    }
+
     public ButtonWidget getButtonWidget(){
         return this.buttonWidget;
     }
@@ -76,6 +92,9 @@ public class ButtonEntry<T> extends EntryImpl implements Entry {
         return this.nameWidget;
     }
 
+    public T getVal() {
+        return get.get();
+    }
 
     public static class Builder<T> {
         private Supplier<T> get = null;
@@ -83,11 +102,12 @@ public class ButtonEntry<T> extends EntryImpl implements Entry {
         private Function<T, Text> toText;
 
         private Function<T, T> nextVal = null;
+
         int y = 0;
 
         private Text name = null;
-        private Tooltip tooltip = null;
-        private TextRenderer textRenderer;
+        private final Tooltip tooltip = null;//for future use
+        private final TextRenderer textRenderer;
 
         public Builder(TextRenderer t) {
             toText = (x) -> Text.literal(x.toString());
@@ -129,9 +149,6 @@ public class ButtonEntry<T> extends EntryImpl implements Entry {
         public ButtonEntry<T> build() {
             return new ButtonEntry<T>(textRenderer, name, tooltip, get, set, toText, nextVal, y);
         }
-
-
-
 
     }
 

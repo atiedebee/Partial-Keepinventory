@@ -12,7 +12,7 @@ public class XpDroprateFormula extends DroprateFormula {
     private int xpLevel;
 
     public XpDroprateFormula(ServerPlayerEntity player, String expression) {
-        this.player = player;
+        super(player);
 
         final BlockPos spawnPos = getPlayerSpawn();
 
