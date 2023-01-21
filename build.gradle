@@ -24,8 +24,6 @@ repositories {
 	}
 	maven { url = "https://maven.terraformersmc.com/releases/" }
 
-
-
 }
 
 dependencies {
@@ -41,11 +39,8 @@ dependencies {
 	implementation "com.github.Redempt:Crunch:${project.crunch_version}"
 	include "com.github.Redempt:Crunch:${project.crunch_version}"
 
-	// cardinal components
-	modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinalcomponents_version}"
-	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cardinalcomponents_version}"
-	include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinalcomponents_version}"
-	include "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cardinalcomponents_version}"
+	// trinkets
+	modApi "dev.emi:trinkets:${trinkets_version}"
 
 	// modmenu
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"

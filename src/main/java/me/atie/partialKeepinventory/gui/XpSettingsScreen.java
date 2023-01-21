@@ -20,7 +20,6 @@ public class XpSettingsScreen extends Screen {
     private final Screen parent;
     private final MinecraftClient client;
     private final pkiSettings LOCAL_CONFIG;
-
     private TextHeaderEntry xpTextHeaderEntry;
     private ButtonEntry<KeepXPMode> keepXPModeButtonEntry;
     private SliderEntry DropSlider;
@@ -64,6 +63,7 @@ public class XpSettingsScreen extends Screen {
 
             keepXPModeButtonEntry = new ButtonEntry.Builder<KeepXPMode>(textRenderer)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.text.partialxpmode"))
+                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.keepxpmode"))
                     .toText(KeepXPMode::getName)
                     .setGetter(LOCAL_CONFIG::getKeepxpMode)
                     .setSetter(s -> {
@@ -81,6 +81,7 @@ public class XpSettingsScreen extends Screen {
                     .toText(SettingsGUI::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.xpdrop"))
+                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xpdrop"))
                     .build();
             super.addSelectableChild(DropSlider.getSliderWidget());
 
@@ -90,6 +91,7 @@ public class XpSettingsScreen extends Screen {
                     .toText(SettingsGUI::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.xploss"))
+                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xploss"))
                     .build();
             super.addSelectableChild(LossSlider.getSliderWidget());
 

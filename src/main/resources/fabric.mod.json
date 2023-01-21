@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "partial-keepinv",
-  "version": "0.1.1",
+  "version": "0.2.0",
 
   "name": "Partial Keepinventory",
   "description": "A mod that makes keepinventory a little more flexible",
@@ -27,9 +27,6 @@
     "server": [
       "me.atie.partialKeepinventory.ServerInitializer"
     ],
-    "cardinal-components": [
-        "me.atie.partialKeepinventory.component.pkiComponentList"
-    ],
     "modmenu": [
       "me.atie.partialKeepinventory.gui.SettingsGUI"
     ]
@@ -51,9 +48,5 @@
   },
 
   "custom": {
-    "cardinal-components": [
-      "partial-keepinv:config",
-      "partial-keepinv:saved-players"
-    ]
   }
 }

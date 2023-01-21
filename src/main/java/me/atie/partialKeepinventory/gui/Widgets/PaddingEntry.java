@@ -8,11 +8,9 @@ import java.util.List;
 
 public class PaddingEntry extends Entry {
 
-    private final int padding;
-
     public PaddingEntry(int padding) {
         super(0);
-        this.padding = padding;
+        this.height = padding;
     }
 
     @Override
@@ -27,8 +25,13 @@ public class PaddingEntry extends Entry {
 
     @Override
     public int updateY(int y) {
-        yPos = y + padding;
+        yPos = y + height;
         return yPos;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
     }
 
     @Override

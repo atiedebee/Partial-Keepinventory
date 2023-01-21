@@ -3,7 +3,7 @@ package me.atie.partialKeepinventory.mixin;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.XpDroprateFormula;
-import me.atie.partialKeepinventory.util.Experience;
+import me.atie.partialKeepinventory.util.ExperienceUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin  {
@@ -41,13 +41,13 @@ public abstract class PlayerEntityMixin  {
 
     @Inject(method = "getXpToDrop()I", at = @At("HEAD"), cancellable = true)
     public void customXpDrop(CallbackInfoReturnable<Integer> cir) {
-        if( !CONFIG_COMPONENT.getEnableMod() || CONFIG_COMPONENT.getKeepxpMode() == KeepXPMode.VANILLA || !Experience.shouldDropExperience((ServerPlayerEntity) (Object)this)){
+        if( !CONFIG.getEnableMod() || CONFIG.getKeepxpMode() == KeepXPMode.VANILLA || !ExperienceUtil.shouldDropExperience((ServerPlayerEntity) (Object)this)){
             return;
         }
 
         updateTotalExperience();
 
-        int dropAmount = switch (CONFIG_COMPONENT.getKeepxpMode()) {
+        int dropAmount = switch (CONFIG.getKeepxpMode()) {
             case STATIC_LEVELS -> {
                 int levels_lost = XpDroprateFormula.getLevelsToLoseStatic((ServerPlayerEntity) player);
                 int levels_dropped = XpDroprateFormula.getLevelDropStatic(levels_lost);
@@ -68,7 +68,7 @@ public abstract class PlayerEntityMixin  {
             case STATIC_POINTS -> XpDroprateFormula.getPointsDropStatic((ServerPlayerEntity) player);
 
 
-            default -> throw new IllegalStateException("Unexpected value: " + CONFIG_COMPONENT.getKeepxpMode());
+            default -> throw new IllegalStateException("Unexpected value: " + CONFIG.getKeepxpMode());
         };
 
         cir.setReturnValue(dropAmount);
@@ -82,7 +82,7 @@ public abstract class PlayerEntityMixin  {
             return;
         }
 
-        if( !CONFIG_COMPONENT.getEnableMod() ){
+        if( !CONFIG.getEnableMod() ){
             return;
         }
 

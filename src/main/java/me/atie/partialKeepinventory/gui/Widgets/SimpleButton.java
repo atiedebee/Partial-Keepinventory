@@ -2,16 +2,17 @@ package me.atie.partialKeepinventory.gui.Widgets;
 
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import java.util.List;
 
-public class SimpleButton<T> extends Entry {
-    private ButtonWidget buttonWidget;
+public class SimpleButton extends Entry {
+    private final ButtonWidget buttonWidget;
 
-    public SimpleButton(int x, int y, int w, int h, Text name, ButtonWidget.PressAction onClick) {
+    public SimpleButton(int x, int y, int w, int h, Text name, Text tooltip, ButtonWidget.PressAction onClick) {
         super(y);
 
 
@@ -19,7 +20,13 @@ public class SimpleButton<T> extends Entry {
                 .dimensions(x, y, w, h)
                 .build();
         buttonWidget.setMessage(name);
+        if( tooltip != null ) {
+            buttonWidget.setTooltip(Tooltip.of(tooltip));
+        }
+    }
 
+    public ButtonWidget getButtonWidget(){
+        return buttonWidget;
     }
 
     @Override
@@ -45,6 +52,18 @@ public class SimpleButton<T> extends Entry {
         final int x = windowWidth/4;
         buttonWidget.setX(x);
         buttonWidget.setWidth(width);
+    }
+
+    @Override
+    public void show(){
+        super.show();
+        buttonWidget.active = true;
+    }
+
+    @Override
+    public void hide(){
+        super.hide();
+        buttonWidget.active = false;
     }
 
 }

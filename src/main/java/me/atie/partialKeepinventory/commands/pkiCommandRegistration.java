@@ -1,20 +1,21 @@
 package me.atie.partialKeepinventory.commands;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
+import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.Collection;
 
-import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -22,7 +23,7 @@ public class pkiCommandRegistration {
 
     private static void modeMessage(CommandContext<ServerCommandSource> ctx) {
         ctx.getSource().sendFeedback(Text.literal(
-                "Keepinventory mode is set to " + CONFIG_COMPONENT.getPartialKeepinvMode().toString()
+                "Keepinventory mode is set to " + CONFIG.getPartialKeepinvMode().toString()
         ), true);
 
     }
@@ -40,49 +41,49 @@ public class pkiCommandRegistration {
                 dispatcher.register(literal("pki").requires(source -> source.hasPermissionLevel(4))
                         .then(literal("enable").executes(
                                 ctx -> {
-                                    CONFIG_COMPONENT.setEnableMod(true);
+                                    CONFIG.setEnableMod(true);
                                     ctx.getSource().sendFeedback(Text.literal("Enabled partial keepinventory"), true);
                                     return 1;
                                 })
                         )
                         .then(literal("disable").executes(
                                 ctx -> {
-                                    CONFIG_COMPONENT.setEnableMod(false);
+                                    CONFIG.setEnableMod(false);
                                     ctx.getSource().sendFeedback(Text.literal("Disabled partial keepinventory"), true);
                                     return 1;
                                 })
                         )
                         .then(literal("info").executes(
                                 ctx -> {
-                                    String message = "Mod " + (CONFIG_COMPONENT.getEnableMod() ? "enabled" : "disabled") + "\n";
+                                    String message = "Mod " + (CONFIG.getEnableMod() ? "enabled" : "disabled") + "\n";
 
-                                    message += "---Inventory---\n" + ">Keepinventory mode: " + CONFIG_COMPONENT.getPartialKeepinvMode().toString() + "\n";
+                                    message += "---Inventory---\n" + ">Keepinventory mode: " + CONFIG.getPartialKeepinvMode().toString() + "\n";
 
                                     // only show relevant information
-                                    message += switch (CONFIG_COMPONENT.getPartialKeepinvMode()) {
+                                    message += switch (CONFIG.getPartialKeepinvMode()) {
                                         case STATIC ->
-                                                ">Inventory droprate: " + CONFIG_COMPONENT.getInventoryDroprate() + "%\n";
+                                                ">Inventory droprate: " + CONFIG.getInventoryDroprate() + "%\n";
 
                                         case RARITY ->
-                                                ">Common droprate: " + CONFIG_COMPONENT.getCommonDroprate() + "%\n" +
-                                                        ">Uncommon droprate: " + CONFIG_COMPONENT.getUncommonDroprate() + "%\n" +
-                                                        ">Rare droprate: " + CONFIG_COMPONENT.getRareDroprate() + "%\n" +
-                                                        ">Epic droprate: " + CONFIG_COMPONENT.getEpicDroprate() + "%\n";
-                                        case CUSTOM -> ">Expression: \"" + CONFIG_COMPONENT.getExpression() + "\"\n\n" +
-                                                ">Inventory droprate: " + CONFIG_COMPONENT.getInventoryDroprate() + "%\n" +
-                                                ">Common droprate: " + CONFIG_COMPONENT.getCommonDroprate() + "%\n" +
-                                                ">Uncommon droprate: " + CONFIG_COMPONENT.getUncommonDroprate() + "%\n" +
-                                                ">Rare droprate: " + CONFIG_COMPONENT.getRareDroprate() + "%\n" +
-                                                ">Epic droprate: " + CONFIG_COMPONENT.getEpicDroprate() + "%\n";
+                                                ">Common droprate: " + CONFIG.getCommonDroprate() + "%\n" +
+                                                        ">Uncommon droprate: " + CONFIG.getUncommonDroprate() + "%\n" +
+                                                        ">Rare droprate: " + CONFIG.getRareDroprate() + "%\n" +
+                                                        ">Epic droprate: " + CONFIG.getEpicDroprate() + "%\n";
+                                        case CUSTOM -> ">Expression: \"" + CONFIG.getExpression() + "\"\n\n" +
+                                                ">Inventory droprate: " + CONFIG.getInventoryDroprate() + "%\n" +
+                                                ">Common droprate: " + CONFIG.getCommonDroprate() + "%\n" +
+                                                ">Uncommon droprate: " + CONFIG.getUncommonDroprate() + "%\n" +
+                                                ">Rare droprate: " + CONFIG.getRareDroprate() + "%\n" +
+                                                ">Epic droprate: " + CONFIG.getEpicDroprate() + "%\n";
                                         case VANILLA -> "";
                                     };
 
                                     message += "\n---XP---\n";
-                                    message += ">Mode: " + CONFIG_COMPONENT.getKeepxpMode().toString() + "\n";
-                                    message += switch (CONFIG_COMPONENT.getKeepxpMode()) {
+                                    message += ">Mode: " + CONFIG.getKeepxpMode().toString() + "\n";
+                                    message += switch (CONFIG.getKeepxpMode()) {
                                         case STATIC_POINTS, STATIC_LEVELS -> "" +
-                                                ">Loss percentage: " + CONFIG_COMPONENT.getXpLoss() + "%\n" +
-                                                ">Drop percentage: " + CONFIG_COMPONENT.getXpDrop() + "%\n";
+                                                ">Loss percentage: " + CONFIG.getXpLoss() + "%\n" +
+                                                ">Drop percentage: " + CONFIG.getXpDrop() + "%\n";
                                         case VANILLA -> "";
                                     };
 
@@ -95,28 +96,28 @@ public class pkiCommandRegistration {
                                 .then(literal("mode")
                                         .then(literal("static")
                                                 .executes(ctx -> {
-                                                    CONFIG_COMPONENT.setPartialKeepinvMode(KeepinvMode.STATIC);
+                                                    CONFIG.setPartialKeepinvMode(KeepinvMode.STATIC);
                                                     modeMessage(ctx);
                                                     return 1;
                                                 })
                                         )
                                         .then(literal("rarity")
                                                 .executes(ctx -> {
-                                                    CONFIG_COMPONENT.setPartialKeepinvMode(KeepinvMode.RARITY);
+                                                    CONFIG.setPartialKeepinvMode(KeepinvMode.RARITY);
                                                     modeMessage(ctx);
                                                     return 1;
                                                 })
                                         )
                                         .then(literal("custom")
                                                 .executes(ctx -> {
-                                                    CONFIG_COMPONENT.setPartialKeepinvMode(KeepinvMode.CUSTOM);
+                                                    CONFIG.setPartialKeepinvMode(KeepinvMode.CUSTOM);
                                                     modeMessage(ctx);
                                                     return 1;
                                                 })
                                         )
                                         .then(literal("vanilla")
                                                 .executes(ctx -> {
-                                                    CONFIG_COMPONENT.setPartialKeepinvMode(KeepinvMode.VANILLA);
+                                                    CONFIG.setPartialKeepinvMode(KeepinvMode.VANILLA);
                                                     modeMessage(ctx);
                                                     return 1;
                                                 })
@@ -132,12 +133,12 @@ public class pkiCommandRegistration {
                                                         .executes(ctx -> {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "Inventory droprate", x);
-                                                            CONFIG_COMPONENT.setInventoryDroprate(x);
+                                                            CONFIG.setInventoryDroprate(x);
                                                             return 1;
                                                         })
                                                 )
                                                 .executes(ctx -> {
-                                                    percentMessage(ctx, "Inventory droprate", CONFIG_COMPONENT.getInventoryDroprate());
+                                                    percentMessage(ctx, "Inventory droprate", CONFIG.getInventoryDroprate());
                                                     return 1;
                                                 })
                                         )
@@ -146,12 +147,12 @@ public class pkiCommandRegistration {
                                                         .executes(ctx -> {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "common droprate", x);
-                                                            CONFIG_COMPONENT.setCommonDroprate(x);
+                                                            CONFIG.setCommonDroprate(x);
                                                             return 1;
                                                         })
                                                 )
                                                 .executes(ctx -> {
-                                                    percentMessage(ctx, "common droprate", CONFIG_COMPONENT.getCommonDroprate());
+                                                    percentMessage(ctx, "common droprate", CONFIG.getCommonDroprate());
                                                     return 1;
                                                 })
                                         )
@@ -160,12 +161,12 @@ public class pkiCommandRegistration {
                                                         .executes(ctx -> {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "uncommon droprate", x);
-                                                            CONFIG_COMPONENT.setUncommonDroprate(x);
+                                                            CONFIG.setUncommonDroprate(x);
                                                             return 1;
                                                         })
                                                 )
                                                 .executes(ctx -> {
-                                                    percentMessage(ctx, "uncommon droprate", CONFIG_COMPONENT.getUncommonDroprate());
+                                                    percentMessage(ctx, "uncommon droprate", CONFIG.getUncommonDroprate());
                                                     return 1;
                                                 })
                                         )
@@ -174,12 +175,12 @@ public class pkiCommandRegistration {
                                                         .executes(ctx -> {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "rare droprate", x);
-                                                            CONFIG_COMPONENT.setRareDroprate(x);
+                                                            CONFIG.setRareDroprate(x);
                                                             return 1;
                                                         })
                                                 )
                                                 .executes(ctx -> {
-                                                    percentMessage(ctx, "rare droprate", CONFIG_COMPONENT.getRareDroprate());
+                                                    percentMessage(ctx, "rare droprate", CONFIG.getRareDroprate());
                                                     return 1;
                                                 })
                                         )
@@ -188,12 +189,12 @@ public class pkiCommandRegistration {
                                                         .executes(ctx -> {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "epic droprate", x);
-                                                            CONFIG_COMPONENT.setEpicDroprate(x);
+                                                            CONFIG.setEpicDroprate(x);
                                                             return 1;
                                                         })
                                                 )
                                                 .executes(ctx -> {
-                                                    percentMessage(ctx, "epic droprate", CONFIG_COMPONENT.getEpicDroprate());
+                                                    percentMessage(ctx, "epic droprate", CONFIG.getEpicDroprate());
                                                     return 1;
                                                 })
                                         )
@@ -201,40 +202,60 @@ public class pkiCommandRegistration {
                                 .then(literal("savedPlayers")
                                         .then(literal("list")
                                                 .executes(ctx -> {
+                                                    if( CONFIG.getSavedPlayers().isEmpty() ){
+                                                        ctx.getSource().sendMessage(Text.literal("No players with regular keepinventory"));
+                                                        return 1;
+                                                    }
+
                                                     ctx.getSource().sendMessage(Text.literal("Players with regular keepinventory:"));
-                                                    for (var name : CONFIG_COMPONENT.savedPlayersTeam.getPlayerList()) {
+                                                    for (var name : CONFIG.getSavedPlayers()) {
                                                         ctx.getSource().sendMessage(Text.literal("> " + name));
                                                     }
                                                     return 1;
                                                 })
                                         )
                                         .then(literal("add")
-                                                .then(argument("players", EntityArgumentType.players())
+                                                .then(argument("players", GameProfileArgumentType.gameProfile())
                                                         .executes(ctx -> {
-                                                            Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(ctx, "players");
-                                                            String message = new String("");
-
+                                                            Collection<GameProfile> players = GameProfileArgumentType.getProfileArgument(ctx, "players");
+                                                            StringBuilder message = new StringBuilder();
+                                                            StringBuilder notAdded = new StringBuilder();
 
                                                             for (var player : players) {
-                                                                CONFIG_COMPONENT.scoreboard.addPlayerToTeam(player.getEntityName(), CONFIG_COMPONENT.savedPlayersTeam);
-                                                                message += player.getEntityName() + ", "; //fancy formatting
+                                                                try {
+                                                                    CONFIG.addSavedPlayer(player.getName());
+                                                                    message.append(player.getName()).append(", "); //fancy formatting
+                                                                }catch (RuntimeException e) {
+                                                                    notAdded.append(player.getName()).append(", ");
+                                                                }
                                                             }
 
-                                                            ctx.getSource().sendFeedback(Text.literal("added " + message + "to the saved players"), true);
+                                                            if( !message.isEmpty() ) {
+                                                                ctx.getSource().sendFeedback(Text.literal("Added " + message + "to the saved players"), true);
+                                                            }
+                                                            if( !notAdded.isEmpty()) {
+                                                                ctx.getSource().sendFeedback(Text.literal(notAdded + " were ignored, for they are in the list already."), false);
+                                                            }
                                                             return 1;
                                                         })
                                                 )
                                         )
                                         .then(literal("remove")
-                                                .then(argument("player", StringArgumentType.greedyString())
+                                                .then(argument("player", GameProfileArgumentType.gameProfile())
                                                         .executes(ctx -> {
-                                                            String name = StringArgumentType.getString(ctx, "player");
+                                                            Collection<GameProfile> players = GameProfileArgumentType.getProfileArgument(ctx, "player");
+                                                            StringBuilder message = new StringBuilder();
 
-                                                            try {
-                                                                CONFIG_COMPONENT.scoreboard.removePlayerFromTeam(name, CONFIG_COMPONENT.savedPlayersTeam);
-                                                                ctx.getSource().sendFeedback(Text.literal("removed " + name + "from the saved players"), true);
-                                                            } catch (Exception e) {
-                                                                ctx.getSource().sendFeedback(Text.literal(name + " isn't in the list"), false);
+                                                            for( var player: players ) {
+                                                                try {
+                                                                    CONFIG.removeSavedPlayer(player.getName());
+                                                                    message.append(player.getName()).append(", ");
+                                                                } catch (RuntimeException e) {
+                                                                    PartialKeepInventory.LOGGER.info(e.getMessage());
+                                                                }
+                                                            }
+                                                            if( !message.isEmpty() ) {
+                                                                ctx.getSource().sendFeedback(Text.literal("Removed " + message + "from the saved players."), true);
                                                             }
                                                             return 1;
                                                         })
@@ -248,7 +269,7 @@ public class pkiCommandRegistration {
                                                         .executes(ctx -> {
                                                             String expression = StringArgumentType.getString(ctx, "expression");
                                                             ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expression + "\""));
-                                                            CONFIG_COMPONENT.setExpression(expression);
+                                                            CONFIG.setExpression(expression);
                                                             return 1;
                                                         })
                                                 )
@@ -260,7 +281,7 @@ public class pkiCommandRegistration {
                                                 })
                                         )
                                         .executes(ctx -> {
-                                            ctx.getSource().sendMessage(Text.literal("The custom droprate formula is set to \"" + CONFIG_COMPONENT.getExpression() + "\""));
+                                            ctx.getSource().sendMessage(Text.literal("The custom droprate formula is set to \"" + CONFIG.getExpression() + "\""));
                                             return 1;
                                         })
 
@@ -270,26 +291,26 @@ public class pkiCommandRegistration {
                                 .then(literal("mode")
                                         .then(literal("vanilla")
                                                 .executes(ctx -> {
-                                                    CONFIG_COMPONENT.setKeepxpMode(KeepXPMode.VANILLA);
+                                                    CONFIG.setKeepxpMode(KeepXPMode.VANILLA);
                                                     return 1;
                                                 })
                                         )
                                         .then(literal("static-level")
                                                 .executes(ctx -> {
-                                                    CONFIG_COMPONENT.setKeepxpMode(KeepXPMode.STATIC_LEVELS);
-                                                    ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG_COMPONENT.getKeepxpMode().toString()));
+                                                    CONFIG.setKeepxpMode(KeepXPMode.STATIC_LEVELS);
+                                                    ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
                                                     return 1;
                                                 })
                                         )
                                         .then(literal("static-points")
                                                 .executes(ctx -> {
-                                                    CONFIG_COMPONENT.setKeepxpMode(KeepXPMode.STATIC_POINTS);
-                                                    ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG_COMPONENT.getKeepxpMode().toString()));
+                                                    CONFIG.setKeepxpMode(KeepXPMode.STATIC_POINTS);
+                                                    ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
                                                     return 1;
                                                 })
                                         )
                                         .executes(ctx -> {
-                                            ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG_COMPONENT.getKeepxpMode().toString()));
+                                            ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
                                             return 1;
                                         })
                                 )
@@ -298,13 +319,13 @@ public class pkiCommandRegistration {
                                                 .then(argument("percent", IntegerArgumentType.integer(0, 100))
                                                         .executes(ctx -> {
                                                             int percent = IntegerArgumentType.getInteger(ctx, "percent");
-                                                            CONFIG_COMPONENT.setXpLoss(percent);
+                                                            CONFIG.setXpLoss(percent);
                                                             percentMessage(ctx, "xp loss-rate", percent);
                                                             return 1;
                                                         })
                                                 )
                                                 .executes(ctx -> {
-                                                    percentMessage(ctx, "xp loss-rate", CONFIG_COMPONENT.getXpLoss());
+                                                    percentMessage(ctx, "xp loss-rate", CONFIG.getXpLoss());
                                                     return 1;
                                                 })
                                         )
@@ -312,13 +333,13 @@ public class pkiCommandRegistration {
                                                 .then(argument("percent", IntegerArgumentType.integer(0, 100))
                                                         .executes(ctx -> {
                                                             int percent = IntegerArgumentType.getInteger(ctx, "percent");
-                                                            CONFIG_COMPONENT.setXpDrop(percent);
+                                                            CONFIG.setXpDrop(percent);
                                                             percentMessage(ctx, "xp droprate", percent);
                                                             return 1;
                                                         })
                                                 )
                                                 .executes(ctx -> {
-                                                    percentMessage(ctx, "xp droprate", CONFIG_COMPONENT.getXpDrop());
+                                                    percentMessage(ctx, "xp droprate", CONFIG.getXpDrop());
                                                     return 1;
                                                 })
                                         )

@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import redempt.crunch.Crunch;
 import redempt.crunch.functional.EvaluationEnvironment;
 
-import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
 public class InventoryDroprateFormula extends DroprateFormula {
 
@@ -33,8 +33,6 @@ public class InventoryDroprateFormula extends DroprateFormula {
 
         final BlockPos spawnPos = getPlayerSpawn();
 
-        PartialKeepInventory.LOGGER.info(expression);
-
         env.addLazyVariable("spawnDistance", this::getSpawnDistance);
         env.addLazyVariable("spawnX", spawnPos::getX);
         env.addLazyVariable("spawnY", spawnPos::getY);
@@ -51,7 +49,7 @@ public class InventoryDroprateFormula extends DroprateFormula {
         env.addLazyVariable( "isUncommon",  () -> item.getRarity().equals(Rarity.UNCOMMON) ? 1.0 : 0.0);
         env.addLazyVariable( "isCommon", () -> item.getRarity().equals(Rarity.COMMON) ? 1.0 : 0.0);
 
-        env.addLazyVariable( "dropPercent", () -> CONFIG_COMPONENT.getInventoryDroprate() / 100.0);
+        env.addLazyVariable( "dropPercent", () -> CONFIG.getInventoryDroprate() / 100.0);
 
         env.addFunction("max", 2, (a) -> Math.max(a[0], a[1]));
         env.addFunction("min", 2, (a) -> Math.min(a[0], a[1]));
@@ -64,18 +62,18 @@ public class InventoryDroprateFormula extends DroprateFormula {
 
     private double dropPercentageFromRarity(ItemStack item){
         double droprate =  switch( item.getRarity() ){
-            case COMMON -> CONFIG_COMPONENT.getCommonDroprate();
-            case UNCOMMON -> CONFIG_COMPONENT.getUncommonDroprate();
-            case RARE -> CONFIG_COMPONENT.getRareDroprate();
-            case EPIC -> CONFIG_COMPONENT.getEpicDroprate();
+            case COMMON -> CONFIG.getCommonDroprate();
+            case UNCOMMON -> CONFIG.getUncommonDroprate();
+            case RARE -> CONFIG.getRareDroprate();
+            case EPIC -> CONFIG.getEpicDroprate();
         };
 
         return droprate / 100.0;
     }
 
 
-    public double getResult(ItemStack itemStack) {
-        this.item = itemStack;
+    public double getResult(ItemStack item) {
+        this.item = item;
 
         return cx.evaluate();
     }

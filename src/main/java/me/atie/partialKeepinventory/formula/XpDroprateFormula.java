@@ -4,7 +4,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import redempt.crunch.Crunch;
 
-import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
 public class XpDroprateFormula extends DroprateFormula {
 
@@ -43,18 +43,18 @@ public class XpDroprateFormula extends DroprateFormula {
 
 
     public static int getLevelDropStatic(int levelsLost) {
-        int levelsDropped = (int) Math.round(CONFIG_COMPONENT.getXpDrop() * 0.01 * levelsLost);
+        int levelsDropped = (int) Math.round(CONFIG.getXpDrop() * 0.01 * levelsLost);
         return levelsDropped;
     }
 
     public static int getLevelDropStatic(ServerPlayerEntity player) {
         int levelsLost = XpDroprateFormula.getLevelsToLoseStatic(player);
-        int levelsDropped = (int) Math.round(CONFIG_COMPONENT.getXpDrop() * 0.01 * levelsLost);
+        int levelsDropped = (int) Math.round(CONFIG.getXpDrop() * 0.01 * levelsLost);
         return levelsDropped;
     }
 
     public static int getLevelsToLoseStatic(ServerPlayerEntity player) {
-        double lossPercent = CONFIG_COMPONENT.getXpLoss() * 0.01;// * 0.01 to get it to the range 0.0 - 1.0
+        double lossPercent = CONFIG.getXpLoss() * 0.01;// * 0.01 to get it to the range 0.0 - 1.0
         return (int) Math.round(player.experienceLevel * lossPercent);
     }
 
@@ -62,12 +62,12 @@ public class XpDroprateFormula extends DroprateFormula {
 
     public static int getPointsDropStatic(ServerPlayerEntity player) {
         int pointsLost = XpDroprateFormula.getPointsToLoseStatic(player);
-        int pointsDropped = (int) Math.round(CONFIG_COMPONENT.getXpDrop() * 0.01 * pointsLost);
+        int pointsDropped = (int) Math.round(CONFIG.getXpDrop() * 0.01 * pointsLost);
         return pointsDropped;
     }
 
     public static int getPointsToLoseStatic(ServerPlayerEntity player) {
-        double lossPercent = CONFIG_COMPONENT.getXpLoss() * 0.01;// * 0.01 to get it to the range 0.0 - 1.0
+        double lossPercent = CONFIG.getXpLoss() * 0.01;// * 0.01 to get it to the range 0.0 - 1.0
         return (int) Math.round(player.totalExperience * lossPercent);
     }
 

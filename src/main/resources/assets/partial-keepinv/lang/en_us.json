@@ -4,31 +4,45 @@
   "partial-keepinv.KeepinvMode.VANILLA": "Vanilla",
   "partial-keepinv.KeepinvMode.CUSTOM": "Custom",
   "partial-keepinv.KeepinvMode.RARITY": "Rarity",
-  "partial-keepinv.True": "True",
-  "partial-keepinv.False": "False",
   "partial-keepinv.gui.error.server_req": "You need to be on a server to access these settings.",
 
   "partial-keepinv.gui.modenabled.true": "Mod Enabled",
   "partial-keepinv.gui.modenabled.false": "Mod Disabled",
+  "partial-keepinv.gui.modenabled.tooltip": "Enable / Disable this mod's features",
   "partial-keepinv.gui.menu.close": "Close",
   "partial-keepinv.gui.menu.inventory": "Inventory",
   "partial-keepinv.gui.menu.experience": "Experience",
 
-  "partial-keepinv.gui.text.partialinvmode": "KeepInventory mode",
+  "partial-keepinv.gui.text.partialinvmode": "KeepInventory Mode",
+  "partial-keepinv.gui.tooltip.partialinvmode": "Inventory drop behaviour.",
   "partial-keepinv.gui.header.inv": "Inventory Settings",
   "partial-keepinv.gui.slider.static": "Static",
+  "partial-keepinv.gui.tooltip.static": "What percentage of items should be dropped.",
   "partial-keepinv.gui.slider.common": "Common",
+  "partial-keepinv.gui.tooltip.common": "What percentage of common items should be dropped.",
   "partial-keepinv.gui.slider.uncommon": "Uncommon",
+  "partial-keepinv.gui.tooltip.uncommon": "What percentage of uncommon items should be dropped.",
   "partial-keepinv.gui.slider.rare": "Rare",
+  "partial-keepinv.gui.tooltip.rare": "What percentage of rare items should be dropped.",
   "partial-keepinv.gui.slider.epic": "Epic",
-  "partial-keepinv.gui.textfield.invexpression": "Formula",
+  "partial-keepinv.gui.tooltip.epic": "What percentage of epic items should be dropped.",
 
-  "partial-keepinv.gui.header.xp": "Experience Settings",
+  "partial-keepinv.gui.text.customheader": "Custom Droprate",
+  "partial-keepinv.gui.textfield.invexpression": "Formula",
+  "partial-keepinv.gui.tooltip.invexpression": "Define how many items should be dropped with your own formula.",
+  "partial-keepinv.gui.list.invexpression": "Variable Guide",
+  "partial-keepinv.gui.text.invexpression": "- spawnDistance:   distance from player to spawnpoint\n- spawnX, spawnY, spawnZ:   spawn coordinates\n- playerX, playerY, playerZ:   player coordinates\n- rarityPercent:   get droprate from rarity as set in the config.\n- isEpic, isRare, isCommon, isUncommon:\nreturn 1.0 if true\n- dropPercent:   inventory droprate as set in the config",
+
+
+    "partial-keepinv.gui.header.xp": "Experience Settings",
   "partial-keepinv.gui.text.partialxpmode": "KeepXP Mode",
+  "partial-keepinv.gui.tooltip.partialxpmode": "XP drop behaviour.",
   "partial-keepinv.KeepXpMode.STATIC_POINTS": "Points",
   "partial-keepinv.KeepXpMode.STATIC_LEVELS": "Levels",
   "partial-keepinv.KeepXpMode.VANILLA": "Vanilla",
   "partial-keepinv.gui.slider.xploss": "XP Loss",
-  "partial-keepinv.gui.slider.xpdrop": "XP Drop"
+  "partial-keepinv.gui.tooltip.xploss": "How much XP to lose on death.",
+  "partial-keepinv.gui.slider.xpdrop": "XP Drop",
+  "partial-keepinv.gui.tooltip.xpdrop": "How much of the lost XP to drop as XP orbs."
 
 }

@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,7 +23,7 @@ public class SliderEntry extends Entry {
     final private Consumer<Double> set;
 
 
-    public SliderEntry(TextRenderer textRenderer, Text name, Supplier<Double> getter, Consumer<Double> setter, Function<Double, Text> toText, int yPos, float min, float max) {
+    public SliderEntry(TextRenderer textRenderer, Text name, Text tooltip, Supplier<Double> getter, Consumer<Double> setter, Function<Double, Text> toText, int yPos, float min, float max) {
         super(yPos);
         this.set = setter;
         this.textRenderer = textRenderer;
@@ -31,6 +32,9 @@ public class SliderEntry extends Entry {
 
         int nameWidth = textRenderer.getWidth(name);
         nameWidget = new TextWidget(SettingsGUI.sideMargin, yPos, nameWidth, 20, name, textRenderer);
+        if( tooltip != null) {
+            nameWidget.setTooltip(Tooltip.of(tooltip));
+        }
 
         double val = getter.get();
         sliderWidget = new SliderWidget(w - SettingsGUI.sliderWidth - SettingsGUI.sideMargin, yPos, SettingsGUI.sliderWidth, 20, toText.apply(val), val) {
@@ -78,6 +82,18 @@ public class SliderEntry extends Entry {
         }
     }
 
+    @Override
+    public void show(){
+        super.show();
+        sliderWidget.active = true;
+    }
+
+    @Override
+    public void hide(){
+        super.hide();
+        sliderWidget.active = false;
+    }
+
     public SliderWidget getSliderWidget(){
         return this.sliderWidget;
     }
@@ -91,6 +107,7 @@ public class SliderEntry extends Entry {
 
 
         private Text name = Text.literal("placeholder name");
+        private Text tooltip = null;
         private final TextRenderer textRenderer;
 
         private float min = 0.0f;
@@ -163,12 +180,17 @@ public class SliderEntry extends Entry {
             return this;
         }
 
+        public Builder setTooltip(Text tooltipText){
+            this.tooltip = tooltipText;
+            return this;
+        }
+
 
         public SliderEntry build() throws InstantiationException {
             if( set == null || get == null || toText == null ) {
                 throw new InstantiationException("Getter, setter, toText weren't set");
             }
-            return new SliderEntry(textRenderer, name, get, set, toText, yPos, min, max);
+            return new SliderEntry(textRenderer, name, tooltip, get, set, toText, yPos, min, max);
         }
     }
 

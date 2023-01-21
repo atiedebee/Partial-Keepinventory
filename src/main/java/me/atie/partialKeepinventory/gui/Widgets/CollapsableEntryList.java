@@ -1,7 +1,7 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
+import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.gui.SettingsGUI;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -19,20 +19,19 @@ public class CollapsableEntryList extends EntryList {
     private boolean collapsed;
 
 
-    public CollapsableEntryList(Text name,  EntryList parent, int y) {
-        this(name, parent, false, y);
+    public CollapsableEntryList(Text name,  EntryList parent, int y, int buttonX, int buttonW) {
+        this(name, parent, false, y, buttonX, buttonW);
     }
 
-    public CollapsableEntryList(Text name,  EntryList parent, boolean collapsed, int y) {
+    public CollapsableEntryList(Text name,  EntryList parent, boolean collapsed, int y, int buttonX, int buttonW) {
         super(y);
         this.collapsed = collapsed;
         this.parent = parent;
 
-        int buttonWidth = MinecraftClient.getInstance().getWindow().getWidth() - 2 * SettingsGUI.sideMargin;
-
         buttonWidgetEntry = new ButtonWidgetEntry(new ButtonWidget.Builder(name, this::collapse)
-                .dimensions(SettingsGUI.sideMargin, y, buttonWidth, SettingsGUI.widgetHeight)
+                .dimensions(buttonX, y, buttonW, SettingsGUI.widgetHeight)
                 .build());
+        buttonWidgetEntry.hidden = false;
         children.add(buttonWidgetEntry);
     }
 
@@ -61,10 +60,20 @@ public class CollapsableEntryList extends EntryList {
         }
     }
 
-
     private void collapse(ButtonWidget buttonWidget) {
         collapsed = !collapsed;
-        parent.updateY(parent.getY());
+        PartialKeepInventory.LOGGER.info("COLLAPSING: " + collapsed);
+        var it = children.iterator();
+        it.next();
+        while(it.hasNext()){
+            Entry e = it.next();
+            PartialKeepInventory.LOGGER.info(e.toString());
+            e.hidden = collapsed;
+        }
+
+        if( parent != null ) {
+            parent.updateY(parent.getY());
+        }
     }
 
     public ButtonWidget getButtonWidget(){
@@ -88,7 +97,9 @@ public class CollapsableEntryList extends EntryList {
 
         @Override
         public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            buttonWidget.render(matrices, mouseX, mouseY, delta);
+            if( !hidden ) {
+                buttonWidget.render(matrices, mouseX, mouseY, delta);
+            }
         }
 
         @Override

@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -19,7 +20,7 @@ public class TextFieldEntry extends Entry {
     private final TextFieldWidget textFieldWidget;
     private final TextRenderer textRenderer;
 
-    public TextFieldEntry(TextRenderer textRenderer, Text name, int yPos, String text) {
+    public TextFieldEntry(TextRenderer textRenderer, Text name, Text tooltip, int yPos, String text) {
         super(yPos);
         this.textRenderer = textRenderer;
 
@@ -30,6 +31,10 @@ public class TextFieldEntry extends Entry {
 
 
         nameWidget = new TextWidget(SettingsGUI.sideMargin, yPos, nameWidth, SettingsGUI.widgetHeight, name, textRenderer);
+        if(tooltip != null) {
+            nameWidget.setTooltip(Tooltip.of(tooltip));
+        }
+
         textFieldWidget = new TextFieldWidget(textRenderer, textFieldX, yPos, textFieldWidth, SettingsGUI.widgetHeight, name);
         textFieldWidget.setMaxLength(512);
         textFieldWidget.setText(text);
@@ -37,7 +42,7 @@ public class TextFieldEntry extends Entry {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        if( !this.hidden ) {
+        if( !hidden ) {
             nameWidget.render(matrices, mouseX, mouseY, delta);
             textFieldWidget.render(matrices, mouseX, mouseY, delta);
         }
@@ -70,6 +75,18 @@ public class TextFieldEntry extends Entry {
 
     }
 
+    @Override
+    public void show(){
+        super.show();
+        textFieldWidget.setEditable(true);
+    }
+
+    @Override
+    public void hide(){
+        super.hide();
+        textFieldWidget.setEditable(false);
+    }
+
     public TextFieldWidget getTextFieldWidget() {
         return this.textFieldWidget;
     }
@@ -82,6 +99,7 @@ public class TextFieldEntry extends Entry {
         private int yPos;
         private final TextRenderer textRenderer;
         private Text name;
+        private Text tooltip;
         private String text;
 
         public Builder(TextRenderer textRenderer) {
@@ -103,8 +121,12 @@ public class TextFieldEntry extends Entry {
             return this;
         }
 
+        public Builder setTooltip(Text tooltipText) {
+            this.tooltip = tooltipText;
+            return this;
+        }
         public TextFieldEntry build() {
-            return new TextFieldEntry(textRenderer, name, yPos, text);
+            return new TextFieldEntry(textRenderer, name, tooltip, yPos, text);
         }
     }
 }

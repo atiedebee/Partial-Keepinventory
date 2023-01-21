@@ -1,8 +1,9 @@
 package me.atie.partialKeepinventory.mixin;
 
+import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
-import me.atie.partialKeepinventory.KeepinvMode;
+import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -20,12 +21,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
-import static me.atie.partialKeepinventory.util.Inventory.shouldDropInventory;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
+import static me.atie.partialKeepinventory.util.InventoryUtil.shouldDropInventory;
 
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin {
@@ -37,36 +39,35 @@ public abstract class PlayerInventoryMixin {
     public DefaultedList<ItemStack> offHand;
 
     @Shadow @Final public PlayerEntity player;
+
     private static InventoryDroprateFormula inventoryDroprateFormula;
+
+    private int getInventorySize(){
+        return this.main.size() + this.armor.size() + this.offHand.size();
+    }
 
     private double dropPercentageFromRarity(ItemStack item) {
 
-        switch (CONFIG_COMPONENT.getPartialKeepinvMode()) {
+        switch (CONFIG.getPartialKeepinvMode()) {
             case CUSTOM:
                 return inventoryDroprateFormula.getResult(item);
             case STATIC:
-                return CONFIG_COMPONENT.getInventoryDroprate() / 100.0;
+                return CONFIG.getInventoryDroprate() / 100.0;
             case RARITY:
                 double droprate = switch (item.getRarity()) {
-                    case COMMON -> CONFIG_COMPONENT.getCommonDroprate();
-                    case UNCOMMON -> CONFIG_COMPONENT.getUncommonDroprate();
-                    case RARE -> CONFIG_COMPONENT.getRareDroprate();
-                    case EPIC -> CONFIG_COMPONENT.getEpicDroprate();
+                    case COMMON -> CONFIG.getCommonDroprate();
+                    case UNCOMMON -> CONFIG.getUncommonDroprate();
+                    case RARE -> CONFIG.getRareDroprate();
+                    case EPIC -> CONFIG.getEpicDroprate();
                 };
                 return droprate / 100.0;
             default:
-                throw new IllegalStateException("Unexpected value: " + CONFIG_COMPONENT.getPartialKeepinvMode());
+                throw new IllegalStateException("Unexpected value: " + CONFIG.getPartialKeepinvMode());
         }
     }
 
-
-
-
     @SuppressWarnings("UnusedAssignment")
-    private void dropInventoryEqually(List<ItemStack> stacks) {
-        HashMap<Item, ItemStack> itemDropCount = new HashMap<>(stacks.size());
-
-
+    private void getDropCounts(HashMap<Item, ItemStack> itemDropCounter, List<ItemStack> stacks){
         for (ItemStack stack : stacks) {
             //for future use, keep this
             boolean dontDrop = false;
@@ -83,15 +84,15 @@ public abstract class PlayerInventoryMixin {
                 Item itemAsKey = stack.getItem();
                 int stackCount = stack.getCount();
 
-                ItemStack itemstack = itemDropCount.get(itemAsKey);
+                ItemStack itemstack = itemDropCounter.get(itemAsKey);
                 if (itemstack == null) itemstack = new ItemStack(stack.getItem());
 
                 itemstack.setCount(itemstack.getCount() + stackCount);
-                itemDropCount.put(itemAsKey, itemstack);
+                itemDropCounter.put(itemAsKey, itemstack);
             }
         }
 
-        for( Map.Entry<Item, ItemStack> set : itemDropCount.entrySet() ){
+        for( Map.Entry<Item, ItemStack> set : itemDropCounter.entrySet() ){
             var v = set.getValue();
             final double percentage = dropPercentageFromRarity(v);
             int count;
@@ -99,8 +100,18 @@ public abstract class PlayerInventoryMixin {
             v.setCount(count);
         }
 
+    }
+
+
+    private void dropInventoryEqually(List<ItemStack> stacks) {
+        HashMap<Item, ItemStack> itemDropCounter;
+
+        itemDropCounter = new HashMap<>(stacks.size());
+
+        getDropCounts(itemDropCounter, stacks);
+
         for (ItemStack stack : stacks) {
-            var itemToDrop = itemDropCount.get(stack.getItem());
+            ItemStack itemToDrop = itemDropCounter.get(stack.getItem());
 
             if (itemToDrop != null) {
                 int dropAmount = Math.min(stack.getCount(), itemToDrop.getCount());
@@ -122,7 +133,7 @@ public abstract class PlayerInventoryMixin {
     public void dropSome(CallbackInfo ci) {
 
 
-        if( CONFIG_COMPONENT.getEnableMod() && CONFIG_COMPONENT.getPartialKeepinvMode() != KeepinvMode.VANILLA ) {
+        if( CONFIG.getEnableMod() && CONFIG.getPartialKeepinvMode() != KeepinvMode.VANILLA ) {
             ci.cancel(); //if the mod is enabled we make sure we don't have the function call dropInventory and friends
 
             if( !shouldDropInventory( (ServerPlayerEntity)this.player) ) {
@@ -130,22 +141,36 @@ public abstract class PlayerInventoryMixin {
                 return;
             }
 
-            if( CONFIG_COMPONENT.getPartialKeepinvMode() == KeepinvMode.CUSTOM) {
+            if( CONFIG.getPartialKeepinvMode() == KeepinvMode.CUSTOM) {
 
                 try{
-                    inventoryDroprateFormula = new InventoryDroprateFormula( (ServerPlayerEntity)this.player, CONFIG_COMPONENT.getExpression().toString() );
+                    inventoryDroprateFormula = new InventoryDroprateFormula( (ServerPlayerEntity)this.player, CONFIG.getExpression().toString() );
                 }
                 catch (Exception e) {
-                    String ErrorMessage = "Failed loading custom expression: \"" + CONFIG_COMPONENT.getExpression() + "\"\nResorting to percentage based drop behaviour";
+                    String ErrorMessage = "Failed loading custom expression: \"" + CONFIG.getExpression() + "\"\nResorting to percentage based drop behaviour";
                     PartialKeepInventory.LOGGER.error(ErrorMessage + "\n" + e.getMessage());
                     this.player.getCommandSource().sendFeedback(Text.literal(ErrorMessage).setStyle(Style.EMPTY.withColor(Formatting.RED)), true);
-                    CONFIG_COMPONENT.setPartialKeepinvMode(KeepinvMode.STATIC);
+                    CONFIG.setPartialKeepinvMode(KeepinvMode.STATIC);
                 }
             }
 
-            dropInventoryEqually(this.main);
-            dropInventoryEqually(this.armor);
-            dropInventoryEqually(this.offHand);
+            int capacity = getInventorySize();
+            List<ItemStack> inv = new ArrayList<>(capacity);
+
+            inv.addAll(this.main);
+            inv.addAll(this.armor);
+            inv.addAll(this.offHand);
+
+            for(var getter: InventoryUtil.inventorySlotGetters){
+                inv.addAll(getter.apply(this.player));
+            }
+            for(var item: inv){
+                if(!item.isEmpty()){
+                    PartialKeepInventory.LOGGER.info("Item: " + item.getItem().getName());
+                }
+            }
+
+            dropInventoryEqually(inv);
         }
     }
 }

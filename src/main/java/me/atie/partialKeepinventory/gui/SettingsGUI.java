@@ -3,7 +3,6 @@ package me.atie.partialKeepinventory.gui;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import me.atie.partialKeepinventory.PartialKeepInventory;
-import me.atie.partialKeepinventory.component.pkiScoreboardComponent;
 import me.atie.partialKeepinventory.component.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.ButtonSelectionEntry;
 import me.atie.partialKeepinventory.gui.Widgets.EntryList;
@@ -18,11 +17,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import org.apache.commons.beanutils.BeanUtils;
 
-import java.lang.reflect.InvocationTargetException;
-
-import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
 //TODO: Tooltips for all settings explaining how to use them
 
@@ -31,8 +27,7 @@ public class SettingsGUI extends Screen implements ModMenuApi {
 
     private Screen nextScreen;
     private Screen previousScreen;
-    public pkiSettings LOCAL_CONFIG = null;
-    private boolean integratedServer;
+    private pkiSettings LOCAL_CONFIG;
     public final static int vertOptionMargin = 5;
     public final static int sideMargin = 20;
     public final static int widgetHeight = 20;
@@ -68,30 +63,15 @@ public class SettingsGUI extends Screen implements ModMenuApi {
         assert (client != null);
         this.textRenderer = client.textRenderer;
 
-
-        //very long check to see if the player is in a world...
         if( !isInWorld() ){
             nextScreen = new ErrorScreen(this);
             client.setScreen(nextScreen);
             return;
         }
-        integratedServer = client.getServer() != null;
+        boolean isIntegratedServer = client.getServer() != null;
 
-        if( integratedServer ){
-            LOCAL_CONFIG = new pkiSettings();
-            try {
-                BeanUtils.copyProperties(LOCAL_CONFIG, CONFIG_COMPONENT);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                PartialKeepInventory.LOGGER.error(e.getMessage());
-                throw new RuntimeException(e);
-            }
+        LOCAL_CONFIG = CONFIG;
 
-            PartialKeepInventory.LOGGER.info("Got CONFIG_COMPONENT: " + LOCAL_CONFIG);
-        }
-        else {
-            LOCAL_CONFIG = PartialKeepInventory.LOCAL_CONFIG;
-            PartialKeepInventory.LOGGER.info("Got LOCAL CONFIG: " + LOCAL_CONFIG);
-        }
 
         initHeader();
 
@@ -103,15 +83,9 @@ public class SettingsGUI extends Screen implements ModMenuApi {
     public Screen constructScreen(ScreenTracker type) {
         Screen screen = null;
         switch (type) {
-            case INV_CONFIG -> {
-                screen = new InvSettingsScreen(this, LOCAL_CONFIG, header);
-            }
-            case XP_CONFIG -> {
-                screen = new XpSettingsScreen(this, LOCAL_CONFIG, header);
-            }
-            case ERROR -> {
-                screen = new ErrorScreen(this);
-            }
+            case INV_CONFIG -> screen = new InvSettingsScreen(this, LOCAL_CONFIG, header);
+            case XP_CONFIG -> screen = new XpSettingsScreen(this, LOCAL_CONFIG, header);
+            case ERROR -> screen = new ErrorScreen(this);
         }
         return screen;
     }
@@ -123,10 +97,11 @@ public class SettingsGUI extends Screen implements ModMenuApi {
         int buttonWidth = super.width/2;
         int buttonX = super.width/4;
 
-        SimpleButton<Boolean> enableModButtonEntry = new SimpleButton<>(buttonX, 0, buttonWidth, widgetHeight, modEnabledText(LOCAL_CONFIG.getEnableMod()),
+        SimpleButton enableModButtonEntry = new SimpleButton(buttonX, 0, buttonWidth, widgetHeight, modEnabledText(CONFIG.getEnableMod()),
+                Text.translatable(PartialKeepInventory.getID() + ".gui.modenabled.tooltip"),
                 b -> {
-                    boolean newVal = !LOCAL_CONFIG.getEnableMod();
-                    LOCAL_CONFIG.setEnableMod(newVal);
+                    boolean newVal = !CONFIG.getEnableMod();
+                    CONFIG.setEnableMod(newVal);
                     b.setMessage( modEnabledText(newVal) );
                 });
 
@@ -163,21 +138,10 @@ public class SettingsGUI extends Screen implements ModMenuApi {
             return;
         }
         //  synchronization
-
-        if(MinecraftClient.getInstance().getServer() != null) {// integrated server
-            try {
-                BeanUtils.copyProperties(CONFIG_COMPONENT, LOCAL_CONFIG);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                PartialKeepInventory.LOGGER.error(e.getMessage());
-                throw new RuntimeException(e);
-            }
-            CONFIG_COMPONENT.sync();
+        assert MinecraftClient.getInstance().player != null;
+        if(MinecraftClient.getInstance().player.hasPermissionLevel(4)) {
+            pkiSettings.updateServerConfig(LOCAL_CONFIG);
         }
-        else{
-            pkiScoreboardComponent.updateServerConfig(LOCAL_CONFIG);
-        }
-
-
     }
 
     @Override
@@ -187,12 +151,6 @@ public class SettingsGUI extends Screen implements ModMenuApi {
 
     public static Text percentageToText(double x) {
         return Text.literal(String.format("%.0f%%", Math.floor(x)));
-    }
-
-    public static Text boolToText(boolean b) {
-        if (b)
-            return Text.translatable(PartialKeepInventory.getID() + ".True");
-        return Text.translatable(PartialKeepInventory.getID() + ".False");
     }
 
     public static int nextElementY(int y){

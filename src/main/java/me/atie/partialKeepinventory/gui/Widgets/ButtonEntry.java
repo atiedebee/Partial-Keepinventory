@@ -37,7 +37,7 @@ public class ButtonEntry<T> extends Entry {
     }
 
 
-    private ButtonEntry(TextRenderer textRenderer, Text name, Tooltip tooltip, Supplier<T> getter, Consumer<T> setter, Function<T, Text> toText, Function<T, T> nextVal, int y){
+    private ButtonEntry(TextRenderer textRenderer, Text name, Text tooltip, Supplier<T> getter, Consumer<T> setter, Function<T, Text> toText, Function<T, T> nextVal, int y){
         super(y);
         get = getter;
         set = setter;
@@ -49,7 +49,9 @@ public class ButtonEntry<T> extends Entry {
         int w = MinecraftClient.getInstance().getWindow().getScaledWidth();
         int nameWidth = textRenderer.getWidth(name);
         nameWidget = new TextWidget(SettingsGUI.sideMargin, y, nameWidth, SettingsGUI.widgetHeight, name, textRenderer);
-
+        if( tooltip != null ) {
+            nameWidget.setTooltip(Tooltip.of(tooltip));
+        }
 
         buttonWidget = ButtonWidget.builder( toText.apply( get.get()), this::onPress)
                 .dimensions(w - SettingsGUI.buttonWidth - SettingsGUI.sideMargin, y, SettingsGUI.buttonWidth, SettingsGUI.widgetHeight)
@@ -84,6 +86,18 @@ public class ButtonEntry<T> extends Entry {
         nameWidget.setWidth(textRenderer.getWidth(nameWidget.getMessage()));
     }
 
+    @Override
+    public void show(){
+        super.show();
+        buttonWidget.active = true;
+    }
+
+    @Override
+    public void hide(){
+        super.hide();
+        buttonWidget.active = false;
+    }
+
     public ButtonWidget getButtonWidget(){
         return this.buttonWidget;
     }
@@ -106,7 +120,7 @@ public class ButtonEntry<T> extends Entry {
         int y = 0;
 
         private Text name = null;
-        private final Tooltip tooltip = null;//for future use
+        private Text tooltip = null;
         private final TextRenderer textRenderer;
 
         public Builder(TextRenderer t) {
@@ -142,6 +156,11 @@ public class ButtonEntry<T> extends Entry {
 
         public Builder<T> setName(Text name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder<T> setTooltip(Text tooltipName) {
+            this.tooltip = tooltipName;
             return this;
         }
 

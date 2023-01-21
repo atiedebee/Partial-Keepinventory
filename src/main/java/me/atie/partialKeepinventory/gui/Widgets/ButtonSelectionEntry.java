@@ -102,6 +102,22 @@ public class ButtonSelectionEntry<T> extends Entry {
         }
     }
 
+    @Override
+    public void show(){
+        super.show();
+        for (ButtonWidget buttonWidget : buttonWidgets) {
+            buttonWidget.active = true;
+        }
+    }
+
+    @Override
+    public void hide(){
+        super.hide();
+        for (ButtonWidget buttonWidget : buttonWidgets) {
+            buttonWidget.active = false;
+        }
+    }
+
 
     public static class Builder<T> {
         private final ArrayList<Text> names;
@@ -156,8 +172,8 @@ public class ButtonSelectionEntry<T> extends Entry {
             return new ButtonSelectionEntry<T>(yPos, xMargin, buttonMargin, values, names, onClick, buttonCount, values.get(0));
         }
 
-        public ButtonSelectionEntry<T> build(T defaultval) {
-            return new ButtonSelectionEntry<T>(yPos, xMargin, buttonMargin, values, names, onClick, buttonCount, defaultval);
+        public ButtonSelectionEntry<T> build(T defaultVal) {
+            return new ButtonSelectionEntry<T>(yPos, xMargin, buttonMargin, values, names, onClick, buttonCount, defaultVal);
         }
 
     }

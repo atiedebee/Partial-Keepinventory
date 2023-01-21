@@ -2,12 +2,12 @@ package me.atie.partialKeepinventory.util;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG_COMPONENT;
+import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
-public class Experience {
+public class ExperienceUtil {
 
     public static boolean shouldDropExperience(ServerPlayerEntity player){
-        return !CONFIG_COMPONENT.savedPlayersTeam.getPlayerList().contains(player.getEntityName());
+        return !CONFIG.getSavedPlayers().contains(player.getEntityName());
     }
 
     public static void removeXpLevels(int levels, ServerPlayerEntity player) {
