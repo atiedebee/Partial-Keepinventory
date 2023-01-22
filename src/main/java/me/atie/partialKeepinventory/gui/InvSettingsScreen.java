@@ -198,6 +198,7 @@ public class InvSettingsScreen extends Screen {
         this.height = height;
         heading.updateDimensions(width);
         entries.updateDimensions(width);
+        footing.getButtonWidget().setPos(width - SettingsGUI.widgetHeight- SettingsGUI.sideMargin, height - SettingsGUI.widgetHeight - SettingsGUI.vertOptionMargin);
     }
 
     private void setEntryVisibility(KeepinvMode mode) {
@@ -264,7 +265,7 @@ class InvCustomSettingsScreen extends Screen {
         this.height = height;
         heading.updateDimensions(width);
         options.updateDimensions(width);
-        footing.getButtonWidget().setX(width - SettingsGUI.sideMargin - SettingsGUI.widgetHeight);
+        footing.getButtonWidget().setPos(width - SettingsGUI.widgetHeight- SettingsGUI.sideMargin, height - SettingsGUI.widgetHeight - SettingsGUI.vertOptionMargin);
     }
 
     @Override

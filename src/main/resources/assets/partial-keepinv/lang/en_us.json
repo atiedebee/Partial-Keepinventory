@@ -31,10 +31,10 @@
   "partial-keepinv.gui.textfield.invexpression": "Formula",
   "partial-keepinv.gui.tooltip.invexpression": "Define how many items should be dropped with your own formula.",
   "partial-keepinv.gui.list.invexpression": "Variable Guide",
-  "partial-keepinv.gui.text.invexpression": "- spawnDistance:   distance from player to spawnpoint\n- spawnX, spawnY, spawnZ:   spawn coordinates\n- playerX, playerY, playerZ:   player coordinates\n- rarityPercent:   get droprate from rarity as set in the config.\n- isEpic, isRare, isCommon, isUncommon:\nreturn 1.0 if true\n- dropPercent:   inventory droprate as set in the config",
+  "partial-keepinv.gui.text.invexpression": "- spawnDistance:\n            Distance from player to spawnpoint.\n- spawnX, spawnY, spawnZ:\n            Spawn coordinates\n- playerX, playerY, playerZ:\n            Player coordinates.\n- rarityPercent:\n            Get droprate from rarity as set in the config.\n- isEpic, isRare, isCommon, isUncommon:\n            Return 1.0 if true\n- dropPercent:\n            Inventory droprate as set in the config",
 
 
-    "partial-keepinv.gui.header.xp": "Experience Settings",
+  "partial-keepinv.gui.header.xp": "Experience Settings",
   "partial-keepinv.gui.text.partialxpmode": "KeepXP Mode",
   "partial-keepinv.gui.tooltip.partialxpmode": "XP drop behaviour.",
   "partial-keepinv.KeepXpMode.STATIC_POINTS": "Points",

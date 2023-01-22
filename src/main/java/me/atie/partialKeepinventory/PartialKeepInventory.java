@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*
- * TODO: Fix the text that explains GUI variables
  * TODO: Trinkets settings (fix trinket droprates, they are currently dropped based on trinkets' code)
  *  Ideas for trinket settings:
  * 	- Trinket specific droprate
@@ -53,10 +52,7 @@ public class PartialKeepInventory implements ModInitializer {
 			}
 		});
 
-		// Prevent config component from "leaking"
-		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-			CONFIG.markDirty();
-		});
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> CONFIG.markDirty());
 
 
 	}
