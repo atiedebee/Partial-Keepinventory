@@ -2,7 +2,7 @@ package me.atie.partialKeepinventory.gui;
 
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
-import me.atie.partialKeepinventory.component.pkiSettings;
+import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

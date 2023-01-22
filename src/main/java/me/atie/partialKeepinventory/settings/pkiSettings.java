@@ -1,4 +1,4 @@
-package me.atie.partialKeepinventory.component;
+package me.atie.partialKeepinventory.settings;
 
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
@@ -21,7 +21,7 @@ import java.util.Objects;
 
 
 @SuppressWarnings("unused")
-public class pkiSettings extends PersistentState implements Cloneable {
+public class pkiSettings extends PersistentState implements Settings {
     public static Identifier updateServerConfig = new Identifier(PartialKeepInventory.getID(), "update-config");
     public static Identifier requestServerConfig = new Identifier(PartialKeepInventory.getID(), "config-request");
     public static Identifier sendServerConfig = new Identifier(PartialKeepInventory.getID(), "config-send");
@@ -233,6 +233,28 @@ public class pkiSettings extends PersistentState implements Cloneable {
 
 
     @Override
+    public NbtCompound readNbt(NbtCompound nbt) {
+        enableMod = nbt.getBoolean("enable");
+        keepinvMode = keepinvModeValues[nbt.getByte("invMode")];
+        inventoryDroprate = nbt.getByte("invDR");
+        commonDroprate = nbt.getByte("commonDR");
+        uncommonDroprate = nbt.getByte("uncommonDR");
+        rareDroprate = nbt.getByte("rareDR");
+        epicDroprate = nbt.getByte("epicDR");
+        expression = new StringBuffer(nbt.getString("invExpr"));
+
+        keepxpMode = keepxpModeValues[nbt.getByte("xpMode")];
+        xpDrop = nbt.getByte("xpDrop");
+        xpLoss = nbt.getByte("xpLoss");
+
+        NbtCompound playerNamesNbt = nbt.getCompound("savedPlayers");
+        savedPlayers = new ArrayList<>();
+        savedPlayers.addAll(playerNamesNbt.getKeys());
+
+        return nbt;
+    }
+
+    @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putBoolean("enable", enableMod);
         nbt.putByte("invMode", (byte) keepinvMode.ordinal());
@@ -260,23 +282,7 @@ public class pkiSettings extends PersistentState implements Cloneable {
     public static pkiSettings createFromNbt(NbtCompound nbt) {
 
         pkiSettings state = new pkiSettings();
-        state.enableMod = nbt.getBoolean("enable");
-        state.keepinvMode = keepinvModeValues[nbt.getByte("invMode")];
-        state.inventoryDroprate = nbt.getByte("invDR");
-        state.commonDroprate = nbt.getByte("commonDR");
-        state.uncommonDroprate = nbt.getByte("uncommonDR");
-        state.rareDroprate = nbt.getByte("rareDR");
-        state.epicDroprate = nbt.getByte("epicDR");
-        state.expression = new StringBuffer(nbt.getString("invExpr"));
-
-        state.keepxpMode = keepxpModeValues[nbt.getByte("xpMode")];
-        state.xpDrop = nbt.getByte("xpDrop");
-        state.xpLoss = nbt.getByte("xpLoss");
-
-        NbtCompound playerNamesNbt = nbt.getCompound("savedPlayers");
-        state.savedPlayers = new ArrayList<>();
-        state.savedPlayers.addAll(playerNamesNbt.getKeys());
-
+        state.readNbt(nbt);
 
         return state;
     }

@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory;
 
-import me.atie.partialKeepinventory.component.pkiSettings;
+import me.atie.partialKeepinventory.settings.pkiSettings;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;

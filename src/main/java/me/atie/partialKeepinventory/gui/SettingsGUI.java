@@ -3,7 +3,7 @@ package me.atie.partialKeepinventory.gui;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import me.atie.partialKeepinventory.PartialKeepInventory;
-import me.atie.partialKeepinventory.component.pkiSettings;
+import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.ButtonSelectionEntry;
 import me.atie.partialKeepinventory.gui.Widgets.EntryList;
 import me.atie.partialKeepinventory.gui.Widgets.SimpleButton;

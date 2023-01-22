@@ -25,7 +25,7 @@ public abstract class PlayerEntityMixin  {
     @Shadow public abstract boolean isCreative();
 
 
-    PlayerEntity player = (PlayerEntity)(Object)this;
+    private final PlayerEntity player = (PlayerEntity)(Object)this;
 
 
     private void updateTotalExperience(){
@@ -41,7 +41,7 @@ public abstract class PlayerEntityMixin  {
 
     @Inject(method = "getXpToDrop()I", at = @At("HEAD"), cancellable = true)
     public void customXpDrop(CallbackInfoReturnable<Integer> cir) {
-        if( !CONFIG.getEnableMod() || CONFIG.getKeepxpMode() == KeepXPMode.VANILLA || !ExperienceUtil.shouldDropExperience((ServerPlayerEntity) (Object)this)){
+        if( !CONFIG.getEnableMod() || CONFIG.getKeepxpMode() == KeepXPMode.VANILLA || !ExperienceUtil.shouldDropExperience((PlayerEntity) (Object)this)){
             return;
         }
 

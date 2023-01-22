@@ -1,8 +1,8 @@
 package me.atie.partialKeepinventory;
 
 import me.atie.partialKeepinventory.commands.pkiCommandRegistration;
-import me.atie.partialKeepinventory.component.pkiSettings;
-import me.atie.partialKeepinventory.impl.impl;
+import me.atie.partialKeepinventory.settings.pkiSettings;
+import me.atie.partialKeepinventory.impl.Impl;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -14,13 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*
+   TODO: Find a good way to implement trinkets drop behaviour
  * TODO: Trinkets settings (fix trinket droprates, they are currently dropped based on trinkets' code)
  *  Ideas for trinket settings:
- * 	- Trinket specific droprate
- *  - Follow / don't follow trinket drop rules (aka destroy / drop / keep. Maybe something to add to the main mod)
+ * 	- Trinkets specific droprates
+ *  - Follow / don't follow trinket drop rules (aka destroy / drop / keep)
  *
  * TODO: GUI for trinkets settings
- * TODO: Option for dropping shulker box contents instead of the shulkerbox themselves
+ * TODO: Option for dropping shulker box contents instead of the shulker box themselves
 * */
 
 public class PartialKeepInventory implements ModInitializer {
@@ -42,7 +43,7 @@ public class PartialKeepInventory implements ModInitializer {
 	public void onInitialize() {
 		pkiCommandRegistration.registerCommands();
 
-		impl.loadImplementations();
+		Impl.loadImplementations();
 
 		// init the settings for singleplayer worlds.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
