@@ -6,7 +6,6 @@ import net.minecraft.util.math.Vec3d;
 import redempt.crunch.CompiledExpression;
 import redempt.crunch.functional.EvaluationEnvironment;
 
-// Doing this the OOP way for fun.
 
 public class DroprateFormula {
     protected final ServerPlayerEntity player;
@@ -16,6 +15,7 @@ public class DroprateFormula {
 
     public DroprateFormula(ServerPlayerEntity player) {
         this.player = player;
+        env = new EvaluationEnvironment();
     }
 
     protected BlockPos getPlayerSpawn(){
@@ -31,6 +31,11 @@ public class DroprateFormula {
         Vec3d playerPos = this.player.getPos();
 
         return playerPos.distanceTo(spawnPos);
+    }
+
+    protected double getResult(){
+
+        return Math.min(1.0, Math.max(cx.evaluate(), 0.0));
     }
 
 }

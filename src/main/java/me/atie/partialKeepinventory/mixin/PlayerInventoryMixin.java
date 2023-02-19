@@ -3,7 +3,7 @@ package me.atie.partialKeepinventory.mixin;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
-import me.atie.partialKeepinventory.util.InventoryUtil;
+import me.atie.partialKeepinventory.impl.Impl;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -13,6 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
+import static me.atie.partialKeepinventory.util.InventoryUtil.DropAction;
 import static me.atie.partialKeepinventory.util.InventoryUtil.shouldDropInventory;
 
 @Mixin(PlayerInventory.class)
@@ -40,7 +42,7 @@ public abstract class PlayerInventoryMixin {
 
     @Shadow @Final public PlayerEntity player;
 
-    private static InventoryDroprateFormula inventoryDroprateFormula;
+    private InventoryDroprateFormula inventoryDroprateFormula = null;
 
     private int getInventorySize(){
         return this.main.size() + this.armor.size() + this.offHand.size();
@@ -49,35 +51,43 @@ public abstract class PlayerInventoryMixin {
 
 
     /**
-     * @param item The item to get the drop percentage from
+     * @param itemStack The item
      * @return What percentage of the item should be dropped (where 1.0 == 100%)
      */
-    private double getDropPercentage(ItemStack item) {
+    private Pair<Double, DropAction> getDropBehaviour(ItemStack itemStack) {
 
-        switch (CONFIG.getPartialKeepinvMode()) {
-            case CUSTOM:
-                return inventoryDroprateFormula.getResult(item);
-            case STATIC:
-                return CONFIG.getInventoryDroprate() / 100.0;
-            case RARITY:
-                double droprate = switch (item.getRarity()) {
+        /* First test out custom drop behaviour*/
+        for( var e: Impl.entryPoints.entrySet()){
+            Pair<Double, DropAction> behaviour = e.getValue().getDropBehaviour(player, itemStack);
+            if( behaviour != null ){
+                PartialKeepInventory.LOGGER.info("Got behaviour from the functions: " + behaviour.getRight().toString());
+                return behaviour;
+            }
+        }
+
+        double percentage = switch (CONFIG.getPartialKeepinvMode()) {
+            case CUSTOM -> inventoryDroprateFormula.getResult(itemStack);
+            case STATIC -> CONFIG.getInventoryDroprate() / 100.0;
+            case RARITY -> switch (itemStack.getRarity()) {
                     case COMMON -> CONFIG.getCommonDroprate();
                     case UNCOMMON -> CONFIG.getUncommonDroprate();
                     case RARE -> CONFIG.getRareDroprate();
                     case EPIC -> CONFIG.getEpicDroprate();
-                };
-                return droprate / 100.0;
-            default:
-                throw new IllegalStateException("Unexpected value: " + CONFIG.getPartialKeepinvMode());
-        }
+                } / 100.0;
+            default -> throw new IllegalStateException("Unexpected value: " + CONFIG.getPartialKeepinvMode());
+        };
+
+        PartialKeepInventory.LOGGER.info("Returning normal pair");
+
+        return new Pair<>(percentage, DropAction.DROP);
     }
 
     /**
-     * @param itemDropCounter A hashmap containing how much to drop of each item
+     * @param itemDropCounter A hashmap containing how much to drop of each item and what behaviour to apply
      * @param stacks A list of references to item stacks in the inventory
      */
     @SuppressWarnings("UnusedAssignment")
-    private void getItemCounts(HashMap<Item, ItemStack> itemDropCounter, List<ItemStack> stacks){
+    private void getItemCounts(HashMap< Item, Pair<ItemStack, DropAction> > itemDropCounter, List<ItemStack> stacks){
         for (ItemStack stack : stacks) {
             //for future use, keep this
             boolean dontDrop = false;
@@ -94,20 +104,29 @@ public abstract class PlayerInventoryMixin {
                 Item itemAsKey = stack.getItem();
                 int stackCount = stack.getCount();
 
-                ItemStack itemstack = itemDropCounter.get(itemAsKey);
-                if (itemstack == null) itemstack = new ItemStack(stack.getItem());
+                Pair<ItemStack, DropAction> pair =  itemDropCounter.get(itemAsKey);
+                if( pair == null ) {
+                    pair = new Pair<>(new ItemStack(itemAsKey, 0), DropAction.DROP);
+                    itemDropCounter.put(itemAsKey, pair);
+                }
 
+                ItemStack itemstack = pair.getLeft();
                 itemstack.setCount(itemstack.getCount() + stackCount);
-                itemDropCounter.put(itemAsKey, itemstack);
+                itemDropCounter.get(itemAsKey).setLeft(itemstack);
             }
         }
 
-        for( Map.Entry<Item, ItemStack> set : itemDropCounter.entrySet() ){
-            var v = set.getValue();
-            final double percentage = getDropPercentage(v);
-            int count;
-            count = (int) (percentage * v.getCount());
-            v.setCount(count);
+        for( Map.Entry<Item, Pair<ItemStack, DropAction>> set : itemDropCounter.entrySet() ){
+            Pair<ItemStack, DropAction> itemDropBehaviour = set.getValue();
+
+            ItemStack itemStack = itemDropBehaviour.getLeft();
+
+            Pair<Double, DropAction> behaviour = getDropBehaviour(itemStack);
+            itemDropBehaviour.setRight( behaviour.getRight() );
+            double dropPercentage = behaviour.getLeft();
+
+            final int dropCount = (int) (dropPercentage * itemStack.getCount());
+            itemStack.setCount(dropCount);
         }
 
     }
@@ -116,22 +135,23 @@ public abstract class PlayerInventoryMixin {
     /**
      * Drop / remove items.
      * @param invStack  A reference of the stack object that's in the inventory
-     * @param dropCounter A reference of the stack object that's used to count how many items to dorp
+     * @param dropCounter A reference of the stack object that's used to count how many items to drop
      */
-    private void itemDropAction(ItemStack invStack, ItemStack dropCounter){
-        int dropAmount = Math.min(invStack.getCount(), dropCounter.getCount());
+    private void dropItems(ItemStack invStack, Pair<ItemStack, DropAction> dropCounter){
+        ItemStack dropItemStack = dropCounter.getLeft();
+        DropAction dropAction = dropCounter.getRight();
+
+        int dropAmount = Math.min(invStack.getCount(), dropItemStack.getCount());
 
         var dropStack = invStack.copy();
         dropStack.setCount(dropAmount);
 
-        InventoryUtil.DropAction action = InventoryUtil.DropAction.DROP;
-
-        switch(action){
+        switch(dropAction){
             case DROP:
                 this.player.dropItem(dropStack, false);
                 // fallthrough
             case DESTROY:
-                dropCounter.decrement(dropAmount);
+                dropItemStack.decrement(dropAmount);
                 invStack.decrement(dropAmount);
                 break;
             case KEEP:
@@ -147,34 +167,50 @@ public abstract class PlayerInventoryMixin {
      * @param stacks List of stacks that are references to the stacks in the inventory
      */
     private void dropInventoryEqually(List<ItemStack> stacks) {
-        HashMap<Item, ItemStack> itemDropCounter;
+        HashMap<Item, Pair<ItemStack, DropAction>> itemDropCounter;
 
         itemDropCounter = new HashMap<>(stacks.size());
 
         getItemCounts(itemDropCounter, stacks);
 
         for (ItemStack stack : stacks) {
-            ItemStack itemDropCounterStack = itemDropCounter.get(stack.getItem());
+            Pair<ItemStack, DropAction> entry = itemDropCounter.get(stack.getItem());
 
-            if (itemDropCounterStack != null) {
-                itemDropAction(stack, itemDropCounterStack);
+            if (entry != null) {
+                dropItems(stack, entry);
             }
         }
     }
 
+    private List<ItemStack> loadInventory(){
+        int capacity = getInventorySize();
+        List<ItemStack> inv = new ArrayList<>(capacity);
+
+        inv.addAll(this.main);
+        inv.addAll(this.armor);
+        inv.addAll(this.offHand);
+
+        var it = Impl.entryPoints.entrySet().iterator();
+        while(it.hasNext()){
+            inv.addAll(it.next().getValue().getInventorySlots(this.player));
+        }
+        return inv;
+    }
+
+
     @Inject(method = "dropAll()V", at = @At("HEAD"), cancellable = true)
     public void dropSome(CallbackInfo ci) {
-
+        PartialKeepInventory.LOGGER.info("-- Drop some --");
 
         if( CONFIG.getEnableMod() && CONFIG.getPartialKeepinvMode() != KeepinvMode.VANILLA ) {
-            ci.cancel(); //if the mod is enabled we make sure we don't have the function call dropInventory and friends
+            //if the mod is enabled we make sure we don't have 'dropAll' call dropInventory and friends
+            ci.cancel();
 
             if( !shouldDropInventory( (ServerPlayerEntity)this.player) ) {
-                // Don't drop
                 return;
             }
 
-            if( CONFIG.getPartialKeepinvMode() == KeepinvMode.CUSTOM) {
+            if( CONFIG.getPartialKeepinvMode() == KeepinvMode.CUSTOM && inventoryDroprateFormula == null) {
                 try{
                     inventoryDroprateFormula = new InventoryDroprateFormula( (ServerPlayerEntity)this.player, CONFIG.getExpression().toString() );
                 }
@@ -185,21 +221,8 @@ public abstract class PlayerInventoryMixin {
                     CONFIG.setPartialKeepinvMode(KeepinvMode.STATIC);
                 }
             }
-            int capacity = getInventorySize();
-            List<ItemStack> inv = new ArrayList<>(capacity);
 
-            inv.addAll(this.main);
-            inv.addAll(this.armor);
-            inv.addAll(this.offHand);
-
-            for(var getter: InventoryUtil.inventorySlotGetters){
-                inv.addAll(getter.apply(this.player));
-            }
-            for(var itemStack: inv){
-                if(!itemStack.isEmpty()){
-                    PartialKeepInventory.LOGGER.info("Item: " + itemStack.getItem().getName());
-                }
-            }
+            List<ItemStack> inv = loadInventory();
             dropInventoryEqually(inv);
         }
 

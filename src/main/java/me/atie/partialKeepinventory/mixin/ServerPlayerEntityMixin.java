@@ -1,44 +1,137 @@
 package me.atie.partialKeepinventory.mixin;
 
+import com.mojang.authlib.GameProfile;
 import me.atie.partialKeepinventory.KeepXPMode;
-import me.atie.partialKeepinventory.KeepinvMode;
+import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.XpDroprateFormula;
+import me.atie.partialKeepinventory.settings.pkiVersion;
 import me.atie.partialKeepinventory.util.ExperienceUtil;
-import me.atie.partialKeepinventory.util.InventoryUtil;
+import me.atie.partialKeepinventory.util.ServerPlayerClientVersion;
+import me.atie.partialKeepinventory.util.getXpLoss;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin {
+public abstract class ServerPlayerEntityMixin extends PlayerEntity
+        implements getXpLoss, ServerPlayerClientVersion
+{
+    private int xpDropAmount;
 
-    @Inject(method = "copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V",
-            at = @At("TAIL"),
-            locals = LocalCapture.CAPTURE_FAILHARD
-    )
-    public void keepXP(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        if( !alive && CONFIG.getEnableMod() ){
+    private int xpLossAmount;
+    private pkiVersion clientPKIVersion;
 
 
-            if( CONFIG.getKeepxpMode() != KeepXPMode.VANILLA &&  ExperienceUtil.shouldDropExperience(oldPlayer)) {
-                switch( CONFIG.getKeepxpMode() ) {
-                    case STATIC_LEVELS -> ExperienceUtil.removeXpLevels(XpDroprateFormula.getLevelsToLoseStatic(oldPlayer), (ServerPlayerEntity) (Object)this);
+    public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
+        super(world, pos, yaw, gameProfile);
+    }
 
-                    case STATIC_POINTS -> ((ServerPlayerEntity) (Object) this).addExperience(-1 * XpDroprateFormula.getPointsToLoseStatic(oldPlayer));
+    @Shadow public abstract void addExperience(int experience);
+    @Shadow @Nullable private Vec3d enteredNetherPos;
 
-                    default -> throw new IllegalStateException("Unexpected value: " + CONFIG.getKeepxpMode());
+
+    @Override
+    public int getXpLossAmount(){
+        return xpLossAmount;
+    }
+
+    @Override
+    public int getXpToDrop() {
+        if( xpDropAmount < 0 ) {
+            return super.getXpToDrop();
+        }
+        return xpDropAmount;
+    }
+
+    @Override
+    public pkiVersion getClientPKIVersion() {
+        return this.clientPKIVersion;
+    }
+
+    @Override
+    public void setClientPKIVersion(pkiVersion version) {
+        this.clientPKIVersion = version;
+    }
+
+    public int levelsToDrop(int startLevel, int levels){
+        final int temp_level = this.experienceLevel;
+        int dropAmount = 0;
+
+        this.experienceLevel = startLevel;
+        for( int i = 0; i < levels; i++ ){
+            dropAmount += this.getNextLevelExperience();
+            this.experienceLevel += 1;
+        }
+        this.experienceLevel = temp_level;
+        return dropAmount;
+    }
+
+    /**
+     * sets the xpLossAmount and xpDropAmount variables for later use
+     * @param mode keepxp mode
+     */
+    public void setXpDropAmounts(KeepXPMode mode){
+        ServerPlayerEntity player = (ServerPlayerEntity)(Object) this;
+        int experienceLevel = player.experienceLevel;
+        int totalExperience = player.totalExperience;
+
+        switch( mode )
+        {
+            case STATIC_LEVELS:
+                xpLossAmount = ExperienceUtil.getLevelsToLoseStatic(player);
+                final int xpLevelsDropped = ExperienceUtil.getLevelDropStatic(xpLossAmount);
+                xpDropAmount = levelsToDrop(this.experienceLevel - xpLossAmount, xpLevelsDropped);
+                break;
+
+            case STATIC_POINTS:
+                xpLossAmount = ExperienceUtil.getPointsToLoseStatic(player);
+                xpDropAmount = ExperienceUtil.getPointsDropStatic(xpLossAmount);
+                break;
+
+            case CUSTOM_LEVELS:
+            case CUSTOM_POINTS:
+                XpDroprateFormula dropForm = new XpDroprateFormula(player, CONFIG.getXpDropExpression().toString());
+                XpDroprateFormula lossForm = new XpDroprateFormula(player, CONFIG.getXpLossExpression().toString());
+
+                double dropPercentage = dropForm.getResult(experienceLevel, totalExperience);
+                double lossPercentage = lossForm.getResult(experienceLevel, totalExperience);
+                lossPercentage = Math.max(Math.min(1.0, lossPercentage), 0.0);
+                dropPercentage = Math.max(Math.min(1.0, dropPercentage), 0.0);
+
+                xpLossAmount = (int) (totalExperience * lossPercentage);
+                final int xpDropLevels = (int) (xpLossAmount * dropPercentage);
+
+                if( mode == KeepXPMode.CUSTOM_LEVELS ){
+                    xpDropAmount = levelsToDrop(this.experienceLevel - xpLossAmount, xpDropLevels);
                 }
-            }
+                break;
 
-            if( CONFIG.getPartialKeepinvMode() != KeepinvMode.VANILLA && !InventoryUtil.shouldDropInventory(oldPlayer) ) {
-                ((ServerPlayerEntity)(Object)this).getInventory().clone(oldPlayer.getInventory());
-            }
+            default:
+                throw new IllegalStateException("Unexpected value: " + mode);
+        }
+    }
 
+
+    @Inject(method = "onDeath", at = @At("HEAD"))
+    public void prepareXpDroprates(CallbackInfo ci){
+        PartialKeepInventory.LOGGER.info("-- Prepare experience --");
+        ExperienceUtil.updateTotalExperience(this);
+
+        if( CONFIG.getEnableMod() ) {
+            setXpDropAmounts(CONFIG.getKeepxpMode());
+        }else{
+            xpLossAmount = -1;
+            xpDropAmount = -1;
         }
     }
 

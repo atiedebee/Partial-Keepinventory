@@ -6,6 +6,8 @@ import dev.emi.trinkets.api.TrinketEnums;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.emi.trinkets.api.event.TrinketDropCallback;
 import me.atie.partialKeepinventory.PartialKeepInventory;
+import me.atie.partialKeepinventory.api.pkiApi;
+import me.atie.partialKeepinventory.settings.Settings;
 import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -14,74 +16,86 @@ import net.minecraft.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrinketsImpl {
+public class TrinketsImpl extends pkiApi {
     public static TrinketsSettings trinketSettings = new TrinketsSettings();
 
 
-    public static void load(){
-        PartialKeepInventory.LOGGER.info("Trinkets compatibility enabled");
 
+    public TrinketsImpl(){
         TrinketDropCallback.EVENT.register(((dropRule, itemStack, slotReference, livingEntity) -> {
-            PartialKeepInventory.LOGGER.info("Drop callback is being executed");
             if( trinketSettings.OverrideDropRule() ){
                 return TrinketEnums.DropRule.KEEP;
             }
             return dropRule;
         }));
 
-        InventoryUtil.inventorySlotGetters.add(TrinketsImpl::getTrinketSlots);
-        InventoryUtil.droprateGetters.add(TrinketsImpl::getTrinketDroprate);
     }
 
+    @Override
+    public Settings getSettings(){
+        return trinketSettings;
+    }
 
-    public static InventoryUtil.DropBehaviour getTrinketDroprate(PlayerEntity player, ItemStack itemStack) {
+    @Override
+    public String getModId() {
+        return "trinkets";
+    }
+
+    @Override
+    public Pair<Double, InventoryUtil.DropAction> getDropBehaviour(PlayerEntity player, ItemStack itemStack) {
         if( TrinketsApi.getTrinket( itemStack.getItem() ).equals( TrinketsApi.getDefaultTrinket() ) ) {
-            return InventoryUtil.NO_DROPBEHAVIOUR;
+            return null;
         }
 
-        double val = switch(trinketSettings.getMode()) {
-            case STATIC -> trinketSettings.getStaticDroprate();
-            case RARITY -> switch (itemStack.getRarity()) {
-                case COMMON -> trinketSettings.getCommonDroprate();
-                case UNCOMMON -> trinketSettings.getUncommonDroprate();
-                case RARE -> trinketSettings.getRareDroprate();
-                case EPIC -> trinketSettings.getEpicDroprate();
-            };
-            case DEFAULT -> 100;
-        } / 100.0;
 
+        double val = 0.0;
+        if( trinketSettings.OverrideDropRule() ) {
+            val = switch (trinketSettings.getMode()) {
+                case STATIC -> trinketSettings.getStaticDroprate();
+                case RARITY -> switch (itemStack.getRarity()) {
+                    case COMMON -> trinketSettings.getCommonDroprate();
+                    case UNCOMMON -> trinketSettings.getUncommonDroprate();
+                    case RARE -> trinketSettings.getRareDroprate();
+                    case EPIC -> trinketSettings.getEpicDroprate();
+                };
+                case DEFAULT -> 100;
+            };
+            val = val / 100.0;
+        }
 
         InventoryUtil.DropAction da = getTrinketDropaction(player, itemStack);
-        return new InventoryUtil.DropBehaviour(da, val);
+        return new Pair<>(val, da);
     }
 
     private static InventoryUtil.DropAction getTrinketDropaction(PlayerEntity player, ItemStack stack) {
-        if( TrinketsApi.getTrinketComponent(player).isPresent() ){
+        if( TrinketsApi.getTrinketComponent(player).isEmpty() ){
+            // really do hope this doesnt happen
+            PartialKeepInventory.LOGGER.error("Couldn't get trinket component from player " + player.getDisplayName().getString());
             return InventoryUtil.DropAction.NONE;
         }
 
-        SlotReference ref = null;
         TrinketComponent trinketComponent = TrinketsApi.getTrinketComponent(player).get();
-        for( var pair: trinketComponent.getEquipped(stack.getItem()) ) {
-            if(pair.getRight().isItemEqual(stack)){
-                ref = pair.getLeft();
-                break;
-            }
-        }
-        if( ref == null ){
-            PartialKeepInventory.LOGGER.info("Reference is null, resulting to default dropaction");
-            return InventoryUtil.DropAction.DROP;
-        }
-        TrinketEnums.DropRule dr = TrinketsApi.getTrinket(stack.getItem()).getDropRule(stack, ref, player);
 
+        var equipped = trinketComponent.getEquipped(stack.getItem());
+        if( equipped.size() == 0 ){
+            return InventoryUtil.DropAction.NONE;
+        }
+        SlotReference ref = equipped.get(0).getLeft();
+
+        TrinketEnums.DropRule dr = TrinketEnums.DropRule.DEFAULT;
+        if( !trinketSettings.OverrideDropRule()) {
+            dr = TrinketsApi.getTrinket(stack.getItem()).getDropRule(stack, ref, player);
+        }
         return switch (dr){
-            case KEEP -> InventoryUtil.DropAction.KEEP;
+            case KEEP, DEFAULT -> InventoryUtil.DropAction.KEEP;
             case DROP -> InventoryUtil.DropAction.DROP;
             case DESTROY -> InventoryUtil.DropAction.DESTROY;
-            case DEFAULT -> InventoryUtil.DropAction.KEEP;
         };
     }
 
+    public List<ItemStack> getInventorySlots(PlayerEntity player){
+        return getTrinketSlots(player);
+    }
 
 
     private static List<ItemStack> getTrinketSlots(PlayerEntity player) {

@@ -19,6 +19,7 @@ import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+// TODO: client-side gui command
 public class pkiCommandRegistration {
 
     private static void modeMessage(CommandContext<ServerCommandSource> ctx) {
@@ -37,8 +38,9 @@ public class pkiCommandRegistration {
 
     public static void registerCommands() {
 
+
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                dispatcher.register(literal("pki").requires(source -> source.hasPermissionLevel(4))
+                dispatcher.register(literal("pki").requires(source -> source.hasPermissionLevel(4) )
                         .then(literal("enable").executes(
                                 ctx -> {
                                     CONFIG.setEnableMod(true);
@@ -81,10 +83,15 @@ public class pkiCommandRegistration {
                                     message += "\n---XP---\n";
                                     message += ">Mode: " + CONFIG.getKeepxpMode().toString() + "\n";
                                     message += switch (CONFIG.getKeepxpMode()) {
-                                        case STATIC_POINTS, STATIC_LEVELS -> "" +
+                                        case STATIC_POINTS, STATIC_LEVELS ->
                                                 ">Loss percentage: " + CONFIG.getXpLoss() + "%\n" +
                                                 ">Drop percentage: " + CONFIG.getXpDrop() + "%\n";
                                         case VANILLA -> "";
+                                        case CUSTOM_LEVELS, CUSTOM_POINTS ->
+                                                ">Loss percentage: " + CONFIG.getXpLoss() + "%\n" +
+                                                ">Drop percentage: " + CONFIG.getXpDrop() + "%\n" +
+                                                ">Drop expression: \"" + CONFIG.getXpDropExpression() + "\"\n" +
+                                                ">Loss expression: \"" + CONFIG.getXpLossExpression() + "\"\n";
                                     };
 
                                     ctx.getSource().sendMessage(Text.literal(message));
@@ -309,6 +316,20 @@ public class pkiCommandRegistration {
                                                     return 1;
                                                 })
                                         )
+                                        .then(literal("custom-points")
+                                                .executes(ctx -> {
+                                                    CONFIG.setKeepxpMode(KeepXPMode.CUSTOM_POINTS);
+                                                    ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
+                                                    return 1;
+                                                })
+                                        )
+                                        .then(literal("custom-level")
+                                                .executes(ctx -> {
+                                                    CONFIG.setKeepxpMode(KeepXPMode.CUSTOM_LEVELS);
+                                                    ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
+                                                    return 1;
+                                                })
+                                        )
                                         .executes(ctx -> {
                                             ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
                                             return 1;
@@ -342,6 +363,32 @@ public class pkiCommandRegistration {
                                                     percentMessage(ctx, "xp droprate", CONFIG.getXpDrop());
                                                     return 1;
                                                 })
+                                        )
+                                )
+                                .then(literal("expression")
+                                        .then(literal("loss")
+                                                .then(argument("expression", StringArgumentType.greedyString())
+                                                        .executes(ctx -> {
+                                                            String expr = StringArgumentType.getString(ctx, "expression");
+                                                            ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expr + "\""));
+
+                                                            CONFIG.setXpLossExpression(expr);
+
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
+                                        .then(literal("drop")
+                                                .then(argument("expression", StringArgumentType.greedyString())
+                                                        .executes(ctx -> {
+                                                            String expr = StringArgumentType.getString(ctx, "expression");
+                                                            ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expr + "\""));
+
+                                                            CONFIG.setXpDropExpression(expr);
+
+                                                            return 1;
+                                                        })
+                                                )
                                         )
                                 )
                         )//TODO: proper help commands for each part of the mod
@@ -378,6 +425,7 @@ public class pkiCommandRegistration {
                             ));
                             return 1;
                         })
+
                 )
         );
 

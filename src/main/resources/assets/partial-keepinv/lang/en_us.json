@@ -39,10 +39,18 @@
   "partial-keepinv.gui.tooltip.partialxpmode": "XP drop behaviour.",
   "partial-keepinv.KeepXpMode.STATIC_POINTS": "Points",
   "partial-keepinv.KeepXpMode.STATIC_LEVELS": "Levels",
+  "partial-keepinv.KeepXpMode.CUSTOM_POINTS": "Custom Points",
+  "partial-keepinv.KeepXpMode.CUSTOM_LEVELS": "Custom Levels",
   "partial-keepinv.KeepXpMode.VANILLA": "Vanilla",
   "partial-keepinv.gui.slider.xploss": "XP Loss",
   "partial-keepinv.gui.tooltip.xploss": "How much XP to lose on death.",
   "partial-keepinv.gui.slider.xpdrop": "XP Drop",
-  "partial-keepinv.gui.tooltip.xpdrop": "How much of the lost XP to drop as XP orbs."
+  "partial-keepinv.gui.tooltip.xpdrop": "How much of the lost XP to drop as XP orbs.",
+
+  "partial-keepinv.gui.text.customxpheader": "Custom Experience Settings",
+  "partial-keepinv.gui.textfield.xploss-expression": "Xp Loss Formula",
+  "partial-keepinv.gui.textfield.xpdrop-expression": "Xp Drop Formula",
+  "partial-keepinv.gui.list.xpexpression": "Xp Formula Variables",
+  "partial-keepinv.gui.text.xpexpression-guide": "- spawnDistance:\n            Distance from player to spawnpoint.\n- spawnX, spawnY, spawnZ:\n            Spawn coordinates\n- playerX, playerY, playerZ:\n            Player coordinates.\n"
 
 }

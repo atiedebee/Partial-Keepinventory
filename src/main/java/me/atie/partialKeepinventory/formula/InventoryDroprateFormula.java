@@ -1,12 +1,10 @@
 package me.atie.partialKeepinventory.formula;
 
-import me.atie.partialKeepinventory.PartialKeepInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
 import redempt.crunch.Crunch;
-import redempt.crunch.functional.EvaluationEnvironment;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
@@ -29,7 +27,6 @@ public class InventoryDroprateFormula extends DroprateFormula {
 
     public InventoryDroprateFormula(ServerPlayerEntity player, String expression) {
         super(player);
-        env = new EvaluationEnvironment();
 
         final BlockPos spawnPos = getPlayerSpawn();
 
@@ -75,7 +72,7 @@ public class InventoryDroprateFormula extends DroprateFormula {
     public double getResult(ItemStack item) {
         this.item = item;
 
-        return cx.evaluate();
+        return super.getResult();
     }
 
 

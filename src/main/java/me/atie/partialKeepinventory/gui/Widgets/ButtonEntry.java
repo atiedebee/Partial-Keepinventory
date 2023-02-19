@@ -58,6 +58,8 @@ public class ButtonEntry<T> extends Entry {
                 .build();
     }
 
+
+
     @Override
     public int updateY(int y){
         nameWidget.setY(y);
@@ -118,6 +120,7 @@ public class ButtonEntry<T> extends Entry {
         private Function<T, T> nextVal = null;
 
         int y = 0;
+
 
         private Text name = null;
         private Text tooltip = null;

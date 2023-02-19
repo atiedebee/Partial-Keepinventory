@@ -72,9 +72,7 @@ public class SettingsGUI extends Screen implements ModMenuApi {
 
         LOCAL_CONFIG = CONFIG;
 
-
         initHeader();
-
 
         nextScreen = new InvSettingsScreen(this, LOCAL_CONFIG, header);
         client.setScreen(nextScreen);

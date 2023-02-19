@@ -3,47 +3,51 @@ package me.atie.partialKeepinventory.settings;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
+import me.atie.partialKeepinventory.impl.Impl;
+import me.atie.partialKeepinventory.network.Identifiers;
+import me.atie.partialKeepinventory.network.ServerListeners;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
 @SuppressWarnings("unused")
 public class pkiSettings extends PersistentState implements Settings {
-    public static Identifier updateServerConfig = new Identifier(PartialKeepInventory.getID(), "update-config");
-    public static Identifier requestServerConfig = new Identifier(PartialKeepInventory.getID(), "config-request");
-    public static Identifier sendServerConfig = new Identifier(PartialKeepInventory.getID(), "config-send");
 
+    // ----- Compatibility related -----
+    public pkiVersion serverVersion = null;
+    public static boolean validSettings = false;
+
+    // ----- Implementation Settings -----
+    protected List<Settings> implementationSettings;
 
     // ----- General -----
-    private boolean enableMod = true;
-    private KeepinvMode keepinvMode = KeepinvMode.STATIC;
-    private static final KeepinvMode[] keepinvModeValues = KeepinvMode.values();
-    private ArrayList<String> savedPlayers = new ArrayList<>();
-    private boolean dropShulkerContents = false;
+    protected boolean enableMod = true;
+    protected KeepinvMode keepinvMode = KeepinvMode.STATIC;
+    protected static final KeepinvMode[] keepinvModeValues = KeepinvMode.values();
+    protected ArrayList<String> savedPlayers = new ArrayList<>();
 
     // ----- Droprates -----
-    private byte inventoryDroprate = 100;
+    protected byte inventoryDroprate = 100;
 
-    private byte commonDroprate = 100;
+    protected byte commonDroprate = 100;
 
-    private byte uncommonDroprate = 100;
+    protected byte uncommonDroprate = 100;
 
-    private byte rareDroprate = 100;
+    protected byte rareDroprate = 100;
 
-    private byte epicDroprate = 100;
+    protected byte epicDroprate = 100;
 
 
     //    Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.
@@ -56,19 +60,21 @@ public class pkiSettings extends PersistentState implements Settings {
 //            - isEpic, isRare, isCommon, isUncommon:
 //                                            return 1.0 if true
 //            - dropPercent:                  inventory droprate as set in the config
-    private StringBuffer expression = new StringBuffer();
+    protected StringBuffer expression = new StringBuffer();
 
     // ----- XP -----
-    private KeepXPMode keepxpMode = KeepXPMode.VANILLA;
-    private static final KeepXPMode[] keepxpModeValues = KeepXPMode.values();
+    protected KeepXPMode keepxpMode = KeepXPMode.VANILLA;
+    protected static final KeepXPMode[] keepxpModeValues = KeepXPMode.values();
 
     // How much of the XP that the player has is lost
-    private byte xpLoss = 50;
+    protected byte xpLoss = 50;
 
     // How much of the XP that the player loses should be dropped
-    private byte xpDrop = 50;
+    protected byte xpDrop = 50;
 
-    private StringBuffer xpExpression = new StringBuffer();
+    protected StringBuffer xpDropExpression = new StringBuffer();
+    protected StringBuffer xpLossExpression = new StringBuffer();
+
 
     ///////////////////////
     // Getters & Setters //
@@ -88,12 +94,6 @@ public class pkiSettings extends PersistentState implements Settings {
 
     public void setPartialKeepinvMode(KeepinvMode partialKeepinvMode) {
         this.keepinvMode = partialKeepinvMode;
-    }
-    public boolean getDropShulkerContents() {
-        return dropShulkerContents;
-    }
-    public void setDropShulkerContents(boolean dropShulkerContents) {
-        this.dropShulkerContents = dropShulkerContents;
     }
 
     public int getInventoryDroprate() {
@@ -186,18 +186,32 @@ public class pkiSettings extends PersistentState implements Settings {
         this.xpLoss = xpLoss.byteValue();
     }
 
-    public StringBuffer getXpExpression() {
-        return this.xpExpression;
+    public StringBuffer getXpDropExpression() {
+        return this.xpDropExpression;
     }
 
-    public void setXpExpression(String xpExpression) {
-        this.xpExpression.replace(0, this.xpExpression.capacity(), xpExpression);
+    public void setXpDropExpression(String xpDropExpression) {
+        this.xpDropExpression.ensureCapacity(xpDropExpression.length());
+        this.xpDropExpression.replace(0, this.xpDropExpression.capacity(), xpDropExpression);
     }
 
-    public void setXpExpression(StringBuffer xpExpression) {
-        this.xpExpression = new StringBuffer(xpExpression);
+    public void setXpDropExpression(StringBuffer xpExpression) {
+        this.xpDropExpression = new StringBuffer(xpExpression);
     }
 
+
+    public StringBuffer getXpLossExpression() {
+        return this.xpLossExpression;
+    }
+
+    public void setXpLossExpression(String xpLossExpression) {
+        this.xpLossExpression.ensureCapacity(xpLossExpression.length());
+        this.xpLossExpression.replace(0, this.xpLossExpression.capacity(), xpLossExpression);
+    }
+
+    public void setXpLossExpression(StringBuffer xpLossExpression) {
+        this.xpLossExpression = new StringBuffer(xpLossExpression);
+    }
 
     public KeepXPMode getKeepxpMode() {
         return keepxpMode;
@@ -208,54 +222,35 @@ public class pkiSettings extends PersistentState implements Settings {
     }
 
     public void packetWriter(PacketByteBuf buf){
-        buf.writeBoolean(enableMod);
-        buf.writeByteArray(new byte[]{inventoryDroprate, commonDroprate, uncommonDroprate, rareDroprate,
-                epicDroprate, xpDrop, xpLoss} );
-        buf.writeString(expression.toString());
-        buf.writeEnumConstant(keepinvMode);
-        buf.writeEnumConstant(keepxpMode);
+        BwSettingsCompat.writePacket(this, PartialKeepInventory.modVersion, buf);
     }
 
-    public void packetReader(PacketByteBuf buf){
-        enableMod = buf.readBoolean();
-        final byte[] droprates = buf.readByteArray();
-        inventoryDroprate = droprates[0];
-        commonDroprate = droprates[1];
-        uncommonDroprate = droprates[2];
-        rareDroprate = droprates[3];
-        epicDroprate = droprates[4];
-        xpDrop = droprates[5];
-        xpLoss = droprates[6];
-        setExpression(buf.readString());
-        keepinvMode = buf.readEnumConstant(KeepinvMode.class);
-        keepxpMode = buf.readEnumConstant(KeepXPMode.class);
+    public void packetReader(PacketByteBuf buf) {
+        pkiVersion clientVersion = PartialKeepInventory.modVersion;
+        pkiVersion serverVersion = new pkiVersion( buf );
+
+        if( clientVersion.major < serverVersion.major || clientVersion.minor < serverVersion.minor ){
+            PartialKeepInventory.LOGGER.warn("Settings obtained from are from a likely incompatible version. Server: \"" + serverVersion +  "\" Client:" + clientVersion);
+            validSettings = false; // May do something with this later on
+        }
+        else{
+            validSettings = true;
+            BwSettingsCompat.readPacket(this, serverVersion, buf);
+        }
+
     }
 
 
     @Override
     public NbtCompound readNbt(NbtCompound nbt) {
-        enableMod = nbt.getBoolean("enable");
-        keepinvMode = keepinvModeValues[nbt.getByte("invMode")];
-        inventoryDroprate = nbt.getByte("invDR");
-        commonDroprate = nbt.getByte("commonDR");
-        uncommonDroprate = nbt.getByte("uncommonDR");
-        rareDroprate = nbt.getByte("rareDR");
-        epicDroprate = nbt.getByte("epicDR");
-        expression = new StringBuffer(nbt.getString("invExpr"));
-
-        keepxpMode = keepxpModeValues[nbt.getByte("xpMode")];
-        xpDrop = nbt.getByte("xpDrop");
-        xpLoss = nbt.getByte("xpLoss");
-
-        NbtCompound playerNamesNbt = nbt.getCompound("savedPlayers");
-        savedPlayers = new ArrayList<>();
-        savedPlayers.addAll(playerNamesNbt.getKeys());
-
-        return nbt;
+        pkiVersion v = new pkiVersion(nbt);
+        return BwSettingsCompat.readNbt(this, v, nbt);
     }
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
+
+        PartialKeepInventory.modVersion.writeNbt(nbt);
         nbt.putBoolean("enable", enableMod);
         nbt.putByte("invMode", (byte) keepinvMode.ordinal());
         nbt.putByte("invDR", inventoryDroprate);
@@ -268,13 +263,22 @@ public class pkiSettings extends PersistentState implements Settings {
         nbt.putByte("xpMode", (byte) keepxpMode.ordinal());
         nbt.putByte("xpDrop", xpDrop);
         nbt.putByte("xpLoss", xpLoss);
+        nbt.putString("xpDropExpr", xpDropExpression.toString());
+        nbt.putString("xpLossExpr", xpLossExpression.toString());
 
         NbtCompound savedPlayersNbt = new NbtCompound();
         for( var playerName: savedPlayers ){
             savedPlayersNbt.putBoolean(playerName, true); //boolean isn't really needed. I just need to store all saved player names
         }
-
         nbt.put("savedPlayers", savedPlayersNbt);
+
+        for( var setting: implementationSettings ){
+            NbtCompound settingNbt = new NbtCompound();
+
+            setting.writeNbt(settingNbt);
+
+            nbt.put(setting.getModId(), settingNbt);
+        }
 
         return nbt;
     }
@@ -305,20 +309,32 @@ public class pkiSettings extends PersistentState implements Settings {
         try {
             pkiSettings clone = (pkiSettings) super.clone();
             clone.expression = new StringBuffer(this.expression);
-            clone.xpExpression = new StringBuffer(this.xpExpression);
+            clone.xpDropExpression = new StringBuffer(this.xpDropExpression);
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
     }
 
-    @Environment(EnvType.CLIENT)
+    @Override
+    public String getModId() {
+        return PartialKeepInventory.getID();
+    }
+
     public static void updateServerConfig(pkiSettings settings) {
-        if(MinecraftClient.getInstance().getServer() == null) {
+        if( PartialKeepInventory.environment == EnvType.CLIENT && MinecraftClient.getInstance().getServer() == null ) { // Player is connected to server
             PacketByteBuf buf = PacketByteBufs.create();
             settings.packetWriter(buf);
 
-            ClientPlayNetworking.send(updateServerConfig, buf);
+            ClientPlayNetworking.send(Identifiers.configUpdatePacket, buf);
         }
+        else if( PartialKeepInventory.environment == EnvType.SERVER ){
+            ServerListeners.sendConfigToPlayers(settings);
+        }
+
+    }
+
+    public pkiSettings() {
+        implementationSettings = Impl.settings;
     }
 }

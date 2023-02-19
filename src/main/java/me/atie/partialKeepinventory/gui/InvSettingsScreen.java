@@ -336,3 +336,4 @@ class InvCustomSettingsScreen extends Screen {
         return null;
     }
 }
+

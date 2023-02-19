@@ -1,10 +1,10 @@
 package me.atie.partialKeepinventory.formula;
 
+import me.atie.partialKeepinventory.PartialKeepInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import redempt.crunch.Crunch;
-
-import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
+import redempt.crunch.functional.EvaluationEnvironment;
 
 public class XpDroprateFormula extends DroprateFormula {
 
@@ -14,6 +14,7 @@ public class XpDroprateFormula extends DroprateFormula {
     public XpDroprateFormula(ServerPlayerEntity player, String expression) {
         super(player);
 
+        PartialKeepInventory.LOGGER.info("Getting player spawn");
         final BlockPos spawnPos = getPlayerSpawn();
 
         env.addLazyVariable("spawnDistance", this::getSpawnDistance);
@@ -25,50 +26,29 @@ public class XpDroprateFormula extends DroprateFormula {
         env.addLazyVariable( "playerY", this.player::getY);
         env.addLazyVariable( "playerZ", this.player::getZ);
 
-        env.addLazyVariable("xpPoints", () -> this.xpAmount);
-        env.addLazyVariable("xpLevel", () -> this.xpLevel);
+        env.addLazyVariable("xpPoints", this::getXpAmount);
+        env.addLazyVariable("xpLevel", this::getXpLevel);
 
         env.addFunction("max", 2, (a) -> Math.max(a[0], a[1]));
         env.addFunction("min", 2, (a) -> Math.min(a[0], a[1]));
 
+        PartialKeepInventory.LOGGER.info("Compiling");
+
         cx = Crunch.compileExpression(expression, env);
     }
+
     public double getResult( int xpLevel, int xpAmount) {
         this.xpAmount = xpAmount;
         this.xpLevel = xpLevel;
 
-
-        return cx.evaluate();
+        return super.getResult();
     }
 
-
-    public static int getLevelDropStatic(int levelsLost) {
-        int levelsDropped = (int) Math.round(CONFIG.getXpDrop() * 0.01 * levelsLost);
-        return levelsDropped;
+    int getXpAmount(){
+        return xpAmount;
     }
-
-    public static int getLevelDropStatic(ServerPlayerEntity player) {
-        int levelsLost = XpDroprateFormula.getLevelsToLoseStatic(player);
-        int levelsDropped = (int) Math.round(CONFIG.getXpDrop() * 0.01 * levelsLost);
-        return levelsDropped;
-    }
-
-    public static int getLevelsToLoseStatic(ServerPlayerEntity player) {
-        double lossPercent = CONFIG.getXpLoss() * 0.01;// * 0.01 to get it to the range 0.0 - 1.0
-        return (int) Math.round(player.experienceLevel * lossPercent);
-    }
-
-
-
-    public static int getPointsDropStatic(ServerPlayerEntity player) {
-        int pointsLost = XpDroprateFormula.getPointsToLoseStatic(player);
-        int pointsDropped = (int) Math.round(CONFIG.getXpDrop() * 0.01 * pointsLost);
-        return pointsDropped;
-    }
-
-    public static int getPointsToLoseStatic(ServerPlayerEntity player) {
-        double lossPercent = CONFIG.getXpLoss() * 0.01;// * 0.01 to get it to the range 0.0 - 1.0
-        return (int) Math.round(player.totalExperience * lossPercent);
+    int getXpLevel(){
+        return xpLevel;
     }
 
 
