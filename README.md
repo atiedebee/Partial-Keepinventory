@@ -10,6 +10,8 @@ Take this fancy list of things I'm working on.
 | Custom formulas for experience  | Planned, work started    |
  
 ---
+## GUI
+Open the GUI using ``/pkiGui``. This requires you to have the mod installed on the client side.
 
 ## Commands
 
