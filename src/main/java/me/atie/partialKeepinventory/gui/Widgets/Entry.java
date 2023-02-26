@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.util.math.MatrixStack;
@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public abstract class Entry {
     protected int yPos;
-    protected int height = SettingsGUI.widgetHeight;
+    protected int height = ParentSettingsScreen.widgetHeight;
     public boolean hidden = false;
     protected Supplier<Integer> getScrollDistance;
 
@@ -30,7 +30,7 @@ public abstract class Entry {
 
     protected int updateY(int y) {
         this.yPos = y;
-        return SettingsGUI.nextElementY(y);
+        return ParentSettingsScreen.nextElementY(y);
     }
 
 

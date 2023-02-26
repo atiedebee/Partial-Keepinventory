@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -18,8 +18,8 @@ public class TextHeaderEntry extends Entry {
         super(yPos);
         int winW = MinecraftClient.getInstance().getWindow().getScaledWidth();
 
-        int width = winW - 2 * SettingsGUI.sideMargin;
-        int x = SettingsGUI.sideMargin;
+        int width = winW - 2 * ParentSettingsScreen.sideMargin;
+        int x = ParentSettingsScreen.sideMargin;
 
         textWidget = new TextWidget(x, yPos, width, 20, name, textRenderer);
     }
@@ -45,8 +45,8 @@ public class TextHeaderEntry extends Entry {
 
     @Override
     public void updateDimensions(int windowWidth) {
-        int width = windowWidth - 2 * SettingsGUI.sideMargin;
-        int x = SettingsGUI.sideMargin;
+        int width = windowWidth - 2 * ParentSettingsScreen.sideMargin;
+        int x = ParentSettingsScreen.sideMargin;
 
         textWidget.setPos(x, yPos);
         textWidget.setWidth(width);

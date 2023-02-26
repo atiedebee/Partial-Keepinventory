@@ -127,7 +127,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
         PartialKeepInventory.LOGGER.info("-- Prepare experience --");
         ExperienceUtil.updateTotalExperience(this);
 
-        if( CONFIG.getEnableMod() ) {
+        if( CONFIG.getEnableMod() && CONFIG.getKeepxpMode() != KeepXPMode.VANILLA ) {
             setXpDropAmounts(CONFIG.getKeepxpMode());
         }else{
             xpLossAmount = -1;

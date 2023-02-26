@@ -23,7 +23,7 @@ import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 //TODO: Tooltips for all settings explaining how to use them
 
 @Environment(EnvType.CLIENT)
-public class SettingsGUI extends Screen implements ModMenuApi {
+public class ParentSettingsScreen extends Screen implements ModMenuApi {
 
     private Screen nextScreen;
     private Screen previousScreen;
@@ -39,16 +39,16 @@ public class SettingsGUI extends Screen implements ModMenuApi {
 
 
     @Override
-    public ConfigScreenFactory<SettingsGUI> getModConfigScreenFactory() {
-        return SettingsGUI::new;
+    public ConfigScreenFactory<ParentSettingsScreen> getModConfigScreenFactory() {
+        return ParentSettingsScreen::new;
     }
 
-    public SettingsGUI() {
+    public ParentSettingsScreen() {
         super(Text.translatable(PartialKeepInventory.getID()));
     }
 
 
-    public SettingsGUI(Screen previous) {
+    public ParentSettingsScreen(Screen previous) {
         super(Text.translatable(PartialKeepInventory.getID()));
         this.previousScreen = previous;
     }

@@ -57,8 +57,8 @@ public class XpSettingsScreen extends Screen {
     @Override
     protected void init() {
 
-        footing = new SimpleButton(width - SettingsGUI.sideMargin, height - SettingsGUI.vertOptionMargin - SettingsGUI.widgetHeight,
-                SettingsGUI.widgetHeight, SettingsGUI.widgetHeight, Text.literal(String.format("%c", 0x2193)), null,
+        footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
+                ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2193)), null,
                 this::changePage);
         this.addSelectableChild(footing.getSelectables().get(0));
 
@@ -90,7 +90,7 @@ public class XpSettingsScreen extends Screen {
             DropSlider = new SliderEntry.Builder(textRenderer)
                     .intGetter(LOCAL_CONFIG::getXpDrop)
                     .intSetter(LOCAL_CONFIG::setXpDrop)
-                    .toText(SettingsGUI::percentageToText)
+                    .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.xpdrop"))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xpdrop"))
@@ -100,7 +100,7 @@ public class XpSettingsScreen extends Screen {
             LossSlider = new SliderEntry.Builder(textRenderer)
                     .intGetter(LOCAL_CONFIG::getXpLoss)
                     .intSetter(LOCAL_CONFIG::setXpLoss)
-                    .toText(SettingsGUI::percentageToText)
+                    .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.xploss"))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xploss"))
@@ -209,13 +209,13 @@ class XpCustomSettingScreen extends Screen {
         this.height = height;
         heading.updateDimensions(width);
         options.updateDimensions(width);
-        footing.getButtonWidget().setPos(width - SettingsGUI.widgetHeight- SettingsGUI.sideMargin, height - SettingsGUI.widgetHeight - SettingsGUI.vertOptionMargin);
+        footing.getButtonWidget().setPos(width - ParentSettingsScreen.widgetHeight- ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.widgetHeight - ParentSettingsScreen.vertOptionMargin);
     }
 
     @Override
     public void init(){
         assert (client != null);
-        int yPos = heading.updateY(SettingsGUI.vertOptionMargin);
+        int yPos = heading.updateY(ParentSettingsScreen.vertOptionMargin);
 
         heading.hidden = false;
 
@@ -256,7 +256,7 @@ class XpCustomSettingScreen extends Screen {
 
         CollapsableEntryList expressionTutorialEntry = new CollapsableEntryList(
                 Text.translatable(PartialKeepInventory.getID() + ".gui.list.xpexpression"),
-                options, false, 0, SettingsGUI.sideMargin, SettingsGUI.buttonWidth);
+                options, false, 0, ParentSettingsScreen.sideMargin, ParentSettingsScreen.buttonWidth);
         expressionTutorialEntry.addChild(text);
         this.addSelectableChild(expressionTutorialEntry.getButtonWidget());
 
@@ -269,8 +269,8 @@ class XpCustomSettingScreen extends Screen {
         options.updateY(yPos);
 
 
-        footing = new SimpleButton(width - SettingsGUI.sideMargin, height - SettingsGUI.vertOptionMargin - SettingsGUI.widgetHeight,
-                SettingsGUI.widgetHeight, SettingsGUI.widgetHeight, Text.literal(String.format("%c", 0x2191)), null,
+        footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
+                ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2191)), null,
                 this::changePage);
         this.addSelectableChild(footing.getSelectables().get(0));
 

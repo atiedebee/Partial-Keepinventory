@@ -1,7 +1,7 @@
 package me.atie.partialKeepinventory;
 
 import com.mojang.brigadier.CommandDispatcher;
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import me.atie.partialKeepinventory.network.ClientListeners;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -16,7 +16,7 @@ public class ClientInitializer implements ClientModInitializer {
         dispatcher.register(literal("pkiGui")
             .executes(context -> {
                 var client = context.getSource().getClient();
-                client.send(() -> client.setScreen(new SettingsGUI(null)));
+                client.send(() -> client.setScreen(new ParentSettingsScreen(null)));
                 return 1;
             })
         );

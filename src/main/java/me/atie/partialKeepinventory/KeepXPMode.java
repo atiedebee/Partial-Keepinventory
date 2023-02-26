@@ -7,11 +7,11 @@ public enum KeepXPMode {
 
     public KeepXPMode next() {
         return switch(this){
+            case VANILLA -> STATIC_LEVELS;
             case STATIC_LEVELS -> STATIC_POINTS;
-            case STATIC_POINTS -> VANILLA;
-            case VANILLA -> CUSTOM_LEVELS;
+            case STATIC_POINTS -> CUSTOM_LEVELS;
             case CUSTOM_LEVELS -> CUSTOM_POINTS;
-            case CUSTOM_POINTS -> STATIC_LEVELS;
+            case CUSTOM_POINTS -> VANILLA;
         };
     }
 

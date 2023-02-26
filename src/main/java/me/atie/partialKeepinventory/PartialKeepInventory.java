@@ -6,6 +6,7 @@ import me.atie.partialKeepinventory.settings.BwSettingsCompat;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.settings.pkiVersion;
 import me.atie.partialKeepinventory.util.ExperienceUtil;
+import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -59,6 +60,7 @@ public class PartialKeepInventory implements ModInitializer {
 		pkiCommandRegistration.registerCommands();
 
 		ServerPlayerEvents.COPY_FROM.register(ExperienceUtil::copyNewXpAmount);
+		ServerPlayerEvents.COPY_FROM.register(InventoryUtil::copyInventory);
 
 
 		// init the settings for singleplayer worlds.

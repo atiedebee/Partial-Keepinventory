@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -26,16 +26,16 @@ public class TextFieldEntry extends Entry {
 
         final int winW = MinecraftClient.getInstance().getWindow().getScaledWidth();
         final int nameWidth = textRenderer.getWidth(name);
-        final int textFieldX = Math.max(nameWidth + 2 * SettingsGUI.sideMargin, winW/2);
-        final int textFieldWidth = winW - textFieldX - SettingsGUI.sideMargin;
+        final int textFieldX = Math.max(nameWidth + 2 * ParentSettingsScreen.sideMargin, winW/2);
+        final int textFieldWidth = winW - textFieldX - ParentSettingsScreen.sideMargin;
 
 
-        nameWidget = new TextWidget(SettingsGUI.sideMargin, yPos, nameWidth, SettingsGUI.widgetHeight, name, textRenderer);
+        nameWidget = new TextWidget(ParentSettingsScreen.sideMargin, yPos, nameWidth, ParentSettingsScreen.widgetHeight, name, textRenderer);
         if(tooltip != null) {
             nameWidget.setTooltip(Tooltip.of(tooltip));
         }
 
-        textFieldWidget = new TextFieldWidget(textRenderer, textFieldX, yPos, textFieldWidth, SettingsGUI.widgetHeight, name);
+        textFieldWidget = new TextFieldWidget(textRenderer, textFieldX, yPos, textFieldWidth, ParentSettingsScreen.widgetHeight, name);
         textFieldWidget.setMaxLength(512);
         textFieldWidget.setText(text);
     }
@@ -63,9 +63,9 @@ public class TextFieldEntry extends Entry {
     @Override
     public void updateDimensions(int windowWidth) {
         final int nameWidth = textRenderer.getWidth(nameWidget.getMessage());
-        final int nameX = SettingsGUI.sideMargin;
-        final int textFieldX = Math.max(nameWidth + 2 * SettingsGUI.sideMargin, windowWidth/2);
-        final int textFieldWidth = windowWidth - textFieldX - SettingsGUI.sideMargin;
+        final int nameX = ParentSettingsScreen.sideMargin;
+        final int textFieldX = Math.max(nameWidth + 2 * ParentSettingsScreen.sideMargin, windowWidth/2);
+        final int textFieldWidth = windowWidth - textFieldX - ParentSettingsScreen.sideMargin;
 
         nameWidget.setWidth(nameWidth);
         nameWidget.setX(nameX);

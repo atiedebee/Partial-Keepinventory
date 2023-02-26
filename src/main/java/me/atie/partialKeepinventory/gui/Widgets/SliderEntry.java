@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -31,13 +31,13 @@ public class SliderEntry extends Entry {
         int w = MinecraftClient.getInstance().getWindow().getScaledWidth();
 
         int nameWidth = textRenderer.getWidth(name);
-        nameWidget = new TextWidget(SettingsGUI.sideMargin, yPos, nameWidth, 20, name, textRenderer);
+        nameWidget = new TextWidget(ParentSettingsScreen.sideMargin, yPos, nameWidth, 20, name, textRenderer);
         if( tooltip != null) {
             nameWidget.setTooltip(Tooltip.of(tooltip));
         }
 
         double val = getter.get();
-        sliderWidget = new SliderWidget(w - SettingsGUI.sliderWidth - SettingsGUI.sideMargin, yPos, SettingsGUI.sliderWidth, 20, toText.apply(val), val) {
+        sliderWidget = new SliderWidget(w - ParentSettingsScreen.sliderWidth - ParentSettingsScreen.sideMargin, yPos, ParentSettingsScreen.sliderWidth, 20, toText.apply(val), val) {
             @Override
             protected void updateMessage() {
                 // value * (max - min) + min is to set the value between these 2 values
@@ -69,10 +69,10 @@ public class SliderEntry extends Entry {
         int nameWidth = textRenderer.getWidth(nameWidget.getMessage());
 
         nameWidget.setWidth(nameWidth);
-        nameWidget.setX(SettingsGUI.sideMargin);
+        nameWidget.setX(ParentSettingsScreen.sideMargin);
 
-        sliderWidget.setWidth(SettingsGUI.sliderWidth);
-        sliderWidget.setX(windowWidth - SettingsGUI.sliderWidth - SettingsGUI.sideMargin);
+        sliderWidget.setWidth(ParentSettingsScreen.sliderWidth);
+        sliderWidget.setX(windowWidth - ParentSettingsScreen.sliderWidth - ParentSettingsScreen.sideMargin);
     }
 
         public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {

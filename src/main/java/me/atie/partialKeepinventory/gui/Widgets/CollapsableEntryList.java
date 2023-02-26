@@ -1,7 +1,7 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
 import me.atie.partialKeepinventory.PartialKeepInventory;
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -29,7 +29,7 @@ public class CollapsableEntryList extends EntryList {
         this.parent = parent;
 
         buttonWidgetEntry = new ButtonWidgetEntry(new ButtonWidget.Builder(name, this::collapse)
-                .dimensions(buttonX, y, buttonW, SettingsGUI.widgetHeight)
+                .dimensions(buttonX, y, buttonW, ParentSettingsScreen.widgetHeight)
                 .build());
         buttonWidgetEntry.hidden = false;
         children.add(buttonWidgetEntry);

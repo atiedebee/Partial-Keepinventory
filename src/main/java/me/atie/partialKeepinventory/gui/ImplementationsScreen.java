@@ -29,9 +29,9 @@ public class ImplementationsScreen extends Screen {
     }
 
     private void setButtonsPerScreen(){
-        int buttonsStart = header.getY() + header.getHeight() + SettingsGUI.vertOptionMargin;
-        int buttonSize = SettingsGUI.vertOptionMargin + SettingsGUI.widgetHeight;
-        int buttonsPlace = this.width - buttonsStart - SettingsGUI.vertOptionMargin;
+        int buttonsStart = header.getY() + header.getHeight() + ParentSettingsScreen.vertOptionMargin;
+        int buttonSize = ParentSettingsScreen.vertOptionMargin + ParentSettingsScreen.widgetHeight;
+        int buttonsPlace = this.width - buttonsStart - ParentSettingsScreen.vertOptionMargin;
 
         buttonsPerScreen = buttonsPlace / buttonSize;
     }
@@ -40,16 +40,16 @@ public class ImplementationsScreen extends Screen {
     public void init(){
         setButtonsPerScreen();
 
-        int startY = header.getY() + header.getHeight() + SettingsGUI.vertOptionMargin;
+        int startY = header.getY() + header.getHeight() + ParentSettingsScreen.vertOptionMargin;
         int yPos =  startY;
         for( int i = 0; i < screenSuppliers.size(); i++ ){
-            if( yPos > this.height - SettingsGUI.vertOptionMargin){
+            if( yPos > this.height - ParentSettingsScreen.vertOptionMargin){
                 yPos = startY;
             }
             int finalI = i;
-            SimpleButton e = new SimpleButton( SettingsGUI.sideMargin, yPos, SettingsGUI.buttonWidth, SettingsGUI.widgetHeight,
+            SimpleButton e = new SimpleButton( ParentSettingsScreen.sideMargin, yPos, ParentSettingsScreen.buttonWidth, ParentSettingsScreen.widgetHeight,
                     Impl.modNames.get(i), null, (b) -> client.setScreen( screenSuppliers.get(finalI).get()) );
-            yPos += SettingsGUI.widgetHeight + SettingsGUI.vertOptionMargin;
+            yPos += ParentSettingsScreen.widgetHeight + ParentSettingsScreen.vertOptionMargin;
         }
     }
 

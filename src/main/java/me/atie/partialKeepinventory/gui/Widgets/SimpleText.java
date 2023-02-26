@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -27,7 +27,7 @@ public class SimpleText extends Entry {
         textWidgets = new TextWidget[lineCount];
         for( int i = 0; i < lineCount; i++ ){
             textWidgets[i] = new TextWidget(Text.literal(lines.get(i)), textRenderer);
-            textWidgets[i].setPos(SettingsGUI.sideMargin, yPos);
+            textWidgets[i].setPos(ParentSettingsScreen.sideMargin, yPos);
             yPos += textRenderer.fontHeight + 2;
         }
         this.height = yPos - this.yPos;
@@ -61,10 +61,10 @@ public class SimpleText extends Entry {
 
     @Override
     protected void updateDimensions(int windowWidth) {
-        final int maxWidth = windowWidth - 2 * SettingsGUI.sideMargin;
+        final int maxWidth = windowWidth - 2 * ParentSettingsScreen.sideMargin;
         for( var w: textWidgets ) {
             height = textRenderer.getWrappedLinesHeight(w.getMessage(), maxWidth);
-            w.setX(SettingsGUI.sideMargin);
+            w.setX(ParentSettingsScreen.sideMargin);
 
             final int messageWidth = textRenderer.getWidth(w.getMessage());
 

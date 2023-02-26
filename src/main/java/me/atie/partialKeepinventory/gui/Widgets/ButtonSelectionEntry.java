@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -53,7 +53,7 @@ public class ButtonSelectionEntry<T> extends Entry {
             final int finalI = i;
 
             ButtonWidget temp = new ButtonWidget.Builder(buttonNames.get(i), b -> onPress(b, buttonValues.get(finalI)))
-                    .dimensions(buttonX, yPos, buttonWidth, SettingsGUI.widgetHeight)
+                    .dimensions(buttonX, yPos, buttonWidth, ParentSettingsScreen.widgetHeight)
                     .build();
 
             if( buttonValues.get(i) == defaultVal ){

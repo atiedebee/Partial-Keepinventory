@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -48,13 +48,13 @@ public class ButtonEntry<T> extends Entry {
 
         int w = MinecraftClient.getInstance().getWindow().getScaledWidth();
         int nameWidth = textRenderer.getWidth(name);
-        nameWidget = new TextWidget(SettingsGUI.sideMargin, y, nameWidth, SettingsGUI.widgetHeight, name, textRenderer);
+        nameWidget = new TextWidget(ParentSettingsScreen.sideMargin, y, nameWidth, ParentSettingsScreen.widgetHeight, name, textRenderer);
         if( tooltip != null ) {
             nameWidget.setTooltip(Tooltip.of(tooltip));
         }
 
         buttonWidget = ButtonWidget.builder( toText.apply( get.get()), this::onPress)
-                .dimensions(w - SettingsGUI.buttonWidth - SettingsGUI.sideMargin, y, SettingsGUI.buttonWidth, SettingsGUI.widgetHeight)
+                .dimensions(w - ParentSettingsScreen.buttonWidth - ParentSettingsScreen.sideMargin, y, ParentSettingsScreen.buttonWidth, ParentSettingsScreen.widgetHeight)
                 .build();
     }
 
@@ -83,8 +83,8 @@ public class ButtonEntry<T> extends Entry {
 
     @Override
     public void updateDimensions(int windowWidth) {
-        buttonWidget.setX(windowWidth - SettingsGUI.buttonWidth - SettingsGUI.sideMargin);
-        nameWidget.setX(SettingsGUI.sideMargin);
+        buttonWidget.setX(windowWidth - ParentSettingsScreen.buttonWidth - ParentSettingsScreen.sideMargin);
+        nameWidget.setX(ParentSettingsScreen.sideMargin);
         nameWidget.setWidth(textRenderer.getWidth(nameWidget.getMessage()));
     }
 

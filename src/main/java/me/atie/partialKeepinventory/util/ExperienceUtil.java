@@ -10,7 +10,7 @@ import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 public class ExperienceUtil {
 
     public static boolean shouldDropExperience(PlayerEntity player){
-        return !CONFIG.getSavedPlayers().contains(player.getEntityName());
+        return !CONFIG.getSavedPlayers().contains(player.getEntityName()) && !player.isCreative();
 
     }
 

@@ -71,7 +71,7 @@ public class InvSettingsScreen extends Screen {
     protected void init() {
 
         assert (client != null);
-        int yPos = heading.updateY(SettingsGUI.vertOptionMargin);
+        int yPos = heading.updateY(ParentSettingsScreen.vertOptionMargin);
 
         heading.hidden = false;
 
@@ -86,8 +86,8 @@ public class InvSettingsScreen extends Screen {
         generalKeepinvText = new TextHeaderEntry(textRenderer, Text.translatable(PartialKeepInventory.getID() + ".gui.header.inv").setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)), yPos);
         yPos = generalKeepinvText.updateY(yPos);
 
-        footing = new SimpleButton(width - SettingsGUI.sideMargin, height - SettingsGUI.vertOptionMargin - SettingsGUI.widgetHeight,
-                SettingsGUI.widgetHeight, SettingsGUI.widgetHeight, Text.literal(String.format("%c", 0x2193)), null,
+        footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
+                ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2193)), null,
                 this::changePage);
         this.addSelectableChild(footing.getSelectables().get(0));
 
@@ -117,7 +117,7 @@ public class InvSettingsScreen extends Screen {
             invPercentSlider = new SliderEntry.Builder(textRenderer)
                     .intGetter(LOCAL_CONFIG::getInventoryDroprate)
                     .intSetter(LOCAL_CONFIG::setInventoryDroprate)
-                    .toText(SettingsGUI::percentageToText)
+                    .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.static"))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.static"))
@@ -127,7 +127,7 @@ public class InvSettingsScreen extends Screen {
             commonPercentSlider = new SliderEntry.Builder(textRenderer)
                     .intGetter(LOCAL_CONFIG::getCommonDroprate)
                     .intSetter(LOCAL_CONFIG::setCommonDroprate)
-                    .toText(SettingsGUI::percentageToText)
+                    .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.common").setStyle(Style.EMPTY.withColor(0xAAAAAA)))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.common"))
@@ -137,7 +137,7 @@ public class InvSettingsScreen extends Screen {
             uncommonPercentSlider = new SliderEntry.Builder(textRenderer)
                     .intGetter(LOCAL_CONFIG::getUncommonDroprate)
                     .intSetter(LOCAL_CONFIG::setUncommonDroprate)
-                    .toText(SettingsGUI::percentageToText)
+                    .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.uncommon").setStyle(Style.EMPTY.withColor(0xFFFF55)))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.uncommon"))
@@ -146,7 +146,7 @@ public class InvSettingsScreen extends Screen {
 
             rarePercentSlider = new SliderEntry.Builder(textRenderer)
                     .intGetter(LOCAL_CONFIG::getRareDroprate).intSetter(LOCAL_CONFIG::setRareDroprate)
-                    .toText(SettingsGUI::percentageToText)
+                    .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.rare").setStyle(Style.EMPTY.withColor(0x55FFFF)))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.rare"))
@@ -155,7 +155,7 @@ public class InvSettingsScreen extends Screen {
 
             epicPercentSlider = new SliderEntry.Builder(textRenderer)
                     .intGetter(LOCAL_CONFIG::getEpicDroprate).intSetter(LOCAL_CONFIG::setEpicDroprate)
-                    .toText(SettingsGUI::percentageToText)
+                    .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.epic").setStyle(Style.EMPTY.withColor(0xFF55FF)))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.epic"))
@@ -189,6 +189,7 @@ public class InvSettingsScreen extends Screen {
 
     @Override
     public void close() {
+
     }
 
 
@@ -198,7 +199,7 @@ public class InvSettingsScreen extends Screen {
         this.height = height;
         heading.updateDimensions(width);
         entries.updateDimensions(width);
-        footing.getButtonWidget().setPos(width - SettingsGUI.widgetHeight- SettingsGUI.sideMargin, height - SettingsGUI.widgetHeight - SettingsGUI.vertOptionMargin);
+        footing.getButtonWidget().setPos(width - ParentSettingsScreen.widgetHeight- ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.widgetHeight - ParentSettingsScreen.vertOptionMargin);
     }
 
     private void setEntryVisibility(KeepinvMode mode) {
@@ -265,13 +266,13 @@ class InvCustomSettingsScreen extends Screen {
         this.height = height;
         heading.updateDimensions(width);
         options.updateDimensions(width);
-        footing.getButtonWidget().setPos(width - SettingsGUI.widgetHeight- SettingsGUI.sideMargin, height - SettingsGUI.widgetHeight - SettingsGUI.vertOptionMargin);
+        footing.getButtonWidget().setPos(width - ParentSettingsScreen.widgetHeight- ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.widgetHeight - ParentSettingsScreen.vertOptionMargin);
     }
 
     @Override
     public void init(){
         assert (client != null);
-        int yPos = heading.updateY(SettingsGUI.vertOptionMargin);
+        int yPos = heading.updateY(ParentSettingsScreen.vertOptionMargin);
 
         heading.hidden = false;
 
@@ -303,7 +304,7 @@ class InvCustomSettingsScreen extends Screen {
 
         CollapsableEntryList expressionTutorialEntry = new CollapsableEntryList(
                 Text.translatable(PartialKeepInventory.getID() + ".gui.list.invexpression"),
-                options, false, 0, SettingsGUI.sideMargin, SettingsGUI.buttonWidth);
+                options, false, 0, ParentSettingsScreen.sideMargin, ParentSettingsScreen.buttonWidth);
         expressionTutorialEntry.addChild(text);
         this.addSelectableChild(expressionTutorialEntry.getButtonWidget());
 
@@ -315,8 +316,8 @@ class InvCustomSettingsScreen extends Screen {
         options.updateY(yPos);
 
 
-        footing = new SimpleButton(width - SettingsGUI.sideMargin, height - SettingsGUI.vertOptionMargin - SettingsGUI.widgetHeight,
-                SettingsGUI.widgetHeight, SettingsGUI.widgetHeight, Text.literal(String.format("%c", 0x2191)), null,
+        footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
+                ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2191)), null,
                 this::changePage);
         this.addSelectableChild(footing.getSelectables().get(0));
 

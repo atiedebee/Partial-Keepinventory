@@ -40,7 +40,7 @@ public class pkiCommandRegistration {
 
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                dispatcher.register(literal("pki").requires(source -> source.hasPermissionLevel(4) )
+                dispatcher.register(literal("pki").requires(source -> source.hasPermissionLevel(2) )
                         .then(literal("enable").executes(
                                 ctx -> {
                                     CONFIG.setEnableMod(true);

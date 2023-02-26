@@ -1,6 +1,6 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
-import me.atie.partialKeepinventory.gui.SettingsGUI;
+import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.util.math.MatrixStack;
@@ -28,7 +28,7 @@ public class EntryList extends Entry {
         children.addAll(collection);
         height = 0;
         for( var child: children ){
-            height += child.getHeight() + SettingsGUI.vertOptionMargin;
+            height += child.getHeight() + ParentSettingsScreen.vertOptionMargin;
         }
     }
 
@@ -46,7 +46,7 @@ public class EntryList extends Entry {
         height = 0;
         while( it.hasNext() ) {
             Entry child = it.next();
-            height += child.getHeight() + SettingsGUI.vertOptionMargin;
+            height += child.getHeight() + ParentSettingsScreen.vertOptionMargin;
             y = child.updateY(y);
         }
         return y;
