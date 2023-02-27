@@ -1,6 +1,5 @@
 package me.atie.partialKeepinventory.api;
 
-import me.atie.partialKeepinventory.settings.Settings;
 import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,15 +18,13 @@ public abstract class pkiApi {
 
 
     public List<ItemStack> getInventorySlots(PlayerEntity player){
-        return List.of();
-    }
-
-    @Nullable
-    public Settings getSettings(){
         return null;
     }
 
-    public Supplier<Screen> configScreenSupplier;
+    @Nullable
+    public pkiSettingsApi getSettings(){
+        return null;
+    }
 
     public abstract String getModId();
 }

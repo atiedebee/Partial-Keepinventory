@@ -7,7 +7,7 @@ import dev.emi.trinkets.api.TrinketsApi;
 import dev.emi.trinkets.api.event.TrinketDropCallback;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.api.pkiApi;
-import me.atie.partialKeepinventory.settings.Settings;
+import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -32,7 +32,7 @@ public class TrinketsImpl extends pkiApi {
     }
 
     @Override
-    public Settings getSettings(){
+    public pkiSettingsApi getSettings(){
         return trinketSettings;
     }
 

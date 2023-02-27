@@ -1,10 +1,10 @@
 package me.atie.partialKeepinventory.impl.trinkets;
 
-import me.atie.partialKeepinventory.settings.Settings;
+import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 
-public class TrinketsSettings implements Settings {
+public class TrinketsSettings implements pkiSettingsApi {
     private boolean overrideDropRule = false;
     private boolean overrideDropRate = false;
     private KeepTrinketMode mode = KeepTrinketMode.DEFAULT;

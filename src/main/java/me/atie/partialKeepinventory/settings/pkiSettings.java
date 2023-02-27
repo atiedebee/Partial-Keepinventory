@@ -3,6 +3,7 @@ package me.atie.partialKeepinventory.settings;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
+import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import me.atie.partialKeepinventory.impl.Impl;
 import me.atie.partialKeepinventory.network.Identifiers;
 import me.atie.partialKeepinventory.network.ServerListeners;
@@ -23,14 +24,14 @@ import java.util.Objects;
 
 
 @SuppressWarnings("unused")
-public class pkiSettings extends PersistentState implements Settings {
+public class pkiSettings extends PersistentState implements pkiSettingsApi {
 
     // ----- Compatibility related -----
     public pkiVersion serverVersion = null;
     public static boolean validSettings = false;
 
     // ----- Implementation Settings -----
-    protected List<Settings> implementationSettings;
+    protected List<pkiSettingsApi> implementationSettings;
 
     // ----- General -----
     protected boolean enableMod = true;

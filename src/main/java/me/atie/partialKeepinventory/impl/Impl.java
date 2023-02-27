@@ -3,7 +3,7 @@ package me.atie.partialKeepinventory.impl;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.api.pkiApi;
 import me.atie.partialKeepinventory.impl.trinkets.TrinketsImpl;
-import me.atie.partialKeepinventory.settings.Settings;
+import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 public class Impl {
     public static LinkedHashMap<String, pkiApi> entryPoints = new LinkedHashMap<>(24, 0.8f);
-    public static List<Settings> settings;
+    public static List<pkiSettingsApi> settings;
     public static ArrayList<Supplier<Screen>> settingScreenSuppliers = new ArrayList<>();
     public static ArrayList<Text> modNames = new ArrayList<>();
 

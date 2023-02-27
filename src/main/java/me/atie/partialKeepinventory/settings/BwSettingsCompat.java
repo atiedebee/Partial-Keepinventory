@@ -4,6 +4,7 @@ package me.atie.partialKeepinventory.settings;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
+import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import me.atie.partialKeepinventory.impl.Impl;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.nbt.NbtCompound;
@@ -96,7 +97,7 @@ public abstract class BwSettingsCompat extends pkiSettings{
         buf.writeString(s.xpDropExpression.toString());
         buf.writeString(s.xpLossExpression.toString());
 
-        for( Settings setting: s.implementationSettings ){
+        for( pkiSettingsApi setting: s.implementationSettings ){
             PacketByteBuf implBuf = PacketByteBufs.create();
             s.packetWriter(implBuf);
 
@@ -152,7 +153,7 @@ public abstract class BwSettingsCompat extends pkiSettings{
         s.xpDropExpression = new StringBuffer(nbt.getString("xpDropExpr"));
         s.xpLossExpression = new StringBuffer(nbt.getString("xpLossExpr"));
 
-        for(Settings setting: s.implementationSettings){
+        for(pkiSettingsApi setting: s.implementationSettings){
             String modId = setting.getModId();
             if( nbt.contains(modId)){
                 setting.readNbt(nbt.getCompound(modId));

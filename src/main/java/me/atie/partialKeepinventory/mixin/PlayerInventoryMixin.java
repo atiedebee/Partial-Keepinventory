@@ -192,7 +192,10 @@ public abstract class PlayerInventoryMixin {
 
         var it = Impl.entryPoints.entrySet().iterator();
         while(it.hasNext()){
-            inv.addAll(it.next().getValue().getInventorySlots(this.player));
+            List<ItemStack> slots = it.next().getValue().getInventorySlots(this.player);
+            if( slots != null ) {
+                inv.addAll(slots);
+            }
         }
         return inv;
     }
