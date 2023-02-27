@@ -30,13 +30,14 @@ public class Impl {
 
 
         for( var entryPoint: entryPoints ){
+            PartialKeepInventory.LOGGER.info("Added " + entryPoint.getModId());
             Impl.entryPoints.put(entryPoint.getModId(), entryPoint);
         }
 
         settings = Impl.entryPoints.values().stream().map(pkiApi::getSettings).filter(Objects::nonNull).toList();
         PartialKeepInventory.LOGGER.info("Settings: ");
         for( var setting: settings){
-            PartialKeepInventory.LOGGER.info(setting.toString());
+            PartialKeepInventory.LOGGER.info(setting.getModId());
         }
 
     }

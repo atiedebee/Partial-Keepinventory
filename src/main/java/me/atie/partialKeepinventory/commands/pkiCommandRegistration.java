@@ -8,8 +8,10 @@ import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
+import me.atie.partialKeepinventory.settings.pkiSettings;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.GameProfileArgumentType;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -19,7 +21,6 @@ import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-// TODO: client-side gui command
 public class pkiCommandRegistration {
 
     private static void modeMessage(CommandContext<ServerCommandSource> ctx) {
@@ -35,15 +36,21 @@ public class pkiCommandRegistration {
         ), true);
     }
 
+    private static void syncSettings(CommandManager.RegistrationEnvironment environment){
+        if( environment.dedicated ){
+            pkiSettings.updateServerConfig(CONFIG);
+        }
+    }
+
 
     public static void registerCommands() {
-
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 dispatcher.register(literal("pki").requires(source -> source.hasPermissionLevel(2) )
                         .then(literal("enable").executes(
                                 ctx -> {
                                     CONFIG.setEnableMod(true);
+                                    syncSettings(environment);
                                     ctx.getSource().sendFeedback(Text.literal("Enabled partial keepinventory"), true);
                                     return 1;
                                 })
@@ -51,6 +58,7 @@ public class pkiCommandRegistration {
                         .then(literal("disable").executes(
                                 ctx -> {
                                     CONFIG.setEnableMod(false);
+                                    syncSettings(environment);
                                     ctx.getSource().sendFeedback(Text.literal("Disabled partial keepinventory"), true);
                                     return 1;
                                 })
@@ -95,7 +103,7 @@ public class pkiCommandRegistration {
                                     };
 
                                     ctx.getSource().sendMessage(Text.literal(message));
-
+                                    syncSettings(environment);
                                     return 1;
                                 })
                         )
@@ -105,6 +113,7 @@ public class pkiCommandRegistration {
                                                 .executes(ctx -> {
                                                     CONFIG.setPartialKeepinvMode(KeepinvMode.STATIC);
                                                     modeMessage(ctx);
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -112,6 +121,7 @@ public class pkiCommandRegistration {
                                                 .executes(ctx -> {
                                                     CONFIG.setPartialKeepinvMode(KeepinvMode.RARITY);
                                                     modeMessage(ctx);
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -119,6 +129,7 @@ public class pkiCommandRegistration {
                                                 .executes(ctx -> {
                                                     CONFIG.setPartialKeepinvMode(KeepinvMode.CUSTOM);
                                                     modeMessage(ctx);
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -126,6 +137,7 @@ public class pkiCommandRegistration {
                                                 .executes(ctx -> {
                                                     CONFIG.setPartialKeepinvMode(KeepinvMode.VANILLA);
                                                     modeMessage(ctx);
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -141,6 +153,7 @@ public class pkiCommandRegistration {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "Inventory droprate", x);
                                                             CONFIG.setInventoryDroprate(x);
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -155,6 +168,7 @@ public class pkiCommandRegistration {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "common droprate", x);
                                                             CONFIG.setCommonDroprate(x);
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -169,6 +183,7 @@ public class pkiCommandRegistration {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "uncommon droprate", x);
                                                             CONFIG.setUncommonDroprate(x);
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -183,6 +198,7 @@ public class pkiCommandRegistration {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "rare droprate", x);
                                                             CONFIG.setRareDroprate(x);
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -197,6 +213,7 @@ public class pkiCommandRegistration {
                                                             final int x = IntegerArgumentType.getInteger(ctx, "percentage");
                                                             percentMessage(ctx, "epic droprate", x);
                                                             CONFIG.setEpicDroprate(x);
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -243,6 +260,7 @@ public class pkiCommandRegistration {
                                                             if( !notAdded.isEmpty()) {
                                                                 ctx.getSource().sendFeedback(Text.literal(notAdded + " were ignored, for they are in the list already."), false);
                                                             }
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -264,6 +282,7 @@ public class pkiCommandRegistration {
                                                             if( !message.isEmpty() ) {
                                                                 ctx.getSource().sendFeedback(Text.literal("Removed " + message + "from the saved players."), true);
                                                             }
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -277,6 +296,7 @@ public class pkiCommandRegistration {
                                                             String expression = StringArgumentType.getString(ctx, "expression");
                                                             ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expression + "\""));
                                                             CONFIG.setExpression(expression);
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -299,6 +319,7 @@ public class pkiCommandRegistration {
                                         .then(literal("vanilla")
                                                 .executes(ctx -> {
                                                     CONFIG.setKeepxpMode(KeepXPMode.VANILLA);
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -306,6 +327,7 @@ public class pkiCommandRegistration {
                                                 .executes(ctx -> {
                                                     CONFIG.setKeepxpMode(KeepXPMode.STATIC_LEVELS);
                                                     ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -313,6 +335,7 @@ public class pkiCommandRegistration {
                                                 .executes(ctx -> {
                                                     CONFIG.setKeepxpMode(KeepXPMode.STATIC_POINTS);
                                                     ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -320,6 +343,7 @@ public class pkiCommandRegistration {
                                                 .executes(ctx -> {
                                                     CONFIG.setKeepxpMode(KeepXPMode.CUSTOM_POINTS);
                                                     ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -327,6 +351,7 @@ public class pkiCommandRegistration {
                                                 .executes(ctx -> {
                                                     CONFIG.setKeepxpMode(KeepXPMode.CUSTOM_LEVELS);
                                                     ctx.getSource().sendMessage(Text.literal("XP mode is set to " + CONFIG.getKeepxpMode().toString()));
+                                                    syncSettings(environment);
                                                     return 1;
                                                 })
                                         )
@@ -342,6 +367,7 @@ public class pkiCommandRegistration {
                                                             int percent = IntegerArgumentType.getInteger(ctx, "percent");
                                                             CONFIG.setXpLoss(percent);
                                                             percentMessage(ctx, "xp loss-rate", percent);
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -356,6 +382,7 @@ public class pkiCommandRegistration {
                                                             int percent = IntegerArgumentType.getInteger(ctx, "percent");
                                                             CONFIG.setXpDrop(percent);
                                                             percentMessage(ctx, "xp droprate", percent);
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -374,6 +401,7 @@ public class pkiCommandRegistration {
 
                                                             CONFIG.setXpLossExpression(expr);
 
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )
@@ -386,6 +414,7 @@ public class pkiCommandRegistration {
 
                                                             CONFIG.setXpDropExpression(expr);
 
+                                                            syncSettings(environment);
                                                             return 1;
                                                         })
                                                 )

@@ -33,7 +33,7 @@ public class XpSettingsScreen extends Screen {
 
     private final EntryList heading;
     private EntryList entries;
-
+    final private boolean canEditValues;
 
 
     public XpSettingsScreen(Screen parent, pkiSettings settings, EntryList heading) {
@@ -42,6 +42,8 @@ public class XpSettingsScreen extends Screen {
         this.client = MinecraftClient.getInstance();
         this.LOCAL_CONFIG = settings;
         this.heading = heading;
+        assert client.player != null;
+        this.canEditValues = client.player.hasPermissionLevel(2);
     }
 
     @Override
@@ -53,6 +55,13 @@ public class XpSettingsScreen extends Screen {
         footing.render(matrices, mouseX, mouseY, delta);
     }
 
+
+    @Override
+    protected <T extends Element & Selectable> T addSelectableChild(T child) {
+        if(canEditValues)
+            return super.addSelectableChild(child);
+        return null;
+    }
 
     @Override
     protected void init() {
@@ -84,7 +93,7 @@ public class XpSettingsScreen extends Screen {
                     })
                     .nextVal(KeepXPMode::next)
                     .build();
-            super.addSelectableChild(keepXPModeButtonEntry.getButtonWidget());
+            this.addSelectableChild(keepXPModeButtonEntry.getButtonWidget());
 
 
             DropSlider = new SliderEntry.Builder(textRenderer)
@@ -95,7 +104,7 @@ public class XpSettingsScreen extends Screen {
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.xpdrop"))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xpdrop"))
                     .build();
-            super.addSelectableChild(DropSlider.getSliderWidget());
+            this.addSelectableChild(DropSlider.getSliderWidget());
 
             LossSlider = new SliderEntry.Builder(textRenderer)
                     .intGetter(LOCAL_CONFIG::getXpLoss)
@@ -105,7 +114,7 @@ public class XpSettingsScreen extends Screen {
                     .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.xploss"))
                     .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xploss"))
                     .build();
-            super.addSelectableChild(LossSlider.getSliderWidget());
+            this.addSelectableChild(LossSlider.getSliderWidget());
 
         } catch (Exception e) {
             PartialKeepInventory.LOGGER.error("Failed creating gui: " + e);
@@ -185,7 +194,7 @@ class XpCustomSettingScreen extends Screen {
         this.heading = heading;
         this.parent = parent;
         assert client.player != null;
-        canEditValues = client.player.hasPermissionLevel(4);
+        canEditValues = client.player.hasPermissionLevel(2);
     }
 
     @Override
@@ -272,7 +281,7 @@ class XpCustomSettingScreen extends Screen {
         footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
                 ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2191)), null,
                 this::changePage);
-        this.addSelectableChild(footing.getSelectables().get(0));
+        super.addSelectableChild(footing.getSelectables().get(0));
 
     }
 

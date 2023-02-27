@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
  * TODO: Trinkets settings
  *  Ideas for trinket settings:
  * 	- Trinkets specific droprates
- *  - Follow / don't follow trinket drop rules (aka destroy / drop / keep)
  * TODO: GUI for trinkets settings
  * TODO: Backwards compatibility on settings, needs more testing
 * */

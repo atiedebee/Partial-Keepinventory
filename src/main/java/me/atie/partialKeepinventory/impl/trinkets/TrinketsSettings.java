@@ -4,6 +4,7 @@ import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 
+@SuppressWarnings("unused")
 public class TrinketsSettings implements pkiSettingsApi {
     private boolean overrideDropRule = false;
     private boolean overrideDropRate = false;
@@ -137,7 +138,7 @@ public class TrinketsSettings implements pkiSettingsApi {
 
     @Override
     public String getModId() {
-        return "trinkets";
+        return "pki-trinkets";
     }
 }
 

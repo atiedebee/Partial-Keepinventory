@@ -45,7 +45,7 @@ public class InvSettingsScreen extends Screen {
         this.LOCAL_CONFIG = settings;
         this.heading = heading;
         assert client.player != null;
-        canEditValues = client.player.hasPermissionLevel(4);
+        canEditValues = client.player.hasPermissionLevel(2);
 
         this.parent = parent;
     }

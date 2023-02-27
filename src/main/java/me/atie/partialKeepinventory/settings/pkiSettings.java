@@ -337,5 +337,8 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
 
     public pkiSettings() {
         implementationSettings = Impl.settings;
+        for( var s: Impl.settings ){
+            PartialKeepInventory.LOGGER.info("Settings: " + s.getModId());
+        }
     }
 }

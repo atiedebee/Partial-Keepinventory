@@ -15,10 +15,11 @@ import net.minecraft.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class TrinketsImpl extends pkiApi {
     public static TrinketsSettings trinketSettings = new TrinketsSettings();
-
+    private static final Random rand = new Random();
 
 
     public TrinketsImpl(){
@@ -38,7 +39,7 @@ public class TrinketsImpl extends pkiApi {
 
     @Override
     public String getModId() {
-        return "trinkets";
+        return "pki-trinkets";
     }
 
     @Override
@@ -58,6 +59,7 @@ public class TrinketsImpl extends pkiApi {
                     case RARE -> trinketSettings.getRareDroprate();
                     case EPIC -> trinketSettings.getEpicDroprate();
                 };
+                case CHANCE -> rand.nextDouble();
                 case DEFAULT -> 100;
             };
             val = val / 100.0;
@@ -116,6 +118,7 @@ public class TrinketsImpl extends pkiApi {
         }
         return inv;
     }
+
 
 }
 

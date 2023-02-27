@@ -55,7 +55,7 @@ public abstract class BwSettingsCompat extends pkiSettings{
     }
 
 
-    // NOTE: 0.1.1 compatibilty isn't actually available because the location is different
+    // NOTE: 0.1.1 compatibility isn't actually available because the location is different
     // 0.1.1
     public static NbtCompound nbtReader_0_1_1(pkiSettings s, NbtCompound nbt) {
         s.enableMod = nbt.getBoolean("enable");
@@ -99,11 +99,14 @@ public abstract class BwSettingsCompat extends pkiSettings{
 
         for( pkiSettingsApi setting: s.implementationSettings ){
             PacketByteBuf implBuf = PacketByteBufs.create();
-            s.packetWriter(implBuf);
+            PartialKeepInventory.LOGGER.info("Writing settings from mod " + s.getModId());
+            setting.packetWriter(implBuf);
+
 
             int size = implBuf.array().length;
 
             buf.writeString(setting.getModId());
+            buf.writeInt(size);
             buf.writeBytes(implBuf);
         }
 
