@@ -20,8 +20,6 @@ import net.minecraft.util.Formatting;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
-//TODO: Tooltips for all settings explaining how to use them
-
 @Environment(EnvType.CLIENT)
 public class ParentSettingsScreen extends Screen implements ModMenuApi {
 
@@ -138,7 +136,8 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
         //  synchronization
         assert MinecraftClient.getInstance().player != null;
         if(MinecraftClient.getInstance().player.hasPermissionLevel(4)) {
-            pkiSettings.updateServerConfig(LOCAL_CONFIG);
+            CONFIG = LOCAL_CONFIG;
+            pkiSettings.updateServerConfig();
         }
     }
 

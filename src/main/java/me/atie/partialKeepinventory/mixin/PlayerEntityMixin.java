@@ -26,8 +26,6 @@ public abstract class PlayerEntityMixin  {
 
     @Inject(method = "dropInventory()V", at = @At("HEAD"), cancellable = true)
     public void dropInventory(CallbackInfo ci) {
-        PartialKeepInventory.LOGGER.info("-- Drop inventory PlayerEntityMixin --");
-        PartialKeepInventory.LOGGER.info(Arrays.toString(Thread.currentThread().getStackTrace()));
         if( this.isCreative() && player.getWorld().getGameRules().getBoolean(PartialKeepInventory.creativeKeepInventory) ) {
             ci.cancel();
             return;

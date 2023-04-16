@@ -12,6 +12,7 @@ import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class TrinketsImpl extends pkiApi {
     }
 
     @Override
-    public String getModId() {
+    public @NotNull String getModId() {
         return "pki-trinkets";
     }
 

@@ -46,10 +46,9 @@ public class ServerListeners {
 
 
     private static void updateConfig(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        PartialKeepInventory.LOGGER.info("Received config update");
+//        PartialKeepInventory.LOGGER.info("Received config update");
 
-        // TODO this is a temporary workaround, buttons that change settings shouldn't be clickable in the gui
-        if( !player.hasPermissionLevel(4) ) {
+        if( !player.hasPermissionLevel(2) ) {
             player.sendMessage(Text.translatable(PartialKeepInventory.getID() + ".error.insufficientPermissions"));
             return;
         }

@@ -59,8 +59,7 @@ public abstract class PlayerInventoryMixin {
         /* First test out custom drop behaviour*/
         for( var e: Impl.entryPoints.entrySet()){
             Pair<Double, DropAction> behaviour = e.getValue().getDropBehaviour(player, itemStack);
-            if( behaviour != null ){
-                PartialKeepInventory.LOGGER.info("Got behaviour from the functions: " + behaviour.getRight().toString());
+            if( behaviour != null && behaviour.getRight() != DropAction.NONE){
                 return behaviour;
             }
         }
@@ -76,8 +75,6 @@ public abstract class PlayerInventoryMixin {
                 } / 100.0;
             default -> throw new IllegalStateException("Unexpected value: " + CONFIG.getPartialKeepinvMode());
         };
-
-        PartialKeepInventory.LOGGER.info("Returning normal pair");
 
         return new Pair<>(percentage, DropAction.DROP);
     }
@@ -203,7 +200,6 @@ public abstract class PlayerInventoryMixin {
 
     @Inject(method = "dropAll()V", at = @At("HEAD"), cancellable = true)
     public void dropSome(CallbackInfo ci) {
-        PartialKeepInventory.LOGGER.info("-- Drop some --");
 
         if( CONFIG.getEnableMod() && CONFIG.getPartialKeepinvMode() != KeepinvMode.VANILLA ) {
             //if the mod is enabled we make sure we don't have 'dropAll' call dropInventory and friends

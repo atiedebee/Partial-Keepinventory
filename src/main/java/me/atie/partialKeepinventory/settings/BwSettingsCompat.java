@@ -40,17 +40,17 @@ public abstract class BwSettingsCompat extends pkiSettings{
     }
 
     public static void writePacket(pkiSettings s, pkiVersion v, PacketByteBuf buf) {
-        PartialKeepInventory.LOGGER.info("Writing packet with version " + v.toString());
+//        PartialKeepInventory.LOGGER.info("Writing packet with version " + v.toString());
         packetWriters.get(v).write(s, buf);
     }
 
     public static void readPacket(pkiSettings s, pkiVersion v, PacketByteBuf buf){
-        PartialKeepInventory.LOGGER.info("Reading packet with version " + v.toString());
+//        PartialKeepInventory.LOGGER.info("Reading packet with version " + v.toString());
         packetReaders.get(v).read(s, buf);
     }
 
     public static NbtCompound readNbt(pkiSettings s, pkiVersion v, NbtCompound nbt){
-        PartialKeepInventory.LOGGER.info("Reading NBT with version " + v.toString());
+//        PartialKeepInventory.LOGGER.info("Reading NBT with version " + v.toString());
         return nbtReaders.get(v).read(s, nbt);
     }
 
@@ -99,7 +99,6 @@ public abstract class BwSettingsCompat extends pkiSettings{
 
         for( pkiSettingsApi setting: s.implementationSettings ){
             PacketByteBuf implBuf = PacketByteBufs.create();
-            PartialKeepInventory.LOGGER.info("Writing settings from mod " + s.getModId());
             setting.packetWriter(implBuf);
 
 

@@ -33,6 +33,7 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
     // ----- Implementation Settings -----
     protected List<pkiSettingsApi> implementationSettings;
 
+
     // ----- General -----
     protected boolean enableMod = true;
     protected KeepinvMode keepinvMode = KeepinvMode.STATIC;
@@ -222,11 +223,18 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
         this.keepxpMode = keepxpMode;
     }
 
+
+
+    ///////////////////
+    // Serialization //
+    ///////////////////
+
     public void packetWriter(PacketByteBuf buf){
         BwSettingsCompat.writePacket(this, PartialKeepInventory.modVersion, buf);
     }
 
     public void packetReader(PacketByteBuf buf) {
+
         pkiVersion clientVersion = PartialKeepInventory.modVersion;
         pkiVersion serverVersion = new pkiVersion( buf );
 
@@ -240,7 +248,6 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
         }
 
     }
-
 
     @Override
     public NbtCompound readNbt(NbtCompound nbt) {
@@ -322,15 +329,15 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
         return PartialKeepInventory.getID();
     }
 
-    public static void updateServerConfig(pkiSettings settings) {
+    public static void updateServerConfig() {
         if( PartialKeepInventory.environment == EnvType.CLIENT && MinecraftClient.getInstance().getServer() == null ) { // Player is connected to server
             PacketByteBuf buf = PacketByteBufs.create();
-            settings.packetWriter(buf);
+            PartialKeepInventory.CONFIG.packetWriter(buf);
 
             ClientPlayNetworking.send(Identifiers.configUpdatePacket, buf);
         }
         else if( PartialKeepInventory.environment == EnvType.SERVER ){
-            ServerListeners.sendConfigToPlayers(settings);
+            ServerListeners.sendConfigToPlayers(PartialKeepInventory.CONFIG);
         }
 
     }

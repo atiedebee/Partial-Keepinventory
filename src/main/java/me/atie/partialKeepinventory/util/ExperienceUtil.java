@@ -82,11 +82,9 @@ public class ExperienceUtil {
             temp += player.getNextLevelExperience();
         }
         player.totalExperience = (int) (temp + (player.getNextLevelExperience() * player.experienceProgress));
-        PartialKeepInventory.LOGGER.info("Player total experience is equal to: " + player.totalExperience);
     }
 
     public static void copyNewXpAmount(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive){
-        PartialKeepInventory.LOGGER.info("-- CopyFrom event --");
         if( !alive && CONFIG.getEnableMod() ){
             KeepXPMode xpMode = CONFIG.getKeepxpMode();
 
@@ -97,12 +95,10 @@ public class ExperienceUtil {
                 switch(xpMode)
                 {
                     case CUSTOM_LEVELS, STATIC_LEVELS:
-                        PartialKeepInventory.LOGGER.info("Removing XP levels: " + xpLossAmount);
                         newPlayer.experienceLevel = oldPlayer.experienceLevel;
                         ExperienceUtil.removeXpLevels(xpLossAmount, newPlayer);
                         break;
                     case CUSTOM_POINTS, STATIC_POINTS:
-                        PartialKeepInventory.LOGGER.info("Removing XP points: " + xpLossAmount);
                         newPlayer.experienceLevel = oldPlayer.experienceLevel;
                         newPlayer.totalExperience = oldPlayer.totalExperience;
                         newPlayer.addExperience(-1 * xpLossAmount);

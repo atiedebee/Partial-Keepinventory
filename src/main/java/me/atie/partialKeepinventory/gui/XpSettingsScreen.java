@@ -18,8 +18,6 @@ import net.minecraft.util.Formatting;
 
 import java.util.Arrays;
 
-//TODO: add footing
-
 @Environment(EnvType.CLIENT)
 public class XpSettingsScreen extends Screen {
     private final Screen parent;
@@ -118,6 +116,7 @@ public class XpSettingsScreen extends Screen {
 
         } catch (Exception e) {
             PartialKeepInventory.LOGGER.error("Failed creating gui: " + e);
+            throw new RuntimeException(e);
         }
 
         entries = new EntryList(yPos);

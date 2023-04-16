@@ -38,7 +38,7 @@ public class pkiCommandRegistration {
 
     private static void syncSettings(CommandManager.RegistrationEnvironment environment){
         if( environment.dedicated ){
-            pkiSettings.updateServerConfig(CONFIG);
+            pkiSettings.updateServerConfig();
         }
     }
 

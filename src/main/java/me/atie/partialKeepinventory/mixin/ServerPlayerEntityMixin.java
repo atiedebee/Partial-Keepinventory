@@ -124,7 +124,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
 
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void prepareXpDroprates(CallbackInfo ci){
-        PartialKeepInventory.LOGGER.info("-- Prepare experience --");
         ExperienceUtil.updateTotalExperience(this);
 
         if( CONFIG.getEnableMod() && CONFIG.getKeepxpMode() != KeepXPMode.VANILLA ) {

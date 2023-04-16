@@ -1,6 +1,7 @@
 package me.atie.partialKeepinventory.network;
 
 import me.atie.partialKeepinventory.PartialKeepInventory;
+import me.atie.partialKeepinventory.settings.pkiSettings;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -28,6 +29,9 @@ public class ClientListeners {
     }
 
     private static void configReceiver(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
+        if( CONFIG == null ){
+            CONFIG = new pkiSettings();
+        }
         CONFIG.packetReader(buf);
     }
 }

@@ -69,4 +69,4 @@ If your mod adds slots to the inventory that should be dropped together with the
 The default return value is ``null`` or ``List.of()``. You can return these yourself or call the super function.
 
 ## Providing Settings
-You can integrate a settings class with settings regarding your mod's implementation by creating a class implementing the ``pkiSettingsApi`` interface and implementing it. You can return it by overriding ``getSettings``.
+You can integrate a settings class with settings regarding your mod's implementation by creating a class implementing the ``pkiSettingsApi`` interface and implementing it. You can return it by overriding ``getSettings``. If you do this the mod itself will sync settings between client and server. You can sync the config by calling ``pkiSettings.updateServerConfig();``.

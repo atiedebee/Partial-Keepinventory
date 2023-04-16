@@ -21,9 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*
- * TODO: Trinkets settings
- *  Ideas for trinket settings:
- * 	- Trinkets specific droprates
  * TODO: GUI for trinkets settings
  * TODO: Backwards compatibility on settings, needs more testing
 * */
@@ -55,7 +52,6 @@ public class PartialKeepInventory implements ModInitializer {
 		// handles the entry points as well
 		Impl.loadImplementations();
 
-		CONFIG = new pkiSettings();
 		pkiCommandRegistration.registerCommands();
 
 		ServerPlayerEvents.COPY_FROM.register(ExperienceUtil::copyNewXpAmount);
@@ -65,8 +61,6 @@ public class PartialKeepInventory implements ModInitializer {
 		// init the settings for singleplayer worlds.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			if( environment == EnvType.CLIENT ) {
-				LOGGER.info("SINGLE PLAYER WORLD STARTED");
-
 				PartialKeepInventory.server = server;
 				CONFIG = pkiSettings.getServerState(server);
 			}

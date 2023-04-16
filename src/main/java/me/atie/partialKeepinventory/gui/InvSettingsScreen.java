@@ -46,7 +46,6 @@ public class InvSettingsScreen extends Screen {
         this.heading = heading;
         assert client.player != null;
         canEditValues = client.player.hasPermissionLevel(2);
-
         this.parent = parent;
     }
 
