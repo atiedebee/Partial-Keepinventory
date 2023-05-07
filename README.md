@@ -1,5 +1,5 @@
 # Partial Keepinventory
-A fabric mod for changing the behaviour of keep inventory. \
+A fabric mod for changing the behaviour of keep inventory.
 
 Take this fancy list of things I'm working on.
 

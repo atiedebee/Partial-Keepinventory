@@ -1,5 +1,7 @@
 # Mod Integration
 
+As an example for using the API, you can look in ``impl/trinkets`` for usage of the features below.
+
 ## Entrypoint
 
 For mod integration you can use the entrypoint "partial-keepinv" and add it to your fabric.mod.json:
