@@ -45,6 +45,7 @@ public class pkiCommandRegistration {
 //        }
     }
 
+
     private static int sendMessage(CommandContext<ServerCommandSource> ctx, Text text){
         ctx.getSource().sendMessage(text);
         return 1;
@@ -56,7 +57,7 @@ public class pkiCommandRegistration {
     """
         Modes dictate how items are dropped:
         Static:
-        \t All items are dropped equally. The percentage used is the \"Inventory Droprate\".
+        \t All items are dropped equally. The percentage used is the "Inventory Droprate".
         Vanilla:
         \t Items are dropped like they are in vanilla.
         Rarity:

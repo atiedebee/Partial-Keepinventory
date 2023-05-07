@@ -73,21 +73,23 @@ public abstract class TrinketsCommands {
                         })
                 )
                 .then(
-                    literal("mode").then(
-                            literal("set")
-                                    .then(literal("default")
-                                            .executes(ctx -> setTrinketMode(ctx, KeepTrinketMode.DEFAULT))
-                                    )
-                                    .then(literal("static")
-                                            .executes(ctx -> setTrinketMode(ctx, KeepTrinketMode.STATIC))
-                                    )
-                                    .then(literal("chance")
-                                            .executes(ctx -> setTrinketMode(ctx, KeepTrinketMode.CHANCE))
-                                    )
-                                    .then(literal("rarity")
-                                            .executes(ctx -> setTrinketMode(ctx, KeepTrinketMode.RARITY))
-                                    )
-                    )
+                    literal("mode")
+                            .then(literal("default")
+                                    .executes(ctx -> setTrinketMode(ctx, KeepTrinketMode.DEFAULT))
+                            )
+                            .then(literal("static")
+                                    .executes(ctx -> setTrinketMode(ctx, KeepTrinketMode.STATIC))
+                            )
+                            .then(literal("chance")
+                                    .executes(ctx -> setTrinketMode(ctx, KeepTrinketMode.CHANCE))
+                            )
+                            .then(literal("rarity")
+                                    .executes(ctx -> setTrinketMode(ctx, KeepTrinketMode.RARITY))
+                            )
+                            .executes(ctx -> {
+                                ctx.getSource().sendMessage(Text.literal("Trinkets mode was set to " + TrinketsImpl.trinketSettings.getMode().toString()));
+                                return 1;
+                            })
                 )
                 .then(
                     literal("droprate")

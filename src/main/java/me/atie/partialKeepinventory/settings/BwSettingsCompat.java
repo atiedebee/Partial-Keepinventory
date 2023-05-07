@@ -100,12 +100,10 @@ public abstract class BwSettingsCompat extends pkiSettings{
         for( pkiSettingsApi setting: s.implementationSettings ){
             PacketByteBuf implBuf = PacketByteBufs.create();
             setting.packetWriter(implBuf);
+            int size = implBuf.readableBytes();
 
-
-            int size = implBuf.array().length;
-
-            buf.writeString(setting.getModId());
             buf.writeInt(size);
+            buf.writeString(setting.getModId());
             buf.writeBytes(implBuf);
         }
 
@@ -128,18 +126,18 @@ public abstract class BwSettingsCompat extends pkiSettings{
         s.xpLossExpression = new StringBuffer(buf.readString());
 
         while( buf.readerIndex() < buf.readableBytes() ) {
+            int size = buf.readInt();
+             int index = buf.readerIndex();
+
             String modId = buf.readString();
 
-            int index = buf.readerIndex();
-            int size = buf.readInt();
             PacketByteBuf implBuf = new PacketByteBuf(buf.readBytes(size));
-            if( Impl.entryPoints.containsKey(modId) ) {
 
+            if( Impl.entryPoints.containsKey(modId) ) {
                 var tempSetting = Impl.entryPoints.get(modId).getSettings();
                 if( tempSetting != null ) {
                     tempSetting.packetReader(implBuf);
                 }
-
             }
 
             if( size < buf.readableBytes() ) {

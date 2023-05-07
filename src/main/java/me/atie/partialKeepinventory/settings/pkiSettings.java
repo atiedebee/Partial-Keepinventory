@@ -234,9 +234,9 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
     }
 
     public void packetReader(PacketByteBuf buf) {
-
         pkiVersion clientVersion = PartialKeepInventory.modVersion;
         pkiVersion serverVersion = new pkiVersion( buf );
+        PartialKeepInventory.LOGGER.info("Got PKI version " + serverVersion + " from the server");
 
         if( clientVersion.major < serverVersion.major || clientVersion.minor < serverVersion.minor ){
             PartialKeepInventory.LOGGER.warn("Settings obtained from are from a likely incompatible version. Server: \"" + serverVersion +  "\" Client:" + clientVersion);

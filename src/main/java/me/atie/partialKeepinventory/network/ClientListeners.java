@@ -12,6 +12,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
+import static me.atie.partialKeepinventory.PartialKeepInventory.LOGGER;
 
 public class ClientListeners {
     public static void init(){
@@ -32,6 +33,7 @@ public class ClientListeners {
         if( CONFIG == null ){
             CONFIG = new pkiSettings();
         }
+        LOGGER.info("GOT CONFIG");
         CONFIG.packetReader(buf);
     }
 }

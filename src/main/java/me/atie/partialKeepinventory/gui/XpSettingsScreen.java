@@ -222,10 +222,14 @@ class XpCustomSettingScreen extends Screen {
         this.width = width;
         this.height = height;
         heading.updateDimensions(width);
-        saveLossExpressionButton.updateDimensions(width);
-        saveDropExpressionButton.updateDimensions(width);
+
         xpLossExpressionTextField.updateDimensions(width);
         xpDropExpressionTextField.updateDimensions(width);
+
+        saveLossExpressionButton.updateDimensions(width);
+        saveLossExpressionButton.getButtonWidget().setX(xpLossExpressionTextField.getTextFieldWidget().getX() - 10 - saveLossExpressionButton.getButtonWidget().getWidth());
+        saveDropExpressionButton.updateDimensions(width);
+        saveDropExpressionButton.getButtonWidget().setX(xpDropExpressionTextField.getTextFieldWidget().getX() - 10 - saveDropExpressionButton.getButtonWidget().getWidth());
 
         footing.getButtonWidget().setPos(width - ParentSettingsScreen.widgetHeight- ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.widgetHeight - ParentSettingsScreen.vertOptionMargin);
     }
