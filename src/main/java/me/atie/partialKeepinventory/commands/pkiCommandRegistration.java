@@ -45,8 +45,28 @@ public class pkiCommandRegistration {
 //        }
     }
 
+    private static int sendMessage(CommandContext<ServerCommandSource> ctx, Text text){
+        ctx.getSource().sendMessage(text);
+        return 1;
+    }
 
     public static void registerCommands() {
+        final Text droprateTextHelp = Text.literal("TODO");
+        final Text modeTextHelp = Text.literal(
+    """
+        Modes dictate how items are dropped:
+        Static:
+        \t All items are dropped equally. The percentage used is the \"Inventory Droprate\".
+        Vanilla:
+        \t Items are dropped like they are in vanilla.
+        Rarity:
+        \t Items are dropped based off of their rarity.
+        Custom"
+        \t Item drops are calculated using an expression.
+        """
+        );
+
+
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 dispatcher.register(literal("pki").requires(source -> source.hasPermissionLevel(2) )
