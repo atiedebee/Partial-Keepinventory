@@ -19,12 +19,8 @@ Open the GUI using ``/pki-gui``. This requires you to have the mod installed on 
 Enable/disable the mod
 > /pki [enable|disable]
 
-Get info about the mod
-> /pki info
-
 Set the drop behaviour
 > /pki inv mode [vanilla / static / rarity / custom]
-
 
 Set droprate for the inventory/rarities (0-100)
 > /pki inv droprate [static / common / uncommon / rare / epic] <percentage>
@@ -37,9 +33,6 @@ Remove/add players who get normal keepinventory behaviour
 
 Set the custom droprate formula
 > /pki inv expression set [expression]
-
-Get information on variables for custom formulas
-> /pki inv expression help
 
 ---
 ## Expressions
