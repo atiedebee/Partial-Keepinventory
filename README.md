@@ -12,7 +12,7 @@ For more information on what I'm planning and working on see [the Roadmap](https
  
 ---
 ## GUI
-Open the GUI using ``/pkiGui``. This requires you to have the mod installed on the client side.
+Open the GUI using ``/pki-gui``. This requires you to have the mod installed on the client side.
 
 ## Commands
 

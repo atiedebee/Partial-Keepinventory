@@ -13,7 +13,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.lit
 
 public class ClientInitializer implements ClientModInitializer {
     private static void registerClientCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        dispatcher.register(literal("pkiGui")
+        dispatcher.register(literal("pki-gui")
             .executes(context -> {
                 var client = context.getSource().getClient();
                 client.send(() -> client.setScreen(new ParentSettingsScreen(null)));
