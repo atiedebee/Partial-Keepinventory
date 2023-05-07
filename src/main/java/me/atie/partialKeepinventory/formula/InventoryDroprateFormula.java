@@ -3,10 +3,9 @@ package me.atie.partialKeepinventory.formula;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Rarity;
-import net.minecraft.util.math.BlockPos;
-import redempt.crunch.Crunch;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
+import static me.atie.partialKeepinventory.util.InventoryUtil.dropPercentageFromRarity;
 
 public class InventoryDroprateFormula extends DroprateFormula {
 
@@ -25,21 +24,28 @@ public class InventoryDroprateFormula extends DroprateFormula {
 
     private ItemStack item;
 
-    public InventoryDroprateFormula(ServerPlayerEntity player, String expression) {
+    public InventoryDroprateFormula(ServerPlayerEntity player) {
         super(player);
+    }
 
-        final BlockPos spawnPos = getPlayerSpawn();
+    public InventoryDroprateFormula() {
+        super();
+    }
 
-        env.addLazyVariable("spawnDistance", this::getSpawnDistance);
-        env.addLazyVariable("spawnX", spawnPos::getX);
-        env.addLazyVariable("spawnY", spawnPos::getY);
-        env.addLazyVariable("spawnZ", spawnPos::getZ);
+    @Override
+    protected void initDummyEnvVariables() {
+        super.initDummyEnvVariables();
+        env.addLazyVariable( "rarityPercent", () -> CONFIG.getCommonDroprate() / 100.0);
+        env.addLazyVariable( "isEpic", () -> 0.0);
+        env.addLazyVariable( "isRare", () -> 0.0);
+        env.addLazyVariable( "isUncommon",  () -> 0.0);
+        env.addLazyVariable( "isCommon", () -> 1.0);
 
-        env.addLazyVariable("playerX", this.player::getX);
-        env.addLazyVariable( "playerY", this.player::getY);
-        env.addLazyVariable( "playerZ", this.player::getZ);
-
-
+        env.addLazyVariable( "dropPercent", () -> CONFIG.getInventoryDroprate() / 100.0);
+    }
+    @Override
+    protected void initEnvVariables() {
+        super.initEnvVariables();
         env.addLazyVariable( "rarityPercent", () -> dropPercentageFromRarity(item));
         env.addLazyVariable( "isEpic", () -> item.getRarity().equals(Rarity.EPIC) ? 1.0 : 0.0);
         env.addLazyVariable( "isRare", () -> item.getRarity().equals(Rarity.RARE) ? 1.0 : 0.0);
@@ -47,33 +53,14 @@ public class InventoryDroprateFormula extends DroprateFormula {
         env.addLazyVariable( "isCommon", () -> item.getRarity().equals(Rarity.COMMON) ? 1.0 : 0.0);
 
         env.addLazyVariable( "dropPercent", () -> CONFIG.getInventoryDroprate() / 100.0);
-
-        env.addFunction("max", 2, (a) -> Math.max(a[0], a[1]));
-        env.addFunction("min", 2, (a) -> Math.min(a[0], a[1]));
-
-        cx = Crunch.compileExpression(expression, env);
     }
 
 
-
-
-    private double dropPercentageFromRarity(ItemStack item){
-        double droprate =  switch( item.getRarity() ){
-            case COMMON -> CONFIG.getCommonDroprate();
-            case UNCOMMON -> CONFIG.getUncommonDroprate();
-            case RARE -> CONFIG.getRareDroprate();
-            case EPIC -> CONFIG.getEpicDroprate();
-        };
-
-        return droprate / 100.0;
-    }
 
 
     public double getResult(ItemStack item) {
         this.item = item;
-
         return super.getResult();
     }
-
 
 }

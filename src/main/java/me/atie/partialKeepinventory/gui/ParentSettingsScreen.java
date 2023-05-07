@@ -20,6 +20,8 @@ import net.minecraft.util.Formatting;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
+// I suggest you don't touch this code, for your own sanity
+
 @Environment(EnvType.CLIENT)
 public class ParentSettingsScreen extends Screen implements ModMenuApi {
 
@@ -68,7 +70,7 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
         }
         boolean isIntegratedServer = client.getServer() != null;
 
-        LOCAL_CONFIG = CONFIG;
+        LOCAL_CONFIG = CONFIG.clone();
 
         initHeader();
 
@@ -99,7 +101,7 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
                     boolean newVal = !CONFIG.getEnableMod();
                     CONFIG.setEnableMod(newVal);
                     b.setMessage( modEnabledText(newVal) );
-                });
+                }, null);
 
         ButtonSelectionEntry<ScreenTracker> menu = new ButtonSelectionEntry.Builder<ScreenTracker>(3)
                 .setButtonMargin(2)

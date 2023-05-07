@@ -7,7 +7,7 @@ import net.minecraft.network.PacketByteBuf;
 
 import java.util.List;
 
-public class pkiVersion {
+public class pkiVersion implements Cloneable {
     public byte major;
     public byte minor;
     public byte patch;
@@ -153,4 +153,13 @@ public class pkiVersion {
     }
 
 
+    @Override
+    public pkiVersion clone() {
+        try {
+            pkiVersion clone = (pkiVersion) super.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

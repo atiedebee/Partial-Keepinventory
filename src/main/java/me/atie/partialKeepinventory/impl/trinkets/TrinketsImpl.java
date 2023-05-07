@@ -11,7 +11,9 @@ import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Pair;
+import net.minecraft.util.Rarity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -30,12 +32,21 @@ public class TrinketsImpl extends pkiApi {
             }
             return dropRule;
         }));
-
+        TrinketsCommands.initTrinketCommands();
     }
 
     @Override
     public pkiSettingsApi getSettings(){
         return trinketSettings;
+    }
+
+    double rarityDroprateFromItem(Rarity rarity){
+        return switch (rarity) {
+            case COMMON -> trinketSettings.getCommonDroprate();
+            case UNCOMMON -> trinketSettings.getUncommonDroprate();
+            case RARE -> trinketSettings.getRareDroprate();
+            case EPIC -> trinketSettings.getEpicDroprate();
+        };
     }
 
     @Override
@@ -54,14 +65,9 @@ public class TrinketsImpl extends pkiApi {
         if( trinketSettings.OverrideDropRule() ) {
             val = switch (trinketSettings.getMode()) {
                 case STATIC -> trinketSettings.getStaticDroprate();
-                case RARITY -> switch (itemStack.getRarity()) {
-                    case COMMON -> trinketSettings.getCommonDroprate();
-                    case UNCOMMON -> trinketSettings.getUncommonDroprate();
-                    case RARE -> trinketSettings.getRareDroprate();
-                    case EPIC -> trinketSettings.getEpicDroprate();
-                };
-                case CHANCE -> rand.nextDouble();
-                case DEFAULT -> 100;
+                case RARITY -> rarityDroprateFromItem(itemStack.getRarity());
+                case CHANCE -> rand.nextDouble(0.0, 100.0) < rarityDroprateFromItem(itemStack.getRarity()) ? 100.0 : 0.0;
+                case DEFAULT -> 100.0;
             };
             val = val / 100.0;
         }
@@ -72,7 +78,7 @@ public class TrinketsImpl extends pkiApi {
 
     private static InventoryUtil.DropAction getTrinketDropaction(PlayerEntity player, ItemStack stack) {
         if( TrinketsApi.getTrinketComponent(player).isEmpty() ){
-            // really do hope this doesnt happen
+            // really do hope this doesn't happen
             PartialKeepInventory.LOGGER.error("Couldn't get trinket component from player " + player.getDisplayName().getString());
             return InventoryUtil.DropAction.NONE;
         }

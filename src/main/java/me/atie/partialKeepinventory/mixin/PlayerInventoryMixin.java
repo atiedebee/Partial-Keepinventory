@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
-import static me.atie.partialKeepinventory.util.InventoryUtil.DropAction;
-import static me.atie.partialKeepinventory.util.InventoryUtil.shouldDropInventory;
+import static me.atie.partialKeepinventory.util.InventoryUtil.*;
 
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin {
@@ -40,7 +39,8 @@ public abstract class PlayerInventoryMixin {
     @Shadow @Final
     public DefaultedList<ItemStack> offHand;
 
-    @Shadow @Final public PlayerEntity player;
+    @Shadow @Final
+    public PlayerEntity player;
 
     private InventoryDroprateFormula inventoryDroprateFormula = null;
 
@@ -67,12 +67,7 @@ public abstract class PlayerInventoryMixin {
         double percentage = switch (CONFIG.getPartialKeepinvMode()) {
             case CUSTOM -> inventoryDroprateFormula.getResult(itemStack);
             case STATIC -> CONFIG.getInventoryDroprate() / 100.0;
-            case RARITY -> switch (itemStack.getRarity()) {
-                    case COMMON -> CONFIG.getCommonDroprate();
-                    case UNCOMMON -> CONFIG.getUncommonDroprate();
-                    case RARE -> CONFIG.getRareDroprate();
-                    case EPIC -> CONFIG.getEpicDroprate();
-                } / 100.0;
+            case RARITY -> dropPercentageFromRarity(itemStack);
             default -> throw new IllegalStateException("Unexpected value: " + CONFIG.getPartialKeepinvMode());
         };
 
@@ -211,7 +206,9 @@ public abstract class PlayerInventoryMixin {
 
             if( CONFIG.getPartialKeepinvMode() == KeepinvMode.CUSTOM && inventoryDroprateFormula == null) {
                 try{
-                    inventoryDroprateFormula = new InventoryDroprateFormula( (ServerPlayerEntity)this.player, CONFIG.getExpression().toString() );
+                    inventoryDroprateFormula = new InventoryDroprateFormula( (ServerPlayerEntity)this.player );
+
+                    inventoryDroprateFormula.compileExpression( CONFIG.getExpression().toString() );
                 }
                 catch (Exception e) {
                     String ErrorMessage = "Failed loading custom expression: \"" + CONFIG.getExpression() + "\"\nResorting to percentage based drop behaviour";

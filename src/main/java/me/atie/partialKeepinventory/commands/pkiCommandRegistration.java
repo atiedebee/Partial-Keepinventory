@@ -8,12 +8,15 @@ import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
+import me.atie.partialKeepinventory.formula.XpDroprateFormula;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 
 import java.util.Collection;
 
@@ -37,9 +40,9 @@ public class pkiCommandRegistration {
     }
 
     private static void syncSettings(CommandManager.RegistrationEnvironment environment){
-        if( environment.dedicated ){
+//        if( environment.dedicated ){
             pkiSettings.updateServerConfig();
-        }
+//        }
     }
 
 
@@ -294,9 +297,17 @@ public class pkiCommandRegistration {
                                                 .then(argument("expression", StringArgumentType.greedyString())
                                                         .executes(ctx -> {
                                                             String expression = StringArgumentType.getString(ctx, "expression");
-                                                            ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expression + "\""));
-                                                            CONFIG.setExpression(expression);
-                                                            syncSettings(environment);
+                                                            try {
+                                                                var formula = new InventoryDroprateFormula(ctx.getSource().getPlayer());
+                                                                formula.testExpression(expression);
+                                                                ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expression + "\""));
+                                                                CONFIG.setExpression(expression);
+                                                                syncSettings(environment);
+                                                            }catch(Exception e){
+                                                                PartialKeepInventory.LOGGER.error("Invalid expression: " + e.getMessage());
+                                                                ctx.getSource().sendMessage(Text.literal("Invalid expression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
+                                                            }
+
                                                             return 1;
                                                         })
                                                 )
@@ -396,12 +407,18 @@ public class pkiCommandRegistration {
                                         .then(literal("loss")
                                                 .then(argument("expression", StringArgumentType.greedyString())
                                                         .executes(ctx -> {
-                                                            String expr = StringArgumentType.getString(ctx, "expression");
-                                                            ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expr + "\""));
-
-                                                            CONFIG.setXpLossExpression(expr);
-
-                                                            syncSettings(environment);
+                                                            String expression = StringArgumentType.getString(ctx, "expression");
+                                                            try {
+                                                                var formula = new XpDroprateFormula(ctx.getSource().getPlayer());
+                                                                formula.testExpression(expression);
+                                                                ctx.getSource().sendMessage(Text.literal(
+                                                                        "Saved the expression \"" + expression + "\""));
+                                                                CONFIG.setXpLossExpression(expression);
+                                                                syncSettings(environment);
+                                                            }catch(Exception e){
+                                                                PartialKeepInventory.LOGGER.error("Invalid expression: " + e.getMessage());
+                                                                ctx.getSource().sendMessage(Text.literal("Invalid expression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
+                                                            }
                                                             return 1;
                                                         })
                                                 )
@@ -409,12 +426,21 @@ public class pkiCommandRegistration {
                                         .then(literal("drop")
                                                 .then(argument("expression", StringArgumentType.greedyString())
                                                         .executes(ctx -> {
-                                                            String expr = StringArgumentType.getString(ctx, "expression");
-                                                            ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expr + "\""));
+                                                            String expression = StringArgumentType.getString(ctx, "expression");
+                                                            try {
+                                                                var formula = new XpDroprateFormula(ctx.getSource().getPlayer());
+                                                                formula.testExpression(expression);
 
-                                                            CONFIG.setXpDropExpression(expr);
+                                                                ctx.getSource().sendMessage(Text.literal(
+                                                                        "Saved the expression \"" + expression + "\""));
 
-                                                            syncSettings(environment);
+                                                                CONFIG.setXpDropExpression(expression);
+
+                                                                syncSettings(environment);
+                                                            }catch(Exception e){
+                                                                PartialKeepInventory.LOGGER.error("Invalid expression: " + e.getMessage());
+                                                                ctx.getSource().sendMessage(Text.literal("Invalid expression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
+                                                            }
                                                             return 1;
                                                         })
                                                 )

@@ -4,6 +4,7 @@ import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Box;
 
 import java.util.List;
 import java.util.function.Supplier;

@@ -2,6 +2,7 @@ package me.atie.partialKeepinventory.gui;
 
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
+import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.*;
 import net.fabricmc.api.EnvType;
@@ -10,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
@@ -87,7 +89,7 @@ public class InvSettingsScreen extends Screen {
 
         footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
                 ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2193)), null,
-                this::changePage);
+                this::changePage, null);
         this.addSelectableChild(footing.getSelectables().get(0));
 
         initOptions(yPos);
@@ -231,6 +233,7 @@ class InvCustomSettingsScreen extends Screen {
     private TextHeaderEntry textHeader;
     private final EntryList heading;
     private EntryList options;
+    private SimpleButton checkExpressionButton;
     private SimpleButton footing;
     private TextFieldEntry expressionTextField;
     private final boolean canEditValues;
@@ -252,6 +255,7 @@ class InvCustomSettingsScreen extends Screen {
         textHeader.render(matrices, mouseX, mouseY, delta);
         options.render(matrices, mouseX, mouseY, delta);
         footing.render(matrices, mouseX, mouseY, delta);
+        checkExpressionButton.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
@@ -298,6 +302,16 @@ class InvCustomSettingsScreen extends Screen {
                 .build();
         this.addSelectableChild(expressionTextField.getTextFieldWidget());
 
+        checkExpressionButton = new SimpleButton(
+                expressionTextField.getTextFieldWidget().getX() - 10 - 40,
+                yPos, 40, ParentSettingsScreen.widgetHeight,
+                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression"),
+                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_base").setStyle(Style.EMPTY.withColor(0x888888)),
+                this::saveExpression, button -> button.setX(expressionTextField.getTextFieldWidget().getX() - 10 - 40));
+        for(var s: checkExpressionButton.getSelectables()){
+            this.addSelectableChild(s);
+        }
+
         SimpleText text = new SimpleText(textRenderer, Text.translatable(PartialKeepInventory.getID() + ".gui.text.invexpression"), 0);
         this.addSelectableChild(text.getSelectables().get(0));
 
@@ -317,7 +331,7 @@ class InvCustomSettingsScreen extends Screen {
 
         footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
                 ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2191)), null,
-                this::changePage);
+                this::changePage, null);
         this.addSelectableChild(footing.getSelectables().get(0));
 
     }
@@ -335,5 +349,34 @@ class InvCustomSettingsScreen extends Screen {
             return super.addSelectableChild(child);
         return null;
     }
+
+    private void saveExpression(ButtonWidget button){
+        String expression = this.expressionTextField.getText();
+        var formula = new InventoryDroprateFormula(null);
+        try{
+            formula.testExpression(expression);
+            button.setMessage(
+                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression")
+                            .setStyle(Style.EMPTY.withColor(0x00AA00))
+            );
+            button.setTooltip(Tooltip.of(
+                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_success")
+                            .setStyle((Style.EMPTY.withColor(0x00FF00)))
+            ));
+            LOCAL_CONFIG.setExpression(expression);
+        }catch(Exception e){
+            button.setMessage(
+                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression")
+                            .setStyle(Style.EMPTY.withColor(0xAA0000))
+            );
+
+            button.setTooltip(Tooltip.of(
+                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_failure")
+                            .append(Text.literal(e.getMessage()))
+                            .setStyle(Style.EMPTY.withColor(0xFF0000))
+            ));
+        }
+    }
+
 }
 

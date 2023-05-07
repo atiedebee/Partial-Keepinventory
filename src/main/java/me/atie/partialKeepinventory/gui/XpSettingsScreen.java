@@ -2,6 +2,7 @@ package me.atie.partialKeepinventory.gui;
 
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
+import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.*;
 import net.fabricmc.api.EnvType;
@@ -10,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
@@ -66,7 +68,7 @@ public class XpSettingsScreen extends Screen {
 
         footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
                 ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2193)), null,
-                this::changePage);
+                this::changePage, null);
         this.addSelectableChild(footing.getSelectables().get(0));
 
         assert (client != null);
@@ -180,11 +182,13 @@ class XpCustomSettingScreen extends Screen {
     private final pkiSettings LOCAL_CONFIG;
     private TextHeaderEntry textHeader;
     private final EntryList heading;
-    private EntryList options;
     private SimpleButton footing;
     private TextFieldEntry xpLossExpressionTextField;
     private TextFieldEntry xpDropExpressionTextField;
     private final boolean canEditValues;
+    private SimpleButton saveLossExpressionButton;
+    private SimpleButton saveDropExpressionButton;
+    private CollapsableEntryList expressionTutorialEntry;
 
     public XpCustomSettingScreen(Screen parent, pkiSettings settings, EntryList heading) {
         super(Text.translatable(PartialKeepInventory.getID() + ".gui.screen.xp"));
@@ -201,14 +205,16 @@ class XpCustomSettingScreen extends Screen {
         this.renderBackground(matrices);
         heading.render(matrices, mouseX, mouseY, delta);
         textHeader.render(matrices, mouseX, mouseY, delta);
-        options.render(matrices, mouseX, mouseY, delta);
         footing.render(matrices, mouseX, mouseY, delta);
+        saveDropExpressionButton.render(matrices, mouseX, mouseY, delta);
+        saveLossExpressionButton.render(matrices, mouseX, mouseY, delta);
+        xpDropExpressionTextField.render(matrices, mouseX, mouseY, delta);
+        xpLossExpressionTextField.render(matrices, mouseX, mouseY, delta);
+        expressionTutorialEntry.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
     public void close() {
-        LOCAL_CONFIG.setXpDropExpression(xpDropExpressionTextField.getText());
-        LOCAL_CONFIG.setXpLossExpression(xpLossExpressionTextField.getText());
     }
 
     @Override
@@ -216,7 +222,11 @@ class XpCustomSettingScreen extends Screen {
         this.width = width;
         this.height = height;
         heading.updateDimensions(width);
-        options.updateDimensions(width);
+        saveLossExpressionButton.updateDimensions(width);
+        saveDropExpressionButton.updateDimensions(width);
+        xpLossExpressionTextField.updateDimensions(width);
+        xpDropExpressionTextField.updateDimensions(width);
+
         footing.getButtonWidget().setPos(width - ParentSettingsScreen.widgetHeight- ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.widgetHeight - ParentSettingsScreen.vertOptionMargin);
     }
 
@@ -224,7 +234,7 @@ class XpCustomSettingScreen extends Screen {
     public void init(){
         assert (client != null);
         int yPos = heading.updateY(ParentSettingsScreen.vertOptionMargin);
-
+        final int saveButtonWidth = 40;
         heading.hidden = false;
 
         for( var e: heading.getSelectables()){
@@ -241,8 +251,7 @@ class XpCustomSettingScreen extends Screen {
         yPos = textHeader.updateY(yPos);
 
 
-        options = new EntryList(yPos);
-
+//        XP Drop Expression
         xpDropExpressionTextField = new TextFieldEntry.Builder(textRenderer)
                 .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.textfield.xpdrop-expression"))
                 .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xpdrop-expression"))
@@ -251,6 +260,18 @@ class XpCustomSettingScreen extends Screen {
         this.addSelectableChild(xpDropExpressionTextField.getTextFieldWidget());
 
 
+        saveDropExpressionButton = new SimpleButton(
+                xpDropExpressionTextField.getTextFieldWidget().getX() - 10 - saveButtonWidth,
+                yPos, 40, ParentSettingsScreen.widgetHeight,
+                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression"),
+                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_base").setStyle(Style.EMPTY.withColor(0x888888)),
+                button -> this.saveExpression(button, xpDropExpressionTextField),
+                button -> button.setX(xpDropExpressionTextField.getTextFieldWidget().getX() - 10 - saveButtonWidth)
+        );
+        this.addSelectableChild(saveDropExpressionButton.getButtonWidget());
+        yPos = xpDropExpressionTextField.updateY(yPos);
+
+//        XP Loss Expression
         xpLossExpressionTextField = new TextFieldEntry.Builder(textRenderer)
                 .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.textfield.xploss-expression"))
                 .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xploss-expression"))
@@ -258,28 +279,33 @@ class XpCustomSettingScreen extends Screen {
                 .build();
         this.addSelectableChild(xpLossExpressionTextField.getTextFieldWidget());
 
+        saveLossExpressionButton = new SimpleButton(
+                xpLossExpressionTextField.getTextFieldWidget().getX() - 10 - saveButtonWidth,
+                yPos, 40, ParentSettingsScreen.widgetHeight,
+                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression"),
+                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_base").setStyle(Style.EMPTY.withColor(0x888888)),
+                button -> this.saveExpression(button, xpLossExpressionTextField),
+                button -> button.setX(xpLossExpressionTextField.getTextFieldWidget().getX() - 10 - saveButtonWidth)
+        );
+        this.addSelectableChild(saveLossExpressionButton.getButtonWidget());
+        yPos = xpLossExpressionTextField.updateY(yPos);
+
 
         SimpleText text = new SimpleText(textRenderer, Text.translatable(PartialKeepInventory.getID() + ".gui.text.xpexpression-guide"), 0);
         this.addSelectableChild(text.getSelectables().get(0));
 
-        CollapsableEntryList expressionTutorialEntry = new CollapsableEntryList(
+        expressionTutorialEntry = new CollapsableEntryList(
                 Text.translatable(PartialKeepInventory.getID() + ".gui.list.xpexpression"),
-                options, false, 0, ParentSettingsScreen.sideMargin, ParentSettingsScreen.buttonWidth);
+                null, false, yPos, ParentSettingsScreen.sideMargin, ParentSettingsScreen.buttonWidth);
         expressionTutorialEntry.addChild(text);
         this.addSelectableChild(expressionTutorialEntry.getButtonWidget());
+        yPos = expressionTutorialEntry.updateY(yPos);
 
-
-        options.addChildren(Arrays.asList(
-                xpLossExpressionTextField,
-                xpDropExpressionTextField,
-                expressionTutorialEntry
-        ));
-        options.updateY(yPos);
 
 
         footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
                 ParentSettingsScreen.widgetHeight, ParentSettingsScreen.widgetHeight, Text.literal(String.format("%c", 0x2191)), null,
-                this::changePage);
+                this::changePage, null);
         super.addSelectableChild(footing.getSelectables().get(0));
 
     }
@@ -297,5 +323,35 @@ class XpCustomSettingScreen extends Screen {
             return super.addSelectableChild(child);
         return null;
     }
+
+    private void saveExpression(ButtonWidget button, TextFieldEntry textFieldEntry){
+        String expression = textFieldEntry.getText();
+        var formula = new InventoryDroprateFormula(null);
+        try{
+            formula.testExpression(expression);
+            button.setMessage(
+                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression")
+                            .setStyle(Style.EMPTY.withColor(0x00AA00))
+            );
+            button.setTooltip(Tooltip.of(
+                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_success")
+                            .setStyle((Style.EMPTY.withColor(0x00FF00)))
+            ));
+            LOCAL_CONFIG.setExpression(expression);
+        }catch(Exception e){
+            button.setMessage(
+                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression")
+                            .setStyle(Style.EMPTY.withColor(0xAA0000))
+            );
+
+            button.setTooltip(Tooltip.of(
+                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_failure")
+                            .append(Text.literal(e.getMessage()))
+                            .setStyle(Style.EMPTY.withColor(0xFF0000))
+            ));
+        }
+    }
+
+
 }
 

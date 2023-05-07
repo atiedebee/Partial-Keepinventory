@@ -9,10 +9,12 @@ import net.minecraft.text.Text;
 
 import java.util.List;
 
+//TODO maybe: some container based widget system, or use callbacks to functions to resize items
 public class SimpleButton extends Entry {
     private final ButtonWidget buttonWidget;
+    ButtonWidget.PressAction onResize;
 
-    public SimpleButton(int x, int y, int w, int h, Text name, Text tooltip, ButtonWidget.PressAction onClick) {
+    public SimpleButton(int x, int y, int w, int h, Text name, Text tooltip, ButtonWidget.PressAction onClick, ButtonWidget.PressAction onResize) {
         super(y);
 
 
@@ -48,10 +50,9 @@ public class SimpleButton extends Entry {
 
     @Override
     public void updateDimensions(int windowWidth) {
-        final int width = windowWidth/2;
-        final int x = windowWidth/4;
-        buttonWidget.setX(x);
-        buttonWidget.setWidth(width);
+        if( this.onResize != null ) {
+            this.onResize.onPress(this.buttonWidget);
+        }
     }
 
     @Override

@@ -100,8 +100,11 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
 
             case CUSTOM_LEVELS:
             case CUSTOM_POINTS:
-                XpDroprateFormula dropForm = new XpDroprateFormula(player, CONFIG.getXpDropExpression().toString());
-                XpDroprateFormula lossForm = new XpDroprateFormula(player, CONFIG.getXpLossExpression().toString());
+                XpDroprateFormula dropForm = new XpDroprateFormula(player);
+                XpDroprateFormula lossForm = new XpDroprateFormula(player);
+
+                dropForm.compileExpression(CONFIG.getXpDropExpression().toString());
+                dropForm.compileExpression(CONFIG.getXpLossExpression().toString());
 
                 double dropPercentage = dropForm.getResult(experienceLevel, totalExperience);
                 double lossPercentage = lossForm.getResult(experienceLevel, totalExperience);

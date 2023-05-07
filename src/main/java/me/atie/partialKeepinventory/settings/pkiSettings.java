@@ -318,6 +318,13 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
             pkiSettings clone = (pkiSettings) super.clone();
             clone.expression = new StringBuffer(this.expression);
             clone.xpDropExpression = new StringBuffer(this.xpDropExpression);
+            clone.xpLossExpression = new StringBuffer(this.xpLossExpression);
+
+//            Not used when in singleplayer
+            if( this.serverVersion != null ){
+                clone.serverVersion = this.serverVersion.clone();
+            }
+
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
@@ -344,8 +351,5 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
 
     public pkiSettings() {
         implementationSettings = Impl.settings;
-        for( var s: Impl.settings ){
-            PartialKeepInventory.LOGGER.info("Settings: " + s.getModId());
-        }
     }
 }

@@ -28,7 +28,7 @@
   "partial-keepinv.gui.tooltip.epic": "What percentage of epic items should be dropped.",
 
   "partial-keepinv.gui.text.customheader": "Custom Droprate",
-  "partial-keepinv.gui.textfield.invexpression": "Formula",
+  "partial-keepinv.gui.textfield.invexpression": "Expression",
   "partial-keepinv.gui.tooltip.invexpression": "Define how many items should be dropped with your own formula.",
   "partial-keepinv.gui.list.invexpression": "Variable Guide",
   "partial-keepinv.gui.text.invexpression": "- spawnDistance:\n            Distance from player to spawnpoint.\n- spawnX, spawnY, spawnZ:\n            Spawn coordinates\n- playerX, playerY, playerZ:\n            Player coordinates.\n- rarityPercent:\n            Get droprate from rarity as set in the config.\n- isEpic, isRare, isCommon, isUncommon:\n            Return 1.0 if true\n- dropPercent:\n            Inventory droprate as set in the config",
@@ -51,6 +51,11 @@
   "partial-keepinv.gui.textfield.xploss-expression": "Xp Loss Formula",
   "partial-keepinv.gui.textfield.xpdrop-expression": "Xp Drop Formula",
   "partial-keepinv.gui.list.xpexpression": "Xp Formula Variables",
-  "partial-keepinv.gui.text.xpexpression-guide": "- spawnDistance:\n            Distance from player to spawnpoint.\n- spawnX, spawnY, spawnZ:\n            Spawn coordinates\n- playerX, playerY, playerZ:\n            Player coordinates.\n"
+  "partial-keepinv.gui.text.xpexpression-guide": "- spawnDistance:\n            Distance from player to spawnpoint.\n- spawnX, spawnY, spawnZ:\n            Spawn coordinates\n- playerX, playerY, playerZ:\n            Player coordinates.\n",
+
+  "partial-keepinv.gui.inv.button.saveexpression": "Save",
+  "partial-keepinv.gui.inv.button.saveexpression.tooltip_base": "Expression not checked",
+  "partial-keepinv.gui.inv.button.saveexpression.tooltip_success": "Expression valid",
+  "partial-keepinv.gui.inv.button.saveexpression.tooltip_failure": "Expression invalid: "
 
 }

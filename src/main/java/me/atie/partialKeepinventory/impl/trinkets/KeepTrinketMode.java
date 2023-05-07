@@ -11,4 +11,14 @@ public enum KeepTrinketMode {
             case CHANCE -> DEFAULT;
         };
     }
+
+    @Override
+    public String toString() {
+        return switch(this){
+            case DEFAULT -> "Default";
+            case STATIC -> "Static";
+            case RARITY -> "Rarity";
+            case CHANCE -> "Chance";
+        };
+    }
 }

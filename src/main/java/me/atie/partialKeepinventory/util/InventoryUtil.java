@@ -1,6 +1,7 @@
 package me.atie.partialKeepinventory.util;
 
 import me.atie.partialKeepinventory.KeepinvMode;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
@@ -27,7 +28,16 @@ public class InventoryUtil {
             this.droprate = droprate;
         }
     }
+    public static double dropPercentageFromRarity(ItemStack item){
+        double droprate =  switch( item.getRarity() ){
+            case COMMON -> CONFIG.getCommonDroprate();
+            case UNCOMMON -> CONFIG.getUncommonDroprate();
+            case RARE -> CONFIG.getRareDroprate();
+            case EPIC -> CONFIG.getEpicDroprate();
+        };
 
+        return droprate / 100.0;
+    }
     public enum DropAction{
         DROP, KEEP, DESTROY, NONE
     }

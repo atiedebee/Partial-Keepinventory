@@ -3,11 +3,12 @@ A fabric mod for changing the behaviour of keep inventory. \
 
 Take this fancy list of things I'm working on.
 
-| Feature                         | State                    |
-|---------------------------------|--------------------------|
-| Custom formulas for droprates   | Working, still worked on |
-| Per-item configurable droprates | Planned                  |
-| Custom formulas for experience  | Planned, work started    |
+| Feature                                     | State   |
+|---------------------------------------------|---------|
+| Custom formulas for droprates               | Done    |
+| Per-item configurable droprates using rules | Planned |
+| Custom formulas for experience              | Done    |
+For more information on what I'm planning and working on see [the Roadmap](https://github.com/atiedebee/Partial-Keepinventory/wiki/Roadmap)
  
 ---
 ## GUI
