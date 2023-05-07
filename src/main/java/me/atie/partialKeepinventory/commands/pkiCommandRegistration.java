@@ -52,18 +52,45 @@ public class pkiCommandRegistration {
     }
 
     public static void registerCommands() {
-        final Text droprateTextHelp = Text.literal("TODO");
+        final Text xpDroprateTextHelp = Text.literal(
+        """
+        Xp droprates show how much experience you drop and lose when dying:
+        Drop:
+            This is how much XP is DROPPED when dying.
+        Loss:
+            This is the percentage of your DROPPED XP that disappears on death.
+        """
+        );
+        final Text xpModeTextHelp = Text.literal(
+        """
+        These settings change how xp is dropped:
+        Levels:
+            Each level is graded the same.
+        Points:
+            Use XP points as the metric for how much to drop.
+        Each of these can be used with custom expressions as well.
+        """
+        );
+        final Text invDroprateTextHelp = Text.literal(
+        """
+        Droprates dictate how likely certain items are to be dropped:
+        Common, Uncommon, Rare, Epic:
+            These are Minecraft's 4 rarities. Each indicated by the color of an item's name.
+        Inventory:
+            The base droprate when using "staitc" as your droprate.
+        """
+        );
         final Text modeTextHelp = Text.literal(
-    """
+        """
         Modes dictate how items are dropped:
         Static:
-        \t All items are dropped equally. The percentage used is the "Inventory Droprate".
+            All items are dropped equally. The percentage used is the "Inventory Droprate".
         Vanilla:
-        \t Items are dropped like they are in vanilla.
+            Items are dropped like they are in vanilla.
         Rarity:
-        \t Items are dropped based off of their rarity.
+            Items are dropped based off of their rarity.
         Custom"
-        \t Item drops are calculated using an expression.
+            Item drops are calculated using an expression.
         """
         );
 
@@ -467,7 +494,23 @@ public class pkiCommandRegistration {
                                                 )
                                         )
                                 )
-                        )//TODO: proper help commands for each part of the mod
+                        )
+                        .then(literal("help")
+                                .then(literal("inv-mode")
+                                        .executes(ctx -> sendMessage(ctx, modeTextHelp))
+                                )
+                                .then(literal("xp-mode")
+                                        .executes(ctx -> sendMessage(ctx, xpModeTextHelp))
+                                )
+                                .then(literal("inv-droprate")
+                                        .executes(ctx -> sendMessage(ctx, invDroprateTextHelp))
+                                )
+                                .then(literal("xp-droprate")
+                                        .executes(ctx -> sendMessage(ctx, xpDroprateTextHelp))
+                                )
+
+                        )
+                        //TODO: proper help commands for each part of the mod
                         .executes(ctx -> {
                             ctx.getSource().sendMessage(Text.literal(
                                     """

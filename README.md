@@ -42,12 +42,26 @@ Get information on variables for custom formulas
 > /pki inv expression help
 
 ---
+## Expressions
+Expressions are a way to dynamically change how items are dropped. This can be done with a simple formula that uses given variables. The value returned by the expression is clamped between 0 and 1.
+ A list of variables can be found in the provided table:
+
+
+| Variable                             | Meaning                                                                           |
+|--------------------------------------|-----------------------------------------------------------------------------------|
+| spawnDistance                        | The distance from the player to their spawnpoint                                  |
+| isCommon, isUncommon, isRare, isEpic | Whether an item has a certain rarity, These are 1.0 when true and 0.0 when false. |
+| rarityPercent                        | The configured droprate of the item's rarity.                                     |
+| dropPercent                          | The static inventory droprate                                                     |
+| spawnX, spawnY, spawnZ               | The player's spawn position                                                       |
+| playerX, playerY, playerZ            | The player's position                                                             |
+
 
 ### Expression presets:
 
 #### Distance falloff
 Change DISTANCE_IN_BLOCKS to the distance from spawn where you stop dropping items (the droprate decreases linearly).
-> max(0.0, min(1-(spawnDistance/DISTANCE_IN_BLOCKS), 1.0))
+> abs(1-(spawnDistance/DISTANCE_IN_BLOCKS))
 
 ---
 
@@ -63,7 +77,7 @@ There's also 2 "modes" in which these variables can operate.
 - Based on experience points
 
 Levels take increasingly more experience to get, which makes that mode increasingly more punishing when you're on a higher level.
-> /pki xp mode [vanilla / static-level / static-points]
+> /pki xp mode [vanilla / static-level / static-points / custom-level / custom-points]
 
 
 ---

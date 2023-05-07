@@ -102,9 +102,15 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
             case CUSTOM_POINTS:
                 XpDroprateFormula dropForm = new XpDroprateFormula(player);
                 XpDroprateFormula lossForm = new XpDroprateFormula(player);
-
-                dropForm.compileExpression(CONFIG.getXpDropExpression().toString());
-                dropForm.compileExpression(CONFIG.getXpLossExpression().toString());
+                try {
+                    dropForm.compileExpression(CONFIG.getXpDropExpression().toString());
+                    lossForm.compileExpression(CONFIG.getXpLossExpression().toString());
+                }catch(Exception e){
+                    PartialKeepInventory.LOGGER.error("Failed compiling drop expression: " + e.getMessage() + "\nResorting to static droprate of 0");
+                    xpLossAmount = 0;
+                    xpDropAmount = 0;
+                    return;
+                }
 
                 double dropPercentage = dropForm.getResult(experienceLevel, totalExperience);
                 double lossPercentage = lossForm.getResult(experienceLevel, totalExperience);
@@ -127,9 +133,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
 
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void prepareXpDroprates(CallbackInfo ci){
-        ExperienceUtil.updateTotalExperience(this);
-
         if( CONFIG.getEnableMod() && CONFIG.getKeepxpMode() != KeepXPMode.VANILLA ) {
+            ExperienceUtil.updateTotalExperience(this);
             setXpDropAmounts(CONFIG.getKeepxpMode());
         }else{
             xpLossAmount = -1;
