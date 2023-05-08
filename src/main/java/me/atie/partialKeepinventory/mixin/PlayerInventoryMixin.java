@@ -196,7 +196,7 @@ public abstract class PlayerInventoryMixin {
     @Inject(method = "dropAll()V", at = @At("HEAD"), cancellable = true)
     public void dropSome(CallbackInfo ci) {
 
-        if( CONFIG.getEnableMod() && CONFIG.getPartialKeepinvMode() != KeepinvMode.VANILLA ) {
+        if( CONFIG.getEnableMod()  ) {
             //if the mod is enabled we make sure we don't have 'dropAll' call dropInventory and friends
             ci.cancel();
 

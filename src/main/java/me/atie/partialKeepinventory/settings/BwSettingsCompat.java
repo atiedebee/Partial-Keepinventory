@@ -37,6 +37,12 @@ public abstract class BwSettingsCompat extends pkiSettings{
         packetReaders.put(v0_2_0, BwSettingsCompat::packetReader_0_2_0);
         nbtReaders.put(v0_2_0, BwSettingsCompat::nbtReader_0_2_0);
         packetWriters.put(v0_2_0, BwSettingsCompat::packetWriter_0_2_0);
+
+        // v0.2.1, same as 0.2.0
+        final pkiVersion v0_2_1 = new pkiVersion(0, 2, 1);
+        packetReaders.put(v0_2_1, BwSettingsCompat::packetReader_0_2_0);
+        nbtReaders.put(v0_2_1, BwSettingsCompat::nbtReader_0_2_0);
+        packetWriters.put(v0_2_1, BwSettingsCompat::packetWriter_0_2_0);
     }
 
     public static void writePacket(pkiSettings s, pkiVersion v, PacketByteBuf buf) {

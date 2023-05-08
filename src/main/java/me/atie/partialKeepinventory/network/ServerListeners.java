@@ -27,9 +27,7 @@ public class ServerListeners {
 
     public static void init() {
         ServerPlayConnectionEvents.JOIN.register(ServerListeners::sendConfig);
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-            pkiPlayers.remove(handler.getPlayer());
-        });
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> pkiPlayers.remove(handler.getPlayer()));
 
         ServerPlayNetworking.registerGlobalReceiver(Identifiers.configUpdatePacket, ServerListeners::updateConfig);
         ServerPlayNetworking.registerGlobalReceiver(Identifiers.clientVersionPacket, (server, player, handler, buf, sender) -> {
@@ -59,7 +57,6 @@ public class ServerListeners {
 
     public static void sendConfigToPlayers(pkiSettings setting){
         HashMap<pkiVersion, PacketByteBuf> bufList = new HashMap<>();
-
 
         // send all players with the mod the new config
 

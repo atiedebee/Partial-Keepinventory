@@ -39,15 +39,28 @@ Set the custom droprate formula
 Expressions are a way to dynamically change how items are dropped. This can be done with a simple formula that uses given variables. The value returned by the expression is clamped between 0 and 1.
  A list of variables can be found in the provided table:
 
+### Base
 
 | Variable                             | Meaning                                                                           |
 |--------------------------------------|-----------------------------------------------------------------------------------|
 | spawnDistance                        | The distance from the player to their spawnpoint                                  |
+| spawnX, spawnY, spawnZ               | The player's spawn position                                                       |
+| playerX, playerY, playerZ            | The player's position                                                             |
+
+### Inventory
+
+| Variable                             | Meaning                                                                           |
+|--------------------------------------|-----------------------------------------------------------------------------------|
 | isCommon, isUncommon, isRare, isEpic | Whether an item has a certain rarity, These are 1.0 when true and 0.0 when false. |
 | rarityPercent                        | The configured droprate of the item's rarity.                                     |
 | dropPercent                          | The static inventory droprate                                                     |
-| spawnX, spawnY, spawnZ               | The player's spawn position                                                       |
-| playerX, playerY, playerZ            | The player's position                                                             |
+
+### Experience
+
+| Variable    | Meaning                   |
+|-------------|---------------------------|
+| xpPoints    | Player's XP point amount. |
+| xpLevel     | Player's XP level.        |
 
 
 ### Expression presets:

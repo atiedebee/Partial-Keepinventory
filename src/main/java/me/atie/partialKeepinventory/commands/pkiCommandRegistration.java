@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -46,7 +47,8 @@ public class pkiCommandRegistration {
     }
 
 
-    private static int sendMessage(CommandContext<ServerCommandSource> ctx, Text text){
+    private static int sendHelpMessage(CommandContext<ServerCommandSource> ctx, Text text){
+        ctx.getSource().sendMessage(Text.literal("=== Partial Keepinventory ===").setStyle(Style.EMPTY.withBold(true).withColor(0xFF4444)));
         ctx.getSource().sendMessage(text);
         return 1;
     }
@@ -55,45 +57,84 @@ public class pkiCommandRegistration {
         final Text xpDroprateTextHelp = Text.literal(
         """
         Xp droprates show how much experience you drop and lose when dying:
-        Drop:
-            This is how much XP is DROPPED when dying.
-        Loss:
-            This is the percentage of your DROPPED XP that disappears on death.
+        == Drop ==
+        This is how much XP is DROPPED when dying.
+        == Loss ==
+        This is the percentage of your DROPPED XP that disappears on death.
         """
         );
         final Text xpModeTextHelp = Text.literal(
         """
         These settings change how xp is dropped:
-        Levels:
-            Each level is graded the same.
-        Points:
-            Use XP points as the metric for how much to drop.
+        == Levels ==
+        Each level is graded the same.
+        == Points ==
+        Use XP points as the metric for how much to drop.
+        
         Each of these can be used with custom expressions as well.
         """
         );
         final Text invDroprateTextHelp = Text.literal(
         """
         Droprates dictate how likely certain items are to be dropped:
-        Common, Uncommon, Rare, Epic:
-            These are Minecraft's 4 rarities. Each indicated by the color of an item's name.
-        Inventory:
-            The base droprate when using "staitc" as your droprate.
+        == Common, Uncommon, Rare, Epic ==
+        These are Minecraft's 4 rarities. Each indicated by the color of an item's name.
+        == Inventory ==
+        The base droprate when using "static" as your droprate.
         """
         );
         final Text modeTextHelp = Text.literal(
         """
         Modes dictate how items are dropped:
-        Static:
-            All items are dropped equally. The percentage used is the "Inventory Droprate".
-        Vanilla:
-            Items are dropped like they are in vanilla.
-        Rarity:
-            Items are dropped based off of their rarity.
-        Custom"
-            Item drops are calculated using an expression.
+        == Static ==
+        All items are dropped equally. The percentage used is the "Inventory Droprate".
+        == Vanilla ==
+        Items are dropped like they are in vanilla.
+        == Rarity ==
+        Items are dropped based off of their rarity.
+        == Custom ==
+        Item drops are calculated using an expression.
         """
         );
 
+        final Text invExpressionTextHelp = Text.literal(
+        """
+         Expressions give more control over how to drop items. These are simply an equation using certain variables.
+         The expression will return a number between 0.0 - 1.0, and is clamped when higher.
+         0.0 == 0% dropped
+         1.0 == 100% dropped
+         Variables and their meaning can be seen using the command
+         """
+        ).append(Text.literal(
+                "/pki help expression-vars"
+        ).setStyle(Style.EMPTY.withBold(true).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pki help expression-vars")))
+        );
+
+        final Text expressionVarsTextHelp = Text.literal(
+        """
+                === General ===
+                = spawnDistance
+                 The distance from the player to their spawnpoint.
+                = spawnX, spawnY, spawnZ
+                 The player's spawn position
+                = playerX, playerY, playerZ
+                 The player's position
+                
+                === Inventory ===
+                = rarityPercent
+                 The configured droprate of the item's rarity.
+                = isCommon, isUncommon, isRare, isEpic
+                 Whether an item has a certain rarity, These are 1.0 when true and 0.0 when false.
+                = dropPercent
+                 The static inventory droprate.
+                
+                === XP ===
+                = xpPoints
+                 Amount of XP points
+                = xpLevel
+                 Amount of XP levels
+                """
+        );
 
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
@@ -495,22 +536,28 @@ public class pkiCommandRegistration {
                                         )
                                 )
                         )
+                        //TODO: proper help commands for each part of the mod
                         .then(literal("help")
                                 .then(literal("inv-mode")
-                                        .executes(ctx -> sendMessage(ctx, modeTextHelp))
+                                        .executes(ctx -> sendHelpMessage(ctx, modeTextHelp))
                                 )
-                                .then(literal("xp-mode")
-                                        .executes(ctx -> sendMessage(ctx, xpModeTextHelp))
+                                .then(literal("inv-expression")
+                                        .executes(ctx -> sendHelpMessage(ctx, invExpressionTextHelp))
                                 )
                                 .then(literal("inv-droprate")
-                                        .executes(ctx -> sendMessage(ctx, invDroprateTextHelp))
+                                        .executes(ctx -> sendHelpMessage(ctx, invDroprateTextHelp))
+                                )
+                                .then(literal("expression-vars")
+                                        .executes(ctx -> sendHelpMessage(ctx, expressionVarsTextHelp))
+                                )
+                                .then(literal("xp-mode")
+                                        .executes(ctx -> sendHelpMessage(ctx, xpModeTextHelp))
                                 )
                                 .then(literal("xp-droprate")
-                                        .executes(ctx -> sendMessage(ctx, xpDroprateTextHelp))
+                                        .executes(ctx -> sendHelpMessage(ctx, xpDroprateTextHelp))
                                 )
 
                         )
-                        //TODO: proper help commands for each part of the mod
                         .executes(ctx -> {
                             ctx.getSource().sendMessage(Text.literal(
                                     """
