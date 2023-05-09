@@ -401,12 +401,6 @@ public class pkiCommandRegistration {
                                                         })
                                                 )
                                         )
-                                        .then(literal("help")
-                                                .executes(ctx -> {
-                                                    ctx.getSource().sendMessage(Text.literal(InventoryDroprateFormula.info));
-                                                    return 1;
-                                                })
-                                        )
                                         .executes(ctx -> {
                                             ctx.getSource().sendMessage(Text.literal("The custom droprate formula is set to \"" + CONFIG.getExpression() + "\""));
                                             return 1;

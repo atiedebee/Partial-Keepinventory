@@ -10,7 +10,6 @@ import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
 public class ServerInitializer implements DedicatedServerModInitializer {
 
-
     @Override
     public void onInitializeServer() {
         PartialKeepInventory.environment = EnvType.SERVER;
@@ -21,10 +20,8 @@ public class ServerInitializer implements DedicatedServerModInitializer {
             PartialKeepInventory.server = server;
             CONFIG = pkiSettings.getServerState(server);
 
-            PartialKeepInventory.LOGGER.info("Server side initialized config component: " + CONFIG);
+            PartialKeepInventory.LOGGER.info("Server side initialized config component with version " + CONFIG.serverVersion);
         } );
-
-
-
     }
+
 }

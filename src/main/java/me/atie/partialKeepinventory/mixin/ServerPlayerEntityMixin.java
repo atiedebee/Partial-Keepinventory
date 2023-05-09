@@ -10,10 +10,11 @@ import me.atie.partialKeepinventory.util.ServerPlayerClientVersion;
 import me.atie.partialKeepinventory.util.getXpLoss;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,7 +38,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
     }
 
     @Shadow public abstract void addExperience(int experience);
-    @Shadow @Nullable private Vec3d enteredNetherPos;
 
 
     @Override
@@ -106,7 +106,11 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
                     dropForm.compileExpression(CONFIG.getXpDropExpression().toString());
                     lossForm.compileExpression(CONFIG.getXpLossExpression().toString());
                 }catch(Exception e){
-                    PartialKeepInventory.LOGGER.error("Failed compiling drop expression: " + e.getMessage() + "\nResorting to static droprate of 0");
+                    // Send error string to player and server.
+                    String errorStr = "Failed compiling drop expression: " + e.getMessage() + "\nResorting to static droprate of 0";
+                    PartialKeepInventory.LOGGER.error(errorStr);
+                    player.getCommandSource().sendFeedback(Text.literal(errorStr).setStyle(Style.EMPTY.withColor(Formatting.RED)), true);
+
                     xpLossAmount = 0;
                     xpDropAmount = 0;
                     return;

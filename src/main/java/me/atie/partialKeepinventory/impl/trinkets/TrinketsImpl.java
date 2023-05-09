@@ -11,7 +11,6 @@ import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Pair;
 import net.minecraft.util.Rarity;
 import org.jetbrains.annotations.NotNull;

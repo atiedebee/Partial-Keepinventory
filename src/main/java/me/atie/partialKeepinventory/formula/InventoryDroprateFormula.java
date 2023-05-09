@@ -9,27 +9,10 @@ import static me.atie.partialKeepinventory.util.InventoryUtil.dropPercentageFrom
 
 public class InventoryDroprateFormula extends DroprateFormula {
 
-    public static final String info =  """
-                Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.
-                Percentages are from 0.0 - 1.0
-                Variables:
-                        - spawnDistance:                distance from player to spawnpoint
-                        - spawnX, spawnY, spawnZ:       spawn coordinates
-                        - playerX, playerY, playerZ:    player coordinates
-                        - rarityPercent:                get droprate from rarity as set in the config.
-                        - isEpic, isRare, isCommon, isUncommon:
-                                                        return 1.0 if true
-                        - dropPercent:                  inventory droprate as set in the config
-                 """;
-
     private ItemStack item;
 
     public InventoryDroprateFormula(ServerPlayerEntity player) {
         super(player);
-    }
-
-    public InventoryDroprateFormula() {
-        super();
     }
 
     @Override
