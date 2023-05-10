@@ -133,13 +133,17 @@ public class pkiVersion implements Cloneable {
     public boolean lessThan(pkiVersion v){
         boolean ret;
         ret = major < v.major;
-        ret &= minor < v.minor;
-        ret &= patch < v.patch;
+        ret |= minor < v.minor;
+        ret |= patch < v.patch;
         return ret;
     }
 
     public boolean moreThan(pkiVersion v){
-        return !lessThan(v);
+        boolean ret;
+        ret = major > v.major;
+        ret |= minor > v.minor;
+        ret |= patch > v.patch;
+        return ret;
     }
 
     public void setVersion(Integer major, Integer minor, Integer patch) {
@@ -156,8 +160,7 @@ public class pkiVersion implements Cloneable {
     @Override
     public pkiVersion clone() {
         try {
-            pkiVersion clone = (pkiVersion) super.clone();
-            return clone;
+            return (pkiVersion) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
