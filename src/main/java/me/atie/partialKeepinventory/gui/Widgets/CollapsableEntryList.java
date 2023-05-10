@@ -62,12 +62,10 @@ public class CollapsableEntryList extends EntryList {
 
     private void collapse(ButtonWidget buttonWidget) {
         collapsed = !collapsed;
-        PartialKeepInventory.LOGGER.info("COLLAPSING: " + collapsed);
         var it = children.iterator();
         it.next();
         while(it.hasNext()){
             Entry e = it.next();
-            PartialKeepInventory.LOGGER.info(e.toString());
             e.hidden = collapsed;
         }
 
