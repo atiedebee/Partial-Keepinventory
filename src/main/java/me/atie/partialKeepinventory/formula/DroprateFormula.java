@@ -40,7 +40,7 @@ public class DroprateFormula {
 
     protected void initEnvVariables(){
         if( this.player == null ){
-            throw new RuntimeException("Cannot create invExpression: no player was provided.");
+            throw new RuntimeException("Cannot create expression: no player was provided.");
         }
 
         env.addLazyVariable("spawnDistance", this::getSpawnDistance);

@@ -66,10 +66,10 @@ public class GuiText {
         public final static Text saveExpr_tooltip_base = Text.translatable(prefix + ".gui.inv.button.saveexpression.tooltip_base");
         public final static Text saveExpr_tooltip_success = Text.translatable(prefix + ".gui.inv.button.saveexpression.tooltip_success");
         public final static Text saveExpr_tooltip_failure = Text.translatable(prefix + ".gui.inv.button.saveexpression.tooltip_failure");
-        public final static Text xpdrop_textfield = Text.translatable(prefix + ".gui.textfield.xpdrop-invExpression");
-        public final static Text xpdrop_tooltip = Text.translatable(prefix + ".gui.tooltip.xpdrop-invExpression");
-        public final static Text xploss_textfield = Text.translatable(prefix + ".gui.textfield.xploss-invExpression");
-        public final static Text xploss_tooltip = Text.translatable(prefix + ".gui.tooltip.xploss-invExpression");
+        public final static Text xpdrop_textfield = Text.translatable(prefix + ".gui.textfield.xpdrop-expression");
+        public final static Text xpdrop_tooltip = Text.translatable(prefix + ".gui.tooltip.xpdrop-expression");
+        public final static Text xploss_textfield = Text.translatable(prefix + ".gui.textfield.xploss-expression");
+        public final static Text xploss_tooltip = Text.translatable(prefix + ".gui.tooltip.xploss-expression");
         public final static Text xpExpr_list = Text.translatable(prefix + ".gui.list.xpexpression");
         public final static Text xpExpr_guide = Text.translatable(prefix + ".gui.text.xpexpression-guide");
     }

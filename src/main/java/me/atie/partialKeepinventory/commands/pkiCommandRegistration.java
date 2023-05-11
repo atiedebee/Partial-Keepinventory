@@ -93,21 +93,21 @@ public class pkiCommandRegistration {
         == Rarity ==
         Items are dropped based off of their rarity.
         == Custom ==
-        Item drops are calculated using an invExpression.
+        Item drops are calculated using an expression.
         """
         );
 
         final Text invExpressionTextHelp = Text.literal(
         """
          Expressions give more control over how to drop items. These are simply an equation using certain variables.
-         The invExpression will return a number between 0.0 - 1.0, and is clamped when higher.
+         The expression will return a number between 0.0 - 1.0, and is clamped when higher.
          0.0 == 0% dropped
          1.0 == 100% dropped
          Variables and their meaning can be seen using the command
          """
         ).append(Text.literal(
-                "/pki help invExpression-vars"
-        ).setStyle(Style.EMPTY.withBold(true).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pki help invExpression-vars")))
+                "/pki help expression-vars"
+        ).setStyle(Style.EMPTY.withBold(true).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pki help expression-vars")))
         );
 
         final Text expressionVarsTextHelp = Text.literal(
@@ -190,8 +190,8 @@ public class pkiCommandRegistration {
                                         case CUSTOM_LEVELS, CUSTOM_POINTS ->
                                                 ">Loss percentage: " + CONFIG.getXpLoss() + "%\n" +
                                                 ">Drop percentage: " + CONFIG.getXpDrop() + "%\n" +
-                                                ">Drop invExpression: \"" + CONFIG.getXpDropExpression() + "\"\n" +
-                                                ">Loss invExpression: \"" + CONFIG.getXpLossExpression() + "\"\n";
+                                                ">Drop expression: \"" + CONFIG.getXpDropExpression() + "\"\n" +
+                                                ">Loss expression: \"" + CONFIG.getXpLossExpression() + "\"\n";
                                     };
 
                                     ctx.getSource().sendMessage(Text.literal(message));
@@ -381,20 +381,20 @@ public class pkiCommandRegistration {
                                         )
 
                                 )
-                                .then(literal("invExpression")
+                                .then(literal("expression")
                                         .then(literal("set")
-                                                .then(argument("invExpression", StringArgumentType.greedyString())
+                                                .then(argument("expression", StringArgumentType.greedyString())
                                                         .executes(ctx -> {
-                                                            String invExpression = StringArgumentType.getString(ctx, "invExpression");
+                                                            String expression = StringArgumentType.getString(ctx, "expression");
                                                             try {
                                                                 var formula = new InventoryDroprateFormula(ctx.getSource().getPlayer());
-                                                                formula.testExpression(invExpression);
-                                                                ctx.getSource().sendMessage(Text.literal("Saved the invExpression \"" + invExpression + "\""));
-                                                                CONFIG.setInvExpression(invExpression);
+                                                                formula.testExpression(expression);
+                                                                ctx.getSource().sendMessage(Text.literal("Saved the expression \"" + expression + "\""));
+                                                                CONFIG.setInvExpression(expression);
                                                                 syncSettings(environment);
                                                             }catch(Exception e){
-                                                                PartialKeepInventory.LOGGER.error("Invalid invExpression: " + e.getMessage());
-                                                                ctx.getSource().sendMessage(Text.literal("Invalid invExpression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
+                                                                PartialKeepInventory.LOGGER.error("Invalid expression: " + e.getMessage());
+                                                                ctx.getSource().sendMessage(Text.literal("Invalid expression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
                                                             }
 
                                                             return 1;
@@ -486,43 +486,43 @@ public class pkiCommandRegistration {
                                                 })
                                         )
                                 )
-                                .then(literal("invExpression")
+                                .then(literal("expression")
                                         .then(literal("loss")
-                                                .then(argument("invExpression", StringArgumentType.greedyString())
+                                                .then(argument("expression", StringArgumentType.greedyString())
                                                         .executes(ctx -> {
-                                                            String invExpression = StringArgumentType.getString(ctx, "invExpression");
+                                                            String expression = StringArgumentType.getString(ctx, "expression");
                                                             try {
                                                                 var formula = new XpDroprateFormula(ctx.getSource().getPlayer());
-                                                                formula.testExpression(invExpression);
+                                                                formula.testExpression(expression);
                                                                 ctx.getSource().sendMessage(Text.literal(
-                                                                        "Saved the invExpression \"" + invExpression + "\""));
-                                                                CONFIG.setXpLossExpression(invExpression);
+                                                                        "Saved the expression \"" + expression + "\""));
+                                                                CONFIG.setXpLossExpression(expression);
                                                                 syncSettings(environment);
                                                             }catch(Exception e){
-                                                                PartialKeepInventory.LOGGER.error("Invalid invExpression: " + e.getMessage());
-                                                                ctx.getSource().sendMessage(Text.literal("Invalid invExpression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
+                                                                PartialKeepInventory.LOGGER.error("Invalid expression: " + e.getMessage());
+                                                                ctx.getSource().sendMessage(Text.literal("Invalid expression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
                                                             }
                                                             return 1;
                                                         })
                                                 )
                                         )
                                         .then(literal("drop")
-                                                .then(argument("invExpression", StringArgumentType.greedyString())
+                                                .then(argument("expression", StringArgumentType.greedyString())
                                                         .executes(ctx -> {
-                                                            String invExpression = StringArgumentType.getString(ctx, "invExpression");
+                                                            String expression = StringArgumentType.getString(ctx, "expression");
                                                             try {
                                                                 var formula = new XpDroprateFormula(ctx.getSource().getPlayer());
-                                                                formula.testExpression(invExpression);
+                                                                formula.testExpression(expression);
 
                                                                 ctx.getSource().sendMessage(Text.literal(
-                                                                        "Saved the invExpression \"" + invExpression + "\""));
+                                                                        "Saved the expression \"" + expression + "\""));
 
-                                                                CONFIG.setXpDropExpression(invExpression);
+                                                                CONFIG.setXpDropExpression(expression);
 
                                                                 syncSettings(environment);
                                                             }catch(Exception e){
-                                                                PartialKeepInventory.LOGGER.error("Invalid invExpression: " + e.getMessage());
-                                                                ctx.getSource().sendMessage(Text.literal("Invalid invExpression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
+                                                                PartialKeepInventory.LOGGER.error("Invalid expression: " + e.getMessage());
+                                                                ctx.getSource().sendMessage(Text.literal("Invalid expression: " + e.getMessage()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xAA0000))));
                                                             }
                                                             return 1;
                                                         })
@@ -530,18 +530,17 @@ public class pkiCommandRegistration {
                                         )
                                 )
                         )
-                        //TODO: proper help commands for each part of the mod
                         .then(literal("help")
                                 .then(literal("inv-mode")
                                         .executes(ctx -> sendHelpMessage(ctx, modeTextHelp))
                                 )
-                                .then(literal("inv-invExpression")
+                                .then(literal("inv-expression")
                                         .executes(ctx -> sendHelpMessage(ctx, invExpressionTextHelp))
                                 )
                                 .then(literal("inv-droprate")
                                         .executes(ctx -> sendHelpMessage(ctx, invDroprateTextHelp))
                                 )
-                                .then(literal("invExpression-vars")
+                                .then(literal("expression-vars")
                                         .executes(ctx -> sendHelpMessage(ctx, expressionVarsTextHelp))
                                 )
                                 .then(literal("xp-mode")
@@ -550,35 +549,13 @@ public class pkiCommandRegistration {
                                 .then(literal("xp-droprate")
                                         .executes(ctx -> sendHelpMessage(ctx, xpDroprateTextHelp))
                                 )
-
                         )
                         .executes(ctx -> {
                             ctx.getSource().sendMessage(Text.literal(
                                     """
-                                            Enable/ disable the mod:
-                                            > /pki [enable|disable]
-                                                                                
-                                            Set the drop behaviour.
-                                            percentage: all items are dropped equally
-                                            rarity:     Droprates are based off of the rarity of items.
-                                            custom:     Use your own formula for determining how many items to drop.
-                                            vanilla:    Vanilla drop behaviour
-                                            > /pki inv mode [percentage / rarity / custom / vanilla]
-                                                                                
-                                            Set droprates
-                                            > /pki inv droprate [static / common / uncommon / rare / epic] <percentage>
-                                                                                
-                                            Use your own formula for droprates.
-                                            > /pki inv invExpression set [invExpression]
-                                                                                
-                                            Show variables you may use for your formulas.
-                                            > /pki inv invExpression info
-                                                                                
-                                            Set xp drop behaviour
-                                            /pki xp mode [static-points / static-level / vanilla]
-                                                                                
-                                            /pki xp droprate [loss / drop] <percentage>
-                                                                                
+                                            Get help on a subject:
+                                            > /pki help <subject>
+                                            
                                             Show settings
                                             > /pki info
                                             """

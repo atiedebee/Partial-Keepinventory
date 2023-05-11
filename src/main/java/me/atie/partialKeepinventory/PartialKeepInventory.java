@@ -40,8 +40,9 @@ public class PartialKeepInventory implements ModInitializer {
 
 
 	public static String getID(){
-		return "partial-keepinv";
+		return ID;
 	}
+	public static final String ID = "partial-keepinv";
 
 	@Override
 	public void onInitialize() {
