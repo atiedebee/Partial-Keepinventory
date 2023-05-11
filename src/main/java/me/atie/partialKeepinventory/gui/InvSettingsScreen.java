@@ -264,7 +264,7 @@ class InvCustomSettingsScreen extends Screen {
 
     @Override
     public void close() {
-        LOCAL_CONFIG.setExpression(expressionTextField.getText());
+        LOCAL_CONFIG.setInvExpression(expressionTextField.getText());
     }
 
     @Override
@@ -302,7 +302,7 @@ class InvCustomSettingsScreen extends Screen {
         expressionTextField = new TextFieldEntry.Builder(textRenderer)
                 .setName(GuiText.customInvScreen.invExpr_textfield_name)
                 .setTooltip(GuiText.customInvScreen.invExpr_textfield_tooltip)
-                .setText(new String(LOCAL_CONFIG.getExpression()))
+                .setText(new String(LOCAL_CONFIG.getInvExpression()))
                 .build();
         this.addSelectableChild(expressionTextField.getTextFieldWidget());
 
@@ -367,7 +367,7 @@ class InvCustomSettingsScreen extends Screen {
                     GuiText.customInvScreen.saveExpr_tooltip_success
                             .copy().setStyle((Style.EMPTY.withColor(0x00FF00)))
             ));
-            LOCAL_CONFIG.setExpression(expression);
+            LOCAL_CONFIG.setInvExpression(expression);
         }catch(Exception e){
             button.setMessage(
                     GuiText.customInvScreen.saveExpr_button_name

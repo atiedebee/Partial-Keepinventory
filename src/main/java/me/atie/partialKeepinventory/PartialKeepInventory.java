@@ -66,7 +66,6 @@ public class PartialKeepInventory implements ModInitializer {
 				PartialKeepInventory.server = server;
 			}
 			CONFIG = pkiSettings.getServerState(server);
-			PartialKeepInventory.LOGGER.info("READ CONFIG FROM SERVER WITH VERSION " + CONFIG.configVersion);
 		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> PartialKeepInventory.server = null);
 

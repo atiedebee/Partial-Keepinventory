@@ -48,13 +48,20 @@ public class ServerListeners {
 
 
     private static void updateConfig(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-
         if( !player.hasPermissionLevel(2) ) {
             player.sendMessage(Text.translatable(PartialKeepInventory.getID() + ".error.insufficientPermissions"));
             return;
         }
-        CONFIG.packetReader(buf);
+        pkiSettings temp = new pkiSettings();
+        temp.packetReader(buf);
+        try{
+            temp.validate();
+        }catch(Exception e){
+            player.sendMessage(Text.literal("Invalid settings: " + e.getMessage()));
+            return;
+        }
 
+        CONFIG = temp;
         sendConfigToPlayers(CONFIG);
     }
 

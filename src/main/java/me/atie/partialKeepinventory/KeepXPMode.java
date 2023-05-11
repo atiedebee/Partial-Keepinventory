@@ -25,6 +25,14 @@ public enum KeepXPMode {
         };
     }
 
+    public KeepXPMode notCustom(){
+        return switch(this){
+            case CUSTOM_POINTS -> STATIC_POINTS;
+            case CUSTOM_LEVELS -> STATIC_LEVELS;
+            default -> this;
+        };
+    }
+
     public static Text getName(KeepXPMode e) {
         return Text.translatable(PartialKeepInventory.getID() + ".KeepXpMode." + e.toString());
     }

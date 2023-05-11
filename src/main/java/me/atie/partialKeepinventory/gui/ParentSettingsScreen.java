@@ -90,7 +90,7 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
             client.setScreen(nextScreen);
             return;
         }
-        copyConfig = client.player.hasPermissionLevel(4);
+        copyConfig = client.player.hasPermissionLevel(2);
 
         LOCAL_CONFIG = CONFIG.clone();
 

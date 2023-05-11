@@ -74,7 +74,7 @@ public abstract class BwSettingsCompat extends pkiSettings{
 
         buf.writeByteArray(new byte[]{s.inventoryDroprate, s.commonDroprate, s.uncommonDroprate, s.rareDroprate,
                 s.epicDroprate, s.xpDrop, s.xpLoss} );
-        buf.writeString(s.expression.toString());
+        buf.writeString(s.invExpression.toString());
 
         buf.writeEnumConstant(s.keepinvMode);
         buf.writeEnumConstant(s.keepxpMode);
@@ -105,7 +105,7 @@ public abstract class BwSettingsCompat extends pkiSettings{
         s.xpDrop = droprates[5];
         s.xpLoss = droprates[6];
 
-        s.expression = new StringBuffer(buf.readString());
+        s.invExpression = new StringBuffer(buf.readString());
 
         s.keepinvMode = buf.readEnumConstant(KeepinvMode.class);
         s.keepxpMode = buf.readEnumConstant(KeepXPMode.class);
@@ -144,7 +144,7 @@ public abstract class BwSettingsCompat extends pkiSettings{
         s.uncommonDroprate = nbt.getByte("uncommonDR");
         s.rareDroprate = nbt.getByte("rareDR");
         s.epicDroprate = nbt.getByte("epicDR");
-        s.expression = new StringBuffer(nbt.getString("invExpr"));
+        s.invExpression = new StringBuffer(nbt.getString("invExpr"));
 
         s.keepxpMode = keepxpModeValues[nbt.getByte("xpMode")];
         s.xpDrop = nbt.getByte("xpDrop");

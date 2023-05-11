@@ -4,6 +4,8 @@ import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.api.pkiSettingsApi;
+import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
+import me.atie.partialKeepinventory.formula.XpDroprateFormula;
 import me.atie.partialKeepinventory.impl.Impl;
 import me.atie.partialKeepinventory.network.Identifiers;
 import me.atie.partialKeepinventory.network.ServerListeners;
@@ -62,7 +64,7 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
 //            - isEpic, isRare, isCommon, isUncommon:
 //                                            return 1.0 if true
 //            - dropPercent:                  inventory droprate as set in the config
-    protected StringBuffer expression = new StringBuffer();
+    protected StringBuffer invExpression = new StringBuffer();
 
     // ----- XP -----
     protected KeepXPMode keepxpMode = KeepXPMode.VANILLA;
@@ -139,18 +141,18 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
     }
 
 
-    public StringBuffer getExpression() {
-        return expression;
+    public StringBuffer getInvExpression() {
+        return invExpression;
     }
 
-    public void setExpression(String expression) {
-        if( expression.length() > this.expression.capacity())
-            this.expression.ensureCapacity(expression.length());
+    public void setInvExpression(String invExpression) {
+        if( invExpression.length() > this.invExpression.capacity())
+            this.invExpression.ensureCapacity(invExpression.length());
 
-        this.expression.replace(0, this.expression.capacity(), expression);
+        this.invExpression.replace(0, this.invExpression.capacity(), invExpression);
     }
     public void setExpression(StringBuffer expression) {
-        this.expression = expression;
+        this.invExpression = expression;
     }
 
     public ArrayList<String> getSavedPlayers(){
@@ -224,6 +226,19 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
     }
 
 
+    public void validate() throws Exception {
+        if( !validSettings ){
+            throw new Exception("Settings identified themselves as invalid.");
+        }
+
+        var xpCheck = new XpDroprateFormula(null);
+        xpCheck.testExpression(this.xpLossExpression.toString());
+        xpCheck.testExpression(this.xpDropExpression.toString());
+
+        var invCheck = new InventoryDroprateFormula(null);
+        invCheck.testExpression(this.invExpression.toString());
+    }
+
 
     ///////////////////
     // Serialization //
@@ -231,8 +246,6 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
 
     @Override
     public void packetWriter(PacketByteBuf buf){
-        PartialKeepInventory.LOGGER.info("WRITING PACKET WITH SERVER VERSION!!!!!");
-        PartialKeepInventory.LOGGER.info(Thread.currentThread().getStackTrace().toString());
         BwSettingsCompat.writePacket(this, PartialKeepInventory.modVersion, buf);
     }
 
@@ -271,7 +284,7 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
         nbt.putByte("uncommonDR", uncommonDroprate);
         nbt.putByte("rareDR", rareDroprate);
         nbt.putByte("epicDR", epicDroprate);
-        nbt.putString("invExpr", expression.toString());
+        nbt.putString("invExpr", invExpression.toString());
 
         nbt.putByte("xpMode", (byte) keepxpMode.ordinal());
         nbt.putByte("xpDrop", xpDrop);
@@ -313,7 +326,6 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
         state.configVersion = PartialKeepInventory.modVersion;
         state.validSettings = true;
         state.markDirty();
-        PartialKeepInventory.LOGGER.info("Got config: " + state);
         return state;
     }
 
@@ -321,7 +333,7 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
     public pkiSettings clone() {
         try {
             pkiSettings clone = (pkiSettings) super.clone();
-            clone.expression = new StringBuffer(this.expression);
+            clone.invExpression = new StringBuffer(this.invExpression);
             clone.xpDropExpression = new StringBuffer(this.xpDropExpression);
             clone.xpLossExpression = new StringBuffer(this.xpLossExpression);
 

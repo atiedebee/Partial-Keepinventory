@@ -1,6 +1,9 @@
 # Partial Keepinventory
 A fabric mod for changing the behaviour of keep inventory.
 
+### <span style="color:red">NOTE: This mod is still in alpha, and I am just one person. Bugs are bound to happen.</span>
+
+
 Take this fancy list of things I'm working on.
 
 | Feature                                     | State   |
@@ -32,11 +35,11 @@ Remove/add players who get normal keepinventory behaviour
 > /pki inv savedPlayers [add / remove] <name>
 
 Set the custom droprate formula
-> /pki inv expression set [expression]
+> /pki inv invExpression set [invExpression]
 
 ---
 ## Expressions
-Expressions are a way to dynamically change how items are dropped. This can be done with a simple formula that uses given variables. The value returned by the expression is clamped between 0 and 1.
+Expressions are a way to dynamically change how items are dropped. This can be done with a simple formula that uses given variables. The value returned by the invExpression is clamped between 0 and 1.
  A list of variables can be found in the provided table:
 
 ### Base
