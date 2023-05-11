@@ -2,6 +2,8 @@ package me.atie.partialKeepinventory.gui.Widgets;
 
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -13,6 +15,7 @@ import java.util.List;
 /**
  * List of entries that may be collapsed
  */
+@Environment(EnvType.CLIENT)
 public class CollapsableEntryList extends EntryList {
     private final EntryList parent;
     private final ButtonWidgetEntry buttonWidgetEntry;

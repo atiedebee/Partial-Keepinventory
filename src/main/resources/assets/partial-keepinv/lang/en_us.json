@@ -4,7 +4,10 @@
   "partial-keepinv.KeepinvMode.VANILLA": "Vanilla",
   "partial-keepinv.KeepinvMode.CUSTOM": "Custom",
   "partial-keepinv.KeepinvMode.RARITY": "Rarity",
+
   "partial-keepinv.gui.error.server_req": "You need to be on a server to access these settings.",
+  "partial-keepinv.gui.error.config_null": "No config has been loaded.",
+  "partial-keepinv.gui.error.config_invalid": "Invalid config settings.",
 
   "partial-keepinv.gui.modenabled.true": "Mod Enabled",
   "partial-keepinv.gui.modenabled.false": "Mod Disabled",

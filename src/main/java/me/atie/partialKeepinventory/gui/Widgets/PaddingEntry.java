@@ -1,11 +1,14 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class PaddingEntry extends Entry {
 
     public PaddingEntry(int padding) {

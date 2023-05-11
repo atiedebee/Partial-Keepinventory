@@ -1,5 +1,7 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -10,6 +12,7 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 //TODO maybe: some container based widget system, or use callbacks to functions to resize items
+@Environment(EnvType.CLIENT)
 public class SimpleButton extends Entry {
     private final ButtonWidget buttonWidget;
     ButtonWidget.PressAction onResize;

@@ -5,6 +5,7 @@ import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.*;
+import me.atie.partialKeepinventory.text.GuiText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -42,7 +43,7 @@ public class InvSettingsScreen extends Screen {
 
 
     public InvSettingsScreen(Screen parent, pkiSettings settings, EntryList heading) {
-        super(Text.translatable(PartialKeepInventory.getID() + ".gui.screen.inv"));
+        super(GuiText.invScreen.name);
         this.client = MinecraftClient.getInstance();
         this.LOCAL_CONFIG = settings;
         this.heading = heading;
@@ -84,7 +85,7 @@ public class InvSettingsScreen extends Screen {
             super.addSelectableChild(e);
         }
 
-        generalKeepinvText = new TextHeaderEntry(textRenderer, Text.translatable(PartialKeepInventory.getID() + ".gui.header.inv").setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)), yPos);
+        generalKeepinvText = new TextHeaderEntry(textRenderer, GuiText.invScreen.header.copy().setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)), yPos);
         yPos = generalKeepinvText.updateY(yPos);
 
         footing = new SimpleButton(width - ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.vertOptionMargin - ParentSettingsScreen.widgetHeight,
@@ -101,8 +102,8 @@ public class InvSettingsScreen extends Screen {
         try {
 
             keepinvModeButtonEntry = new ButtonEntry.Builder<KeepinvMode>(textRenderer)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.text.partialinvmode"))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.partialinvmode"))
+                    .setName(GuiText.invScreen.text_invMode)
+                    .setTooltip(GuiText.invScreen.tooltip_invMode)
                     .toText(KeepinvMode::getName)
                     .setGetter(LOCAL_CONFIG::getPartialKeepinvMode)
                     .setSetter(LOCAL_CONFIG::setPartialKeepinvMode)
@@ -120,8 +121,8 @@ public class InvSettingsScreen extends Screen {
                     .intSetter(LOCAL_CONFIG::setInventoryDroprate)
                     .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.static"))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.static"))
+                    .setName(GuiText.invScreen.slider_static)
+                    .setTooltip(GuiText.invScreen.tooltip_static)
                     .build();
             this.addSelectableChild(invPercentSlider.getSliderWidget());
 
@@ -130,8 +131,8 @@ public class InvSettingsScreen extends Screen {
                     .intSetter(LOCAL_CONFIG::setCommonDroprate)
                     .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.common").setStyle(Style.EMPTY.withColor(0xAAAAAA)))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.common"))
+                    .setName(GuiText.invScreen.slider_common.copy().setStyle(Style.EMPTY.withColor(0xAAAAAA)))
+                    .setTooltip(GuiText.invScreen.tooltip_common)
                     .build();
             this.addSelectableChild(commonPercentSlider.getSliderWidget());
 
@@ -140,8 +141,8 @@ public class InvSettingsScreen extends Screen {
                     .intSetter(LOCAL_CONFIG::setUncommonDroprate)
                     .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.uncommon").setStyle(Style.EMPTY.withColor(0xFFFF55)))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.uncommon"))
+                    .setName(GuiText.invScreen.slider_uncommon.copy().setStyle(Style.EMPTY.withColor(0xFFFF55)))
+                    .setTooltip(GuiText.invScreen.tooltip_uncommon)
                     .build();
             this.addSelectableChild(uncommonPercentSlider.getSliderWidget());
 
@@ -149,8 +150,8 @@ public class InvSettingsScreen extends Screen {
                     .intGetter(LOCAL_CONFIG::getRareDroprate).intSetter(LOCAL_CONFIG::setRareDroprate)
                     .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.rare").setStyle(Style.EMPTY.withColor(0x55FFFF)))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.rare"))
+                    .setName(GuiText.invScreen.slider_rare.copy().setStyle(Style.EMPTY.withColor(0x55FFFF)))
+                    .setTooltip(GuiText.invScreen.tooltip_rare)
                     .build();
             this.addSelectableChild(rarePercentSlider.getSliderWidget());
 
@@ -158,8 +159,8 @@ public class InvSettingsScreen extends Screen {
                     .intGetter(LOCAL_CONFIG::getEpicDroprate).intSetter(LOCAL_CONFIG::setEpicDroprate)
                     .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.epic").setStyle(Style.EMPTY.withColor(0xFF55FF)))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.epic"))
+                    .setName(GuiText.invScreen.slider_epic.copy().setStyle(Style.EMPTY.withColor(0xFF55FF)))
+                    .setTooltip(GuiText.invScreen.tooltip_epic)
                     .build();
             this.addSelectableChild(epicPercentSlider.getSliderWidget());
 
@@ -227,6 +228,9 @@ public class InvSettingsScreen extends Screen {
 
 }
 
+
+@Environment(EnvType.CLIENT)
+
 class InvCustomSettingsScreen extends Screen {
     private final Screen parent;
     private final pkiSettings LOCAL_CONFIG;
@@ -239,7 +243,7 @@ class InvCustomSettingsScreen extends Screen {
     private final boolean canEditValues;
 
     public InvCustomSettingsScreen(Screen parent, pkiSettings settings, EntryList heading) {
-        super(Text.translatable(PartialKeepInventory.getID() + ".gui.screen.inv"));
+        super(GuiText.invScreen.name);
         this.client = MinecraftClient.getInstance();
         this.LOCAL_CONFIG = settings;
         this.heading = heading;
@@ -288,7 +292,7 @@ class InvCustomSettingsScreen extends Screen {
         }
 
         textHeader = new TextHeaderEntry(textRenderer,
-                Text.translatable(PartialKeepInventory.getID() + ".gui.text.customheader").setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)),
+                GuiText.customInvScreen.text_header.copy().setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)),
                 0);
         yPos = textHeader.updateY(yPos);
 
@@ -296,8 +300,8 @@ class InvCustomSettingsScreen extends Screen {
         options = new EntryList(yPos);
 
         expressionTextField = new TextFieldEntry.Builder(textRenderer)
-                .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.textfield.invexpression"))
-                .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.invexpression"))
+                .setName(GuiText.customInvScreen.invExpr_textfield_name)
+                .setTooltip(GuiText.customInvScreen.invExpr_textfield_tooltip)
                 .setText(new String(LOCAL_CONFIG.getExpression()))
                 .build();
         this.addSelectableChild(expressionTextField.getTextFieldWidget());
@@ -305,18 +309,18 @@ class InvCustomSettingsScreen extends Screen {
         checkExpressionButton = new SimpleButton(
                 expressionTextField.getTextFieldWidget().getX() - 10 - 40,
                 yPos, 40, ParentSettingsScreen.widgetHeight,
-                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression"),
-                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_base").setStyle(Style.EMPTY.withColor(0x888888)),
+                GuiText.customInvScreen.saveExpr_button_name,
+                GuiText.customInvScreen.saveExpr_tooltip_base.copy().setStyle(Style.EMPTY.withColor(0x888888)),
                 this::saveExpression, button -> button.setX(expressionTextField.getTextFieldWidget().getX() - 10 - 40));
         for(var s: checkExpressionButton.getSelectables()){
             this.addSelectableChild(s);
         }
 
-        SimpleText text = new SimpleText(textRenderer, Text.translatable(PartialKeepInventory.getID() + ".gui.text.invexpression"), 0);
+        SimpleText text = new SimpleText(textRenderer, GuiText.customInvScreen.invExpr_text, 0);
         this.addSelectableChild(text.getSelectables().get(0));
 
         CollapsableEntryList expressionTutorialEntry = new CollapsableEntryList(
-                Text.translatable(PartialKeepInventory.getID() + ".gui.list.invexpression"),
+                GuiText.customInvScreen.invExpr_list,
                 options, false, 0, ParentSettingsScreen.sideMargin, ParentSettingsScreen.buttonWidth);
         expressionTutorialEntry.addChild(text);
         this.addSelectableChild(expressionTutorialEntry.getButtonWidget());
@@ -356,22 +360,23 @@ class InvCustomSettingsScreen extends Screen {
         try{
             formula.testExpression(expression);
             button.setMessage(
-                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression")
-                            .setStyle(Style.EMPTY.withColor(0x00AA00))
+                    GuiText.customInvScreen.saveExpr_button_name
+                            .copy().setStyle(Style.EMPTY.withColor(0x00AA00))
             );
             button.setTooltip(Tooltip.of(
-                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_success")
-                            .setStyle((Style.EMPTY.withColor(0x00FF00)))
+                    GuiText.customInvScreen.saveExpr_tooltip_success
+                            .copy().setStyle((Style.EMPTY.withColor(0x00FF00)))
             ));
             LOCAL_CONFIG.setExpression(expression);
         }catch(Exception e){
             button.setMessage(
-                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression")
-                            .setStyle(Style.EMPTY.withColor(0xAA0000))
+                    GuiText.customInvScreen.saveExpr_button_name
+                            .copy().setStyle(Style.EMPTY.withColor(0xAA0000))
             );
 
             button.setTooltip(Tooltip.of(
-                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_failure")
+                    GuiText.customInvScreen.saveExpr_tooltip_failure
+                            .copy()
                             .append(Text.literal(e.getMessage()))
                             .setStyle(Style.EMPTY.withColor(0xFF0000))
             ));

@@ -3,8 +3,10 @@ package me.atie.partialKeepinventory.gui;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
+import me.atie.partialKeepinventory.formula.XpDroprateFormula;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.*;
+import me.atie.partialKeepinventory.text.GuiText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -19,6 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
 public class XpSettingsScreen extends Screen {
@@ -177,6 +180,8 @@ public class XpSettingsScreen extends Screen {
 
 }
 
+
+@Environment(EnvType.CLIENT)
 class XpCustomSettingScreen extends Screen {
     private final Screen parent;
     private final pkiSettings LOCAL_CONFIG;
@@ -250,15 +255,16 @@ class XpCustomSettingScreen extends Screen {
         }
 
         textHeader = new TextHeaderEntry(textRenderer,
-                Text.translatable(PartialKeepInventory.getID() + ".gui.text.customxpheader").setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)),
+                GuiText.customXpScreen.header
+                        .copy().setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)),
                 0);
         yPos = textHeader.updateY(yPos);
 
 
 //        XP Drop Expression
         xpDropExpressionTextField = new TextFieldEntry.Builder(textRenderer)
-                .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.textfield.xpdrop-expression"))
-                .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xpdrop-expression"))
+                .setName(GuiText.customXpScreen.xpdrop_textfield)
+                .setTooltip(GuiText.customXpScreen.xpdrop_tooltip)
                 .setText(new String(LOCAL_CONFIG.getXpDropExpression()))
                 .build();
         this.addSelectableChild(xpDropExpressionTextField.getTextFieldWidget());
@@ -267,9 +273,10 @@ class XpCustomSettingScreen extends Screen {
         saveDropExpressionButton = new SimpleButton(
                 xpDropExpressionTextField.getTextFieldWidget().getX() - 10 - saveButtonWidth,
                 yPos, 40, ParentSettingsScreen.widgetHeight,
-                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression"),
-                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_base").setStyle(Style.EMPTY.withColor(0x888888)),
-                button -> this.saveExpression(button, xpDropExpressionTextField),
+                GuiText.customXpScreen.saveExpr_name,
+                GuiText.customXpScreen.saveExpr_tooltip_base
+                        .copy().setStyle(Style.EMPTY.withColor(0x888888)),
+                button -> this.saveExpression(button, xpDropExpressionTextField, LOCAL_CONFIG::setXpDropExpression),
                 button -> button.setX(xpDropExpressionTextField.getTextFieldWidget().getX() - 10 - saveButtonWidth)
         );
         this.addSelectableChild(saveDropExpressionButton.getButtonWidget());
@@ -277,8 +284,8 @@ class XpCustomSettingScreen extends Screen {
 
 //        XP Loss Expression
         xpLossExpressionTextField = new TextFieldEntry.Builder(textRenderer)
-                .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.textfield.xploss-expression"))
-                .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xploss-expression"))
+                .setName(GuiText.customXpScreen.xploss_textfield)
+                .setTooltip(GuiText.customXpScreen.xploss_tooltip)
                 .setText(new String(LOCAL_CONFIG.getXpLossExpression()))
                 .build();
         this.addSelectableChild(xpLossExpressionTextField.getTextFieldWidget());
@@ -286,20 +293,21 @@ class XpCustomSettingScreen extends Screen {
         saveLossExpressionButton = new SimpleButton(
                 xpLossExpressionTextField.getTextFieldWidget().getX() - 10 - saveButtonWidth,
                 yPos, 40, ParentSettingsScreen.widgetHeight,
-                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression"),
-                Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_base").setStyle(Style.EMPTY.withColor(0x888888)),
-                button -> this.saveExpression(button, xpLossExpressionTextField),
+                GuiText.customXpScreen.saveExpr_name,
+                GuiText.customXpScreen.saveExpr_tooltip_base
+                        .copy().setStyle(Style.EMPTY.withColor(0x888888)),
+                button -> this.saveExpression(button, xpLossExpressionTextField, LOCAL_CONFIG::setXpLossExpression),
                 button -> button.setX(xpLossExpressionTextField.getTextFieldWidget().getX() - 10 - saveButtonWidth)
         );
         this.addSelectableChild(saveLossExpressionButton.getButtonWidget());
         yPos = xpLossExpressionTextField.updateY(yPos);
 
 
-        SimpleText text = new SimpleText(textRenderer, Text.translatable(PartialKeepInventory.getID() + ".gui.text.xpexpression-guide"), 0);
+        SimpleText text = new SimpleText(textRenderer, GuiText.customXpScreen.xpExpr_guide, 0);
         this.addSelectableChild(text.getSelectables().get(0));
 
         expressionTutorialEntry = new CollapsableEntryList(
-                Text.translatable(PartialKeepInventory.getID() + ".gui.list.xpexpression"),
+                GuiText.customXpScreen.xpExpr_list,
                 null, false, yPos, ParentSettingsScreen.sideMargin, ParentSettingsScreen.buttonWidth);
         expressionTutorialEntry.addChild(text);
         this.addSelectableChild(expressionTutorialEntry.getButtonWidget());
@@ -328,28 +336,29 @@ class XpCustomSettingScreen extends Screen {
         return null;
     }
 
-    private void saveExpression(ButtonWidget button, TextFieldEntry textFieldEntry){
+    private void saveExpression(ButtonWidget button, TextFieldEntry textFieldEntry, Consumer<String> setter){
         String expression = textFieldEntry.getText();
-        var formula = new InventoryDroprateFormula(null);
+        var formula = new XpDroprateFormula(null);
         try{
             formula.testExpression(expression);
             button.setMessage(
-                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression")
+                    GuiText.customXpScreen.saveExpr_name.copy()
                             .setStyle(Style.EMPTY.withColor(0x00AA00))
             );
             button.setTooltip(Tooltip.of(
-                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_success")
+                    GuiText.customXpScreen.saveExpr_tooltip_success.copy()
                             .setStyle((Style.EMPTY.withColor(0x00FF00)))
             ));
-            LOCAL_CONFIG.setExpression(expression);
+            setter.accept(expression);
+
         }catch(Exception e){
             button.setMessage(
-                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression")
+                    GuiText.customXpScreen.saveExpr_name.copy()
                             .setStyle(Style.EMPTY.withColor(0xAA0000))
             );
 
             button.setTooltip(Tooltip.of(
-                    Text.translatable(PartialKeepInventory.getID() + ".gui.inv.button.saveexpression.tooltip_failure")
+                    GuiText.customXpScreen.saveExpr_tooltip_failure.copy()
                             .append(Text.literal(e.getMessage()))
                             .setStyle(Style.EMPTY.withColor(0xFF0000))
             ));

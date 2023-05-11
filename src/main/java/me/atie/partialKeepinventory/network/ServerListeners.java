@@ -5,6 +5,8 @@ import me.atie.partialKeepinventory.settings.BwSettingsCompat;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.settings.pkiVersion;
 import me.atie.partialKeepinventory.util.ServerPlayerClientVersion;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -21,12 +23,13 @@ import java.util.HashSet;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
+@Environment(EnvType.SERVER)
 public class ServerListeners {
 
     private static final HashSet<ServerPlayerEntity> pkiPlayers = new HashSet<>();
 
     public static void init() {
-        ServerPlayConnectionEvents.JOIN.register(ServerListeners::sendConfig);
+//        ServerPlayConnectionEvents.JOIN.register(ServerListeners::sendConfig);
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> pkiPlayers.remove(handler.getPlayer()));
 
         ServerPlayNetworking.registerGlobalReceiver(Identifiers.configUpdatePacket, ServerListeners::updateConfig);
@@ -39,12 +42,12 @@ public class ServerListeners {
                 ((ServerPlayerClientVersion) player).setClientPKIVersion(PartialKeepInventory.modVersion);
             }
             pkiPlayers.add(player);
+            sendConfig(handler, sender, server, playerVersion);
         });
     }
 
 
     private static void updateConfig(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-//        PartialKeepInventory.LOGGER.info("Received config update");
 
         if( !player.hasPermissionLevel(2) ) {
             player.sendMessage(Text.translatable(PartialKeepInventory.getID() + ".error.insufficientPermissions"));
@@ -74,9 +77,9 @@ public class ServerListeners {
         }
     }
 
-    private static void sendConfig(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
+    private static void sendConfig(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server, pkiVersion version) {
         PacketByteBuf buf = PacketByteBufs.create();
-        CONFIG.packetWriter(buf);
+        BwSettingsCompat.writePacket(CONFIG, version, buf);
 
         Packet<?> packet = sender.createPacket(Identifiers.configUpdatePacket, buf);
         sender.sendPacket(packet);

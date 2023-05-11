@@ -1,6 +1,8 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
 import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -14,6 +16,7 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 
+@Environment(EnvType.CLIENT)
 public class TextFieldEntry extends Entry {
 
     private final TextWidget nameWidget;

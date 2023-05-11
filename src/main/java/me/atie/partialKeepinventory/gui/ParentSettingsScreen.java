@@ -7,6 +7,7 @@ import me.atie.partialKeepinventory.gui.Widgets.ButtonSelectionEntry;
 import me.atie.partialKeepinventory.gui.Widgets.EntryList;
 import me.atie.partialKeepinventory.gui.Widgets.SimpleButton;
 import me.atie.partialKeepinventory.settings.pkiSettings;
+import me.atie.partialKeepinventory.text.GuiText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -17,6 +18,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import java.util.Objects;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
@@ -37,6 +40,8 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
     private TextRenderer textRenderer;
     private EntryList header;
 
+    private boolean copyConfig = false;
+
 
     @Override
     public ConfigScreenFactory<ParentSettingsScreen> getModConfigScreenFactory() {
@@ -54,6 +59,7 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
     }
 
     private boolean isInWorld() {
+        assert client != null;
         ClientPlayNetworkHandler clientPlayNetworkHandler = client.getNetworkHandler();
         return clientPlayNetworkHandler != null && clientPlayNetworkHandler.getConnection().isOpen();
     }
@@ -61,14 +67,30 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
     @Override
     public void init() {
         assert (client != null);
+        assert (client.player != null);
         this.textRenderer = client.textRenderer;
 
         if( !isInWorld() ){
-            nextScreen = new ErrorScreen(this);
+            nextScreen = new ErrorScreen(this, GuiText.errorScreen.no_server);
             client.setScreen(nextScreen);
             return;
         }
         boolean isIntegratedServer = client.getServer() != null;
+
+        if( CONFIG == null ){
+            PartialKeepInventory.LOGGER.error("Can't open GUI: Config == null");
+            nextScreen = new ErrorScreen(this, GuiText.errorScreen.no_config);
+            client.setScreen(nextScreen);
+            return;
+        }
+
+        if( !CONFIG.validSettings ){
+            PartialKeepInventory.LOGGER.error("Can't open GUI: Invalid config");
+            nextScreen = new ErrorScreen(this, GuiText.errorScreen.invalid_config);
+            client.setScreen(nextScreen);
+            return;
+        }
+        copyConfig = client.player.hasPermissionLevel(4);
 
         LOCAL_CONFIG = CONFIG.clone();
 
@@ -83,7 +105,7 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
         switch (type) {
             case INV_CONFIG -> screen = new InvSettingsScreen(this, LOCAL_CONFIG, header);
             case XP_CONFIG -> screen = new XpSettingsScreen(this, LOCAL_CONFIG, header);
-            case ERROR -> screen = new ErrorScreen(this);
+            case ERROR -> screen = new ErrorScreen(this, GuiText.errorScreen.no_server);
         }
         return screen;
     }
@@ -96,7 +118,7 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
         int buttonX = super.width/4;
 
         SimpleButton enableModButtonEntry = new SimpleButton(buttonX, 0, buttonWidth, widgetHeight, modEnabledText(CONFIG.getEnableMod()),
-                Text.translatable(PartialKeepInventory.getID() + ".gui.modenabled.tooltip"),
+                GuiText.screenHeader.mod_enabled_tooltip,
                 b -> {
                     boolean newVal = !CONFIG.getEnableMod();
                     CONFIG.setEnableMod(newVal);
@@ -106,9 +128,9 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
         ButtonSelectionEntry<ScreenTracker> menu = new ButtonSelectionEntry.Builder<ScreenTracker>(3)
                 .setButtonMargin(2)
                 .setXMargin(sideMargin)
-                .addButton(Text.translatable(PartialKeepInventory.getID() + ".gui.menu.close"), ScreenTracker.CLOSE)
-                .addButton(Text.translatable(PartialKeepInventory.getID() + ".gui.menu.inventory"), ScreenTracker.INV_CONFIG)
-                .addButton(Text.translatable(PartialKeepInventory.getID() + ".gui.menu.experience"), ScreenTracker.XP_CONFIG)
+                .addButton(GuiText.screenHeader.close_button, ScreenTracker.CLOSE)
+                .addButton(GuiText.screenHeader.inv_button, ScreenTracker.INV_CONFIG)
+                .addButton(GuiText.screenHeader.xp_button, ScreenTracker.XP_CONFIG)
                 .onClick(s -> {
                     assert client != null;
                     client.currentScreen.close();
@@ -132,7 +154,7 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
     public void close() {
         super.close();
 
-        if (!isInWorld()) {
+        if (!isInWorld() || LOCAL_CONFIG == null) {
             return;
         }
         //  synchronization
@@ -157,9 +179,8 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
     }
 
     public static Text modEnabledText(boolean b){
-        return b ?
-                Text.translatable(PartialKeepInventory.getID() + ".gui.modenabled.true").setStyle(Style.EMPTY.withColor(Formatting.GREEN)) :
-                Text.translatable(PartialKeepInventory.getID() + ".gui.modenabled.false").setStyle(Style.EMPTY.withColor(Formatting.RED));
+        return b ? GuiText.screenHeader.mod_enabled_button_true.copy().setStyle(Style.EMPTY.withColor(Formatting.GREEN))
+                 : GuiText.screenHeader.mod_enabled_button_false.copy().setStyle(Style.EMPTY.withColor(Formatting.RED));
     }
 
 

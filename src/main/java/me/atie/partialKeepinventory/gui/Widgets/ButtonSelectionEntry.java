@@ -1,6 +1,8 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
 import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -13,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Environment(EnvType.CLIENT)
 public class ButtonSelectionEntry<T> extends Entry {
     private final ButtonWidget[] buttonWidgets;
 

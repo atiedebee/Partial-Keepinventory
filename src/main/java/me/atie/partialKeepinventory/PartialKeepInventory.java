@@ -60,12 +60,13 @@ public class PartialKeepInventory implements ModInitializer {
 		ServerPlayerEvents.COPY_FROM.register(InventoryUtil::copyInventory);
 
 
-		// init the settings for singleplayer worlds.
+		// init the settings.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			if( environment == EnvType.CLIENT ) {
 				PartialKeepInventory.server = server;
-				CONFIG = pkiSettings.getServerState(server);
 			}
+			CONFIG = pkiSettings.getServerState(server);
+			PartialKeepInventory.LOGGER.info("READ CONFIG FROM SERVER WITH VERSION " + CONFIG.configVersion);
 		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> PartialKeepInventory.server = null);
 

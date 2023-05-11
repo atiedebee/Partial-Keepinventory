@@ -1,6 +1,8 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
 import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -16,6 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class ButtonEntry<T> extends Entry {
     private final TextWidget nameWidget;
     private final ButtonWidget buttonWidget;

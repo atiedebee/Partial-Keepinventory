@@ -4,10 +4,12 @@ import me.atie.partialKeepinventory.network.ServerListeners;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
+@Environment(EnvType.SERVER)
 public class ServerInitializer implements DedicatedServerModInitializer {
 
     @Override
@@ -19,8 +21,6 @@ public class ServerInitializer implements DedicatedServerModInitializer {
         ServerPlayConnectionEvents.INIT.register( (handler, server) -> {
             PartialKeepInventory.server = server;
             CONFIG = pkiSettings.getServerState(server);
-
-            PartialKeepInventory.LOGGER.info("Server side initialized config component with version " + CONFIG.serverVersion);
         } );
     }
 

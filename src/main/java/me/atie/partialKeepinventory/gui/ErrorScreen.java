@@ -14,17 +14,20 @@ public class ErrorScreen extends Screen {
     private final Screen parent;
     private final MinecraftClient client;
     private TextHeaderEntry errorMessage;
+    private Text message;
 
-    protected ErrorScreen(Screen parent) {
-        super(Text.translatable(PartialKeepInventory.getID() + ".gui.screen.error"));
+    protected ErrorScreen(Screen parent, Text message) {
+        super(message);
         this.parent = parent;
         this.client = MinecraftClient.getInstance();
+        this.message = message;
     }
 
     @Override
     public void init() {
         errorMessage = new TextHeaderEntry(textRenderer,
-                Text.translatable(PartialKeepInventory.getID() + ".gui.error.server_req"),
+                message,
+//                Text.translatable(PartialKeepInventory.getID() + ".gui.error.server_req"),
                 client.getWindow().getScaledHeight() / 2);
     }
 

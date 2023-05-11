@@ -27,8 +27,8 @@ import java.util.Objects;
 public class pkiSettings extends PersistentState implements pkiSettingsApi {
 
     // ----- Compatibility related -----
-    public pkiVersion serverVersion = null;
-    public static boolean validSettings = false;
+    public pkiVersion configVersion = null;
+    public boolean validSettings = false;
 
     // ----- Implementation Settings -----
     protected List<pkiSettingsApi> implementationSettings;
@@ -229,22 +229,26 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
     // Serialization //
     ///////////////////
 
+    @Override
     public void packetWriter(PacketByteBuf buf){
+        PartialKeepInventory.LOGGER.info("WRITING PACKET WITH SERVER VERSION!!!!!");
+        PartialKeepInventory.LOGGER.info(Thread.currentThread().getStackTrace().toString());
         BwSettingsCompat.writePacket(this, PartialKeepInventory.modVersion, buf);
     }
 
-    public void packetReader(PacketByteBuf buf) {
-        pkiVersion clientVersion = PartialKeepInventory.modVersion;
-        pkiVersion serverVersion = new pkiVersion( buf );
-        PartialKeepInventory.LOGGER.info("Got PKI version " + serverVersion + " from the server");
 
-        if( clientVersion.major < serverVersion.major || clientVersion.minor < serverVersion.minor ){
-            PartialKeepInventory.LOGGER.warn("Settings obtained from are from a likely incompatible version. Server: \"" + serverVersion +  "\" Client:" + clientVersion);
+    public void packetReader(PacketByteBuf buf) {
+        pkiVersion hostVersion = PartialKeepInventory.modVersion;
+        pkiVersion requestVersion = new pkiVersion( buf );
+
+        if( hostVersion.major < requestVersion.major || hostVersion.minor < requestVersion.minor ){
+            PartialKeepInventory.LOGGER.warn("Settings obtained from are from a likely incompatible version. Server: \"" + requestVersion +  "\" Client:" + hostVersion);
             validSettings = false; // May do something with this later on
         }
         else{
+            PartialKeepInventory.LOGGER.info("Received settings of version: " + requestVersion + ", host version: " + hostVersion);
             validSettings = true;
-            BwSettingsCompat.readPacket(this, serverVersion, buf);
+            BwSettingsCompat.readPacket(this, requestVersion, buf);
         }
 
     }
@@ -252,6 +256,7 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
     @Override
     public NbtCompound readNbt(NbtCompound nbt) {
         pkiVersion v = new pkiVersion(nbt);
+        this.configVersion = v;
         return BwSettingsCompat.readNbt(this, v, nbt);
     }
 
@@ -292,10 +297,8 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
     }
 
     public static pkiSettings createFromNbt(NbtCompound nbt) {
-
         pkiSettings state = new pkiSettings();
         state.readNbt(nbt);
-
         return state;
     }
 
@@ -307,8 +310,10 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
                 pkiSettings::createFromNbt,
                 pkiSettings::new,
                 PartialKeepInventory.getID());
-
+        state.configVersion = PartialKeepInventory.modVersion;
+        state.validSettings = true;
         state.markDirty();
+        PartialKeepInventory.LOGGER.info("Got config: " + state);
         return state;
     }
 
@@ -321,8 +326,8 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
             clone.xpLossExpression = new StringBuffer(this.xpLossExpression);
 
 //            Not used when in singleplayer
-            if( this.serverVersion != null ){
-                clone.serverVersion = this.serverVersion.clone();
+            if( this.configVersion != null ){
+                clone.configVersion = this.configVersion.clone();
             }
 
             return clone;

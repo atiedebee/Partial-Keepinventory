@@ -12,6 +12,7 @@ import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+ import java.util.Objects;
 
 /**
  * Set of functions for reading/writing settings from older versions.
@@ -28,29 +29,35 @@ public abstract class BwSettingsCompat extends pkiSettings{
     public final static HashMap<pkiVersion, PacketWriter> packetWriters = new HashMap<>();
 
     public static void init(){
-        // v0.1.1 doesn't have any networking code
-        final pkiVersion v0_1_1 = new pkiVersion(0, 1, 1);
-        nbtReaders.put(v0_1_1, BwSettingsCompat::nbtReader_0_1_1);
-
         // v0.2.0
         final pkiVersion v0_2_0 = new pkiVersion(0, 2, 0);
         packetReaders.put(v0_2_0, BwSettingsCompat::packetReader_0_2_0);
         nbtReaders.put(v0_2_0, BwSettingsCompat::nbtReader_0_2_0);
-        packetWriters.put(v0_2_0, BwSettingsCompat::packetWriter_0_2_0);
+        packetWriters.put(v0_2_0, (s, buf) -> BwSettingsCompat.packetWriter_0_2_0(s, v0_2_0, buf));
 
         // v0.2.1, same as 0.2.0
         final pkiVersion v0_2_1 = new pkiVersion(0, 2, 1);
         packetReaders.put(v0_2_1, BwSettingsCompat::packetReader_0_2_0);
         nbtReaders.put(v0_2_1, BwSettingsCompat::nbtReader_0_2_0);
-        packetWriters.put(v0_2_1, BwSettingsCompat::packetWriter_0_2_0);
+        packetWriters.put(v0_2_1, (s, buf) -> BwSettingsCompat.packetWriter_0_2_0(s, v0_2_1, buf));
     }
 
     public static void writePacket(pkiSettings s, pkiVersion v, PacketByteBuf buf) {
-        packetWriters.get(v).write(s, buf);
+        Objects.requireNonNull( packetWriters.get(v) ).write(s, buf);
     }
 
     public static void readPacket(pkiSettings s, pkiVersion v, PacketByteBuf buf){
-        packetReaders.get(v).read(s, buf);
+        if( v.moreThan(PartialKeepInventory.modVersion) ) {
+            PartialKeepInventory.LOGGER.error("Version obtained for reading packets is incompatible: Got version " + v + " instead of host version " +
+                    PartialKeepInventory.modVersion);
+            PartialKeepInventory.LOGGER.warn("Trying to read with host version.");
+            packetReaders.get(PartialKeepInventory.modVersion).read(s, buf);
+        }
+        else {
+            packetReaders.get(v).read(s, buf);
+        }
+
+        s.configVersion = v.clone();
     }
 
     public static NbtCompound readNbt(pkiSettings s, pkiVersion v, NbtCompound nbt){
@@ -58,35 +65,10 @@ public abstract class BwSettingsCompat extends pkiSettings{
     }
 
 
-    // NOTE: 0.1.1 compatibility isn't actually available because the location is different
-    // 0.1.1
-    public static NbtCompound nbtReader_0_1_1(pkiSettings s, NbtCompound nbt) {
-        s.enableMod = nbt.getBoolean("enable");
-        s.keepinvMode = keepinvModeValues[nbt.getByte("invMode")];
-
-        s.inventoryDroprate = nbt.getByte("invDR");
-        s.commonDroprate = nbt.getByte("commonDR");
-        s.uncommonDroprate = nbt.getByte("uncommonDR");
-        s.rareDroprate = nbt.getByte("rareDR");
-        s.epicDroprate = nbt.getByte("epicDR");
-        s.expression = new StringBuffer(nbt.getString("invExpr"));
-
-        s.keepxpMode = keepxpModeValues[nbt.getByte("xpMode")];
-        s.xpDrop = nbt.getByte("xpDrop");
-        s.xpLoss = nbt.getByte("xpLoss");
-        s.xpDropExpression = new StringBuffer(nbt.getString("xpDropExpr"));
-        s.xpLossExpression = new StringBuffer(nbt.getString("xpLossExpr"));
-
-        NbtCompound playerNamesNbt = nbt.getCompound("savedPlayers");
-        s.savedPlayers = new ArrayList<>();
-        s.savedPlayers.addAll(playerNamesNbt.getKeys());
-
-        return nbt;
-    }
 
     // 0.2.0
-    public static void packetWriter_0_2_0(pkiSettings s, PacketByteBuf buf) {
-        PartialKeepInventory.modVersion.writePacket(buf);
+    public static void packetWriter_0_2_0(pkiSettings s, pkiVersion v, PacketByteBuf buf) {
+        v.writePacket(buf);
 
         buf.writeBoolean(s.enableMod);
 
@@ -114,7 +96,7 @@ public abstract class BwSettingsCompat extends pkiSettings{
 
     public static void packetReader_0_2_0(pkiSettings s, PacketByteBuf buf) {
         s.enableMod = buf.readBoolean();
-        final byte[] droprates = buf.readByteArray();
+        final byte[] droprates = buf.readByteArray(7);
         s.inventoryDroprate = droprates[0];
         s.commonDroprate = droprates[1];
         s.uncommonDroprate = droprates[2];
@@ -122,9 +104,12 @@ public abstract class BwSettingsCompat extends pkiSettings{
         s.epicDroprate = droprates[4];
         s.xpDrop = droprates[5];
         s.xpLoss = droprates[6];
+
         s.expression = new StringBuffer(buf.readString());
+
         s.keepinvMode = buf.readEnumConstant(KeepinvMode.class);
         s.keepxpMode = buf.readEnumConstant(KeepXPMode.class);
+
         s.xpDropExpression = new StringBuffer(buf.readString());
         s.xpLossExpression = new StringBuffer(buf.readString());
 
@@ -147,12 +132,30 @@ public abstract class BwSettingsCompat extends pkiSettings{
                 buf.readerIndex(index + size);
             }
         }
-
-
     }
 
+
     public static NbtCompound nbtReader_0_2_0(pkiSettings s, NbtCompound nbt){
-        nbtReader_0_1_1(s, nbt);
+        s.enableMod = nbt.getBoolean("enable");
+        s.keepinvMode = keepinvModeValues[nbt.getByte("invMode")];
+
+        s.inventoryDroprate = nbt.getByte("invDR");
+        s.commonDroprate = nbt.getByte("commonDR");
+        s.uncommonDroprate = nbt.getByte("uncommonDR");
+        s.rareDroprate = nbt.getByte("rareDR");
+        s.epicDroprate = nbt.getByte("epicDR");
+        s.expression = new StringBuffer(nbt.getString("invExpr"));
+
+        s.keepxpMode = keepxpModeValues[nbt.getByte("xpMode")];
+        s.xpDrop = nbt.getByte("xpDrop");
+        s.xpLoss = nbt.getByte("xpLoss");
+        s.xpDropExpression = new StringBuffer(nbt.getString("xpDropExpr"));
+        s.xpLossExpression = new StringBuffer(nbt.getString("xpLossExpr"));
+
+        NbtCompound playerNamesNbt = nbt.getCompound("savedPlayers");
+        s.savedPlayers = new ArrayList<>();
+        s.savedPlayers.addAll(playerNamesNbt.getKeys());
+
         s.xpDropExpression = new StringBuffer(nbt.getString("xpDropExpr"));
         s.xpLossExpression = new StringBuffer(nbt.getString("xpLossExpr"));
 
@@ -164,6 +167,7 @@ public abstract class BwSettingsCompat extends pkiSettings{
         }
         return nbt;
     }
+
 
 
     interface NbtReader{

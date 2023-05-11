@@ -1,6 +1,8 @@
 package me.atie.partialKeepinventory.gui.Widgets;
 
 import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -10,6 +12,7 @@ import net.minecraft.text.Text;
 
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class SimpleText extends Entry {
     private final TextRenderer textRenderer;
     private final TextWidget[] textWidgets;
