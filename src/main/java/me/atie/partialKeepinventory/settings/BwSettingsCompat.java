@@ -47,11 +47,11 @@ public abstract class BwSettingsCompat extends pkiSettings{
     }
 
     public static void readPacket(pkiSettings s, pkiVersion v, PacketByteBuf buf){
-        if( v.moreThan(PartialKeepInventory.modVersion) ) {
+        if( v.moreThan(PartialKeepInventory.VERSION) ) {
             PartialKeepInventory.LOGGER.error("Version obtained for reading packets is incompatible: Got version " + v + " instead of host version " +
-                    PartialKeepInventory.modVersion);
+                    PartialKeepInventory.VERSION);
             PartialKeepInventory.LOGGER.warn("Trying to read with host version.");
-            packetReaders.get(PartialKeepInventory.modVersion).read(s, buf);
+            packetReaders.get(PartialKeepInventory.VERSION).read(s, buf);
         }
         else {
             packetReaders.get(v).read(s, buf);

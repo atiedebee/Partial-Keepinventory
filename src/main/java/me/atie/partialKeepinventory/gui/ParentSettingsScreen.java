@@ -10,7 +10,6 @@ import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.text.GuiText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -18,8 +17,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
-import java.util.Objects;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
@@ -49,12 +46,12 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
     }
 
     public ParentSettingsScreen() {
-        super(Text.translatable(PartialKeepInventory.getID()));
+        super(Text.translatable(PartialKeepInventory.ID));
     }
 
 
     public ParentSettingsScreen(Screen previous) {
-        super(Text.translatable(PartialKeepInventory.getID()));
+        super(Text.translatable(PartialKeepInventory.ID));
         this.previousScreen = previous;
     }
 
@@ -69,6 +66,7 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
         assert (client != null);
         assert (client.player != null);
         this.textRenderer = client.textRenderer;
+        copyConfig = false;
 
         if( !isInWorld() ){
             nextScreen = new ErrorScreen(this, GuiText.errorScreen.no_server);
@@ -158,9 +156,8 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
             return;
         }
         //  synchronization
-        assert MinecraftClient.getInstance().player != null;
-        if(MinecraftClient.getInstance().player.hasPermissionLevel(4)) {
-            CONFIG = LOCAL_CONFIG;
+        if(copyConfig) {
+            CONFIG.copy(LOCAL_CONFIG);
             pkiSettings.updateServerConfig();
         }
     }

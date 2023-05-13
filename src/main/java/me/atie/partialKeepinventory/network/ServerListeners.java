@@ -36,10 +36,10 @@ public class ServerListeners {
         ServerPlayNetworking.registerGlobalReceiver(Identifiers.clientVersionPacket, (server, player, handler, buf, sender) -> {
             pkiVersion playerVersion = new pkiVersion(buf);
 
-            if( playerVersion.lessThan(PartialKeepInventory.modVersion) ){
+            if( playerVersion.lessThan(PartialKeepInventory.VERSION) ){
                 ((ServerPlayerClientVersion)player).setClientPKIVersion(playerVersion);
             }else {
-                ((ServerPlayerClientVersion) player).setClientPKIVersion(PartialKeepInventory.modVersion);
+                ((ServerPlayerClientVersion) player).setClientPKIVersion(PartialKeepInventory.VERSION);
             }
             pkiPlayers.add(player);
             sendConfig(handler, sender, server, playerVersion);
@@ -49,7 +49,7 @@ public class ServerListeners {
 
     private static void updateConfig(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         if( !player.hasPermissionLevel(2) ) {
-            player.sendMessage(Text.translatable(PartialKeepInventory.getID() + ".error.insufficientPermissions"));
+            player.sendMessage(Text.translatable(PartialKeepInventory.ID + ".error.insufficientPermissions"));
             return;
         }
         pkiSettings temp = new pkiSettings();
@@ -61,7 +61,7 @@ public class ServerListeners {
             return;
         }
 
-        CONFIG = temp;
+        CONFIG.copy(temp);
         sendConfigToPlayers(CONFIG);
     }
 

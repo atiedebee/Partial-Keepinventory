@@ -20,13 +20,14 @@ import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
 @SuppressWarnings("unused")
-public class pkiSettings extends PersistentState implements pkiSettingsApi {
+public class pkiSettings extends PersistentState implements pkiSettingsApi{
 
     // ----- Compatibility related -----
     public pkiVersion configVersion = null;
@@ -246,12 +247,12 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
 
     @Override
     public void packetWriter(PacketByteBuf buf){
-        BwSettingsCompat.writePacket(this, PartialKeepInventory.modVersion, buf);
+        BwSettingsCompat.writePacket(this, PartialKeepInventory.VERSION, buf);
     }
 
 
     public void packetReader(PacketByteBuf buf) {
-        pkiVersion hostVersion = PartialKeepInventory.modVersion;
+        pkiVersion hostVersion = PartialKeepInventory.VERSION;
         pkiVersion requestVersion = new pkiVersion( buf );
 
         if( hostVersion.major < requestVersion.major || hostVersion.minor < requestVersion.minor ){
@@ -275,8 +276,7 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
-
-        PartialKeepInventory.modVersion.writeNbt(nbt);
+        PartialKeepInventory.VERSION.writeNbt(nbt);
         nbt.putBoolean("enable", enableMod);
         nbt.putByte("invMode", (byte) keepinvMode.ordinal());
         nbt.putByte("invDR", inventoryDroprate);
@@ -322,8 +322,8 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
         pkiSettings state = persistentStateManager.getOrCreate(
                 pkiSettings::createFromNbt,
                 pkiSettings::new,
-                PartialKeepInventory.getID());
-        state.configVersion = PartialKeepInventory.modVersion;
+                PartialKeepInventory.ID);
+        state.configVersion = PartialKeepInventory.VERSION;
         state.validSettings = true;
         state.markDirty();
         return state;
@@ -348,13 +348,27 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi {
         }
     }
 
+
+    public void copy(pkiSettings s){
+        try {
+            for (Field f : s.getClass().getDeclaredFields()) {
+                if( !Modifier.isFinal(f.getModifiers())){
+                    f.set(this, f.get(s));
+                }
+            }
+        }catch(Exception e){
+            PartialKeepInventory.LOGGER.error("Failed copying config: " + e.getMessage());
+        }
+        s.markDirty();
+    }
+
     @Override
     public String getModId() {
-        return PartialKeepInventory.getID();
+        return PartialKeepInventory.ID;
     }
 
     public static void updateServerConfig() {
-        if( PartialKeepInventory.environment == EnvType.CLIENT && MinecraftClient.getInstance().getServer() == null ) { // Player is connected to server
+        if( PartialKeepInventory.environment == EnvType.CLIENT && MinecraftClient.getInstance().getServer() == null ) {// Player is connected to server
             PacketByteBuf buf = PacketByteBufs.create();
             PartialKeepInventory.CONFIG.packetWriter(buf);
 

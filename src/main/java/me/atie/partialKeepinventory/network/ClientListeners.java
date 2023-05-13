@@ -14,8 +14,6 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 
-import java.util.Objects;
-
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
 @Environment(EnvType.CLIENT)
@@ -34,7 +32,7 @@ public class ClientListeners {
             CONFIG.validSettings = false;
             PacketByteBuf buf = PacketByteBufs.create();
 
-            PartialKeepInventory.modVersion.writePacket(buf);
+            PartialKeepInventory.VERSION.writePacket(buf);
             Packet<?> packet = sender.createPacket(Identifiers.clientVersionPacket, buf);
             sender.sendPacket(packet);
         }

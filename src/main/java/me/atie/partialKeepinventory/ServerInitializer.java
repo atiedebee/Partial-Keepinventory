@@ -19,7 +19,6 @@ public class ServerInitializer implements DedicatedServerModInitializer {
         ServerListeners.init();
 
         ServerPlayConnectionEvents.INIT.register( (handler, server) -> {
-            PartialKeepInventory.server = server;
             CONFIG = pkiSettings.getServerState(server);
         } );
     }

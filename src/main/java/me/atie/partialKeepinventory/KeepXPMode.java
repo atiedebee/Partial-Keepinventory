@@ -34,6 +34,6 @@ public enum KeepXPMode {
     }
 
     public static Text getName(KeepXPMode e) {
-        return Text.translatable(PartialKeepInventory.getID() + ".KeepXpMode." + e.toString());
+        return Text.translatable(PartialKeepInventory.ID + ".KeepXpMode." + e.toString());
     }
 }

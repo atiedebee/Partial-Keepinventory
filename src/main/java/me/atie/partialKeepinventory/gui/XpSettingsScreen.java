@@ -2,7 +2,6 @@ package me.atie.partialKeepinventory.gui;
 
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
-import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.formula.XpDroprateFormula;
 import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.*;
@@ -40,7 +39,7 @@ public class XpSettingsScreen extends Screen {
 
 
     public XpSettingsScreen(Screen parent, pkiSettings settings, EntryList heading) {
-        super(Text.translatable(PartialKeepInventory.getID() + ".gui.screen.xp"));
+        super(Text.translatable(PartialKeepInventory.ID + ".gui.screen.xp"));
         this.parent = parent;
         this.client = MinecraftClient.getInstance();
         this.LOCAL_CONFIG = settings;
@@ -83,11 +82,12 @@ public class XpSettingsScreen extends Screen {
         int yPos = heading.updateY(5);
 
         try {
-            xpTextHeaderEntry = new TextHeaderEntry(textRenderer, Text.translatable(PartialKeepInventory.getID() + ".gui.header.xp").setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)), yPos);
+            xpTextHeaderEntry = new TextHeaderEntry(textRenderer, Text.translatable(
+                    PartialKeepInventory.ID + ".gui.header.xp").setStyle(Style.EMPTY.withFormatting(Formatting.UNDERLINE)), yPos);
 
             keepXPModeButtonEntry = new ButtonEntry.Builder<KeepXPMode>(textRenderer)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.text.partialxpmode"))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.keepxpmode"))
+                    .setName(Text.translatable(PartialKeepInventory.ID + ".gui.text.partialxpmode"))
+                    .setTooltip(Text.translatable(PartialKeepInventory.ID + ".gui.tooltip.keepxpmode"))
                     .toText(KeepXPMode::getName)
                     .setGetter(LOCAL_CONFIG::getKeepxpMode)
                     .setSetter(s -> {
@@ -104,8 +104,8 @@ public class XpSettingsScreen extends Screen {
                     .intSetter(LOCAL_CONFIG::setXpDrop)
                     .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.xpdrop"))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xpdrop"))
+                    .setName(Text.translatable(PartialKeepInventory.ID + ".gui.slider.xpdrop"))
+                    .setTooltip(Text.translatable(PartialKeepInventory.ID + ".gui.tooltip.xpdrop"))
                     .build();
             this.addSelectableChild(DropSlider.getSliderWidget());
 
@@ -114,8 +114,8 @@ public class XpSettingsScreen extends Screen {
                     .intSetter(LOCAL_CONFIG::setXpLoss)
                     .toText(ParentSettingsScreen::percentageToText)
                     .setLimits(0, 100)
-                    .setName(Text.translatable(PartialKeepInventory.getID() + ".gui.slider.xploss"))
-                    .setTooltip(Text.translatable(PartialKeepInventory.getID() + ".gui.tooltip.xploss"))
+                    .setName(Text.translatable(PartialKeepInventory.ID + ".gui.slider.xploss"))
+                    .setTooltip(Text.translatable(PartialKeepInventory.ID + ".gui.tooltip.xploss"))
                     .build();
             this.addSelectableChild(LossSlider.getSliderWidget());
 
@@ -196,7 +196,7 @@ class XpCustomSettingScreen extends Screen {
     private CollapsableEntryList expressionTutorialEntry;
 
     public XpCustomSettingScreen(Screen parent, pkiSettings settings, EntryList heading) {
-        super(Text.translatable(PartialKeepInventory.getID() + ".gui.screen.xp"));
+        super(Text.translatable(PartialKeepInventory.ID + ".gui.screen.xp"));
         this.client = MinecraftClient.getInstance();
         this.LOCAL_CONFIG = settings;
         this.heading = heading;

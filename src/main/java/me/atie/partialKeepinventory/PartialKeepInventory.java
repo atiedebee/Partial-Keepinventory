@@ -15,7 +15,6 @@ import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.Version;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,25 +28,22 @@ import org.slf4j.LoggerFactory;
 
 public class PartialKeepInventory implements ModInitializer {
 	public static EnvType environment;
-	public static MinecraftServer server;
-	public static pkiVersion modVersion;
-	public static final Logger LOGGER = LoggerFactory.getLogger(getID());
-
+	public static final String ID = "partial-keepinv";
+	public static pkiVersion VERSION;
 	public static pkiSettings CONFIG;
+
+	public static final Logger LOGGER = LoggerFactory.getLogger(ID);
 
 	public static final GameRules.Key<GameRules.BooleanRule> creativeKeepInventory =
 			GameRuleRegistry.register("creativeKeepInventory", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(false));
 
 
-	public static String getID(){
-		return ID;
-	}
-	public static final String ID = "partial-keepinv";
+
 
 	@Override
 	public void onInitialize() {
-		Version version = FabricLoader.getInstance().getModContainer(PartialKeepInventory.getID()).get().getMetadata().getVersion();
-		modVersion = new pkiVersion( version.getFriendlyString() );
+		Version version = FabricLoader.getInstance().getModContainer(ID).get().getMetadata().getVersion();
+		VERSION = new pkiVersion( version.getFriendlyString() );
 
 		// backwards compatibility functions
 		BwSettingsCompat.init();
@@ -63,13 +59,8 @@ public class PartialKeepInventory implements ModInitializer {
 
 		// init the settings.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			if( environment == EnvType.CLIENT ) {
-				PartialKeepInventory.server = server;
-			}
 			CONFIG = pkiSettings.getServerState(server);
 		});
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> PartialKeepInventory.server = null);
-
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> CONFIG.markDirty());
 
 	}

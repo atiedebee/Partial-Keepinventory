@@ -7,7 +7,7 @@ import net.minecraft.text.Text;
 
 @Environment(EnvType.CLIENT)
 public class GuiText {
-    private final static String prefix = PartialKeepInventory.getID();
+    private final static String prefix = PartialKeepInventory.ID;
 
 
     public static class screenHeader{
@@ -29,8 +29,8 @@ public class GuiText {
 
     /// inv screen ///
     public static class invScreen{
-        public final static Text name = Text.translatable(PartialKeepInventory.getID() + ".gui.screen.inv");
-        public final static Text header = Text.translatable(PartialKeepInventory.getID() + ".gui.header.inv");
+        public final static Text name = Text.translatable(PartialKeepInventory.ID + ".gui.screen.inv");
+        public final static Text header = Text.translatable(PartialKeepInventory.ID + ".gui.header.inv");
         public final static Text slider_static = Text.translatable(prefix + ".gui.slider.static");
         public final static Text slider_common = Text.translatable(prefix + ".gui.slider.common");
         public final static Text slider_uncommon = Text.translatable(prefix + ".gui.slider.uncommon");

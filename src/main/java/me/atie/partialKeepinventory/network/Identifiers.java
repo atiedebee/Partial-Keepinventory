@@ -4,6 +4,6 @@ import me.atie.partialKeepinventory.PartialKeepInventory;
 import net.minecraft.util.Identifier;
 
 public class Identifiers {
-    public static Identifier configUpdatePacket = new Identifier(PartialKeepInventory.getID(), "config-update");
-    public static Identifier clientVersionPacket = new Identifier(PartialKeepInventory.getID(), "send-version");
+    public static Identifier configUpdatePacket = new Identifier(PartialKeepInventory.ID, "config-update");
+    public static Identifier clientVersionPacket = new Identifier(PartialKeepInventory.ID, "send-version");
 }
