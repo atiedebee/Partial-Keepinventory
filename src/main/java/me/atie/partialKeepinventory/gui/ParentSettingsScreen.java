@@ -1,7 +1,5 @@
 package me.atie.partialKeepinventory.gui;
 
-import com.terraformersmc.modmenu.api.ConfigScreenFactory;
-import com.terraformersmc.modmenu.api.ModMenuApi;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.gui.Widgets.ButtonSelectionEntry;
 import me.atie.partialKeepinventory.gui.Widgets.EntryList;
@@ -23,7 +21,7 @@ import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 // I suggest you don't touch this code, for your own sanity
 
 @Environment(EnvType.CLIENT)
-public class ParentSettingsScreen extends Screen implements ModMenuApi {
+public class ParentSettingsScreen extends Screen {
 
     private Screen nextScreen;
     private Screen previousScreen;
@@ -40,10 +38,6 @@ public class ParentSettingsScreen extends Screen implements ModMenuApi {
     private boolean copyConfig = false;
 
 
-    @Override
-    public ConfigScreenFactory<ParentSettingsScreen> getModConfigScreenFactory() {
-        return ParentSettingsScreen::new;
-    }
 
     public ParentSettingsScreen() {
         super(Text.translatable(PartialKeepInventory.ID));

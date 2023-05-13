@@ -28,7 +28,7 @@
       "me.atie.partialKeepinventory.ServerInitializer"
     ],
     "modmenu": [
-      "me.atie.partialKeepinventory.gui.ParentSettingsScreen"
+      "me.atie.partialKeepinventory.impl.ModMenuIntegration"
     ]
   },
 
