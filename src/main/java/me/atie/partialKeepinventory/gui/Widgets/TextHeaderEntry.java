@@ -51,7 +51,7 @@ public class TextHeaderEntry extends Entry {
         int width = windowWidth - 2 * ParentSettingsScreen.sideMargin;
         int x = ParentSettingsScreen.sideMargin;
 
-        textWidget.setPos(x, yPos);
+        textWidget.setPosition(x, yPos);
         textWidget.setWidth(width);
     }
 

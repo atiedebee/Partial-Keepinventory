@@ -236,7 +236,7 @@ class XpCustomSettingScreen extends Screen {
         saveDropExpressionButton.updateDimensions(width);
         saveDropExpressionButton.getButtonWidget().setX(xpDropExpressionTextField.getTextFieldWidget().getX() - 10 - saveDropExpressionButton.getButtonWidget().getWidth());
 
-        footing.getButtonWidget().setPos(width - ParentSettingsScreen.widgetHeight- ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.widgetHeight - ParentSettingsScreen.vertOptionMargin);
+        footing.getButtonWidget().setPosition(width - ParentSettingsScreen.widgetHeight- ParentSettingsScreen.sideMargin, height - ParentSettingsScreen.widgetHeight - ParentSettingsScreen.vertOptionMargin);
     }
 
     @Override

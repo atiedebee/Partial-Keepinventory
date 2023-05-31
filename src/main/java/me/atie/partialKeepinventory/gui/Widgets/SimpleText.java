@@ -30,7 +30,7 @@ public class SimpleText extends Entry {
         textWidgets = new TextWidget[lineCount];
         for( int i = 0; i < lineCount; i++ ){
             textWidgets[i] = new TextWidget(Text.literal(lines.get(i)), textRenderer);
-            textWidgets[i].setPos(ParentSettingsScreen.sideMargin, yPos);
+            textWidgets[i].setPosition(ParentSettingsScreen.sideMargin, yPos);
             yPos += textRenderer.fontHeight + 2;
         }
         this.height = yPos - this.yPos;

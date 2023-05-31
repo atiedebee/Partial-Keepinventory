@@ -11,7 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -29,7 +29,6 @@ public class ServerListeners {
     private static final HashSet<ServerPlayerEntity> pkiPlayers = new HashSet<>();
 
     public static void init() {
-//        ServerPlayConnectionEvents.JOIN.register(ServerListeners::sendConfig);
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> pkiPlayers.remove(handler.getPlayer()));
 
         ServerPlayNetworking.registerGlobalReceiver(Identifiers.configUpdatePacket, ServerListeners::updateConfig);
