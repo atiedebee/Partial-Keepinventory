@@ -21,9 +21,6 @@ import org.slf4j.LoggerFactory;
 
 /*
  * TODO: GUI for trinkets settings
- * TODO: Backwards compatibility on settings, needs more testing
- *  NOTE: IDEA: 18 04 2023  Option to damage armor on death
- * TODO: Find and fix bugs for 0.2.1. Also add more help messages.
 * */
 
 public class PartialKeepInventory implements ModInitializer {
