@@ -109,7 +109,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
                     // Send error string to player and server.
                     String errorStr = "Failed compiling drop expression: " + e.getMessage() + "\nResorting to static droprate of 0";
                     PartialKeepInventory.LOGGER.error(errorStr);
-                    player.getCommandSource().sendFeedback(Text.literal(errorStr).setStyle(Style.EMPTY.withColor(Formatting.RED)), true);
+                    player.getCommandSource().sendFeedback(() -> Text.literal(errorStr).setStyle(Style.EMPTY.withColor(Formatting.RED)), true);
 
                     xpLossAmount = 0;
                     xpDropAmount = 0;

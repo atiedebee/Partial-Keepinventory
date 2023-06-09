@@ -1,10 +1,6 @@
 package me.atie.partialKeepinventory.formula;
 
-import me.atie.partialKeepinventory.PartialKeepInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import redempt.crunch.Crunch;
-import redempt.crunch.functional.EvaluationEnvironment;
 
 public class XpDroprateFormula extends DroprateFormula {
 

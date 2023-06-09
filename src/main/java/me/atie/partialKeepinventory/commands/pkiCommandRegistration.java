@@ -28,14 +28,14 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class pkiCommandRegistration {
 
     private static void modeMessage(CommandContext<ServerCommandSource> ctx) {
-        ctx.getSource().sendFeedback(Text.literal(
+        ctx.getSource().sendFeedback(() -> Text.literal(
                 "Keepinventory mode is set to " + CONFIG.getPartialKeepinvMode().toString()
         ), true);
 
     }
 
     private static void percentMessage(CommandContext<ServerCommandSource> ctx, String valName, int val) {
-        ctx.getSource().sendFeedback(Text.literal(
+        ctx.getSource().sendFeedback(() -> Text.literal(
                 valName + " is set to " + val + "%"
         ), true);
     }
@@ -144,7 +144,7 @@ public class pkiCommandRegistration {
                                 ctx -> {
                                     CONFIG.setEnableMod(true);
                                     syncSettings(environment);
-                                    ctx.getSource().sendFeedback(Text.literal("Enabled partial keepinventory"), true);
+                                    ctx.getSource().sendFeedback(() -> Text.literal("Enabled partial keepinventory"), true);
                                     return 1;
                                 })
                         )
@@ -152,7 +152,7 @@ public class pkiCommandRegistration {
                                 ctx -> {
                                     CONFIG.setEnableMod(false);
                                     syncSettings(environment);
-                                    ctx.getSource().sendFeedback(Text.literal("Disabled partial keepinventory"), true);
+                                    ctx.getSource().sendFeedback(() -> Text.literal("Disabled partial keepinventory"), true);
                                     return 1;
                                 })
                         )
@@ -348,10 +348,10 @@ public class pkiCommandRegistration {
                                                             }
 
                                                             if( !message.isEmpty() ) {
-                                                                ctx.getSource().sendFeedback(Text.literal("Added " + message + "to the saved players"), true);
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Added " + message + "to the saved players"), true);
                                                             }
                                                             if( !notAdded.isEmpty()) {
-                                                                ctx.getSource().sendFeedback(Text.literal(notAdded + " were ignored, for they are in the list already."), false);
+                                                                ctx.getSource().sendFeedback(() -> Text.literal(notAdded + " were ignored, for they are in the list already."), false);
                                                             }
                                                             syncSettings(environment);
                                                             return 1;
@@ -373,7 +373,7 @@ public class pkiCommandRegistration {
                                                                 }
                                                             }
                                                             if( !message.isEmpty() ) {
-                                                                ctx.getSource().sendFeedback(Text.literal("Removed " + message + "from the saved players."), true);
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Removed " + message + "from the saved players."), true);
                                                             }
                                                             syncSettings(environment);
                                                             return 1;

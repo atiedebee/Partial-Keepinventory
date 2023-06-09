@@ -12,7 +12,7 @@ import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
- import java.util.Objects;
+import java.util.Objects;
 
 /**
  * Set of functions for reading/writing settings from older versions.

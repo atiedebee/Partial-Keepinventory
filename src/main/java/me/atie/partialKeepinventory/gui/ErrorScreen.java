@@ -1,12 +1,11 @@
 package me.atie.partialKeepinventory.gui;
 
-import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.gui.Widgets.TextHeaderEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 @Environment(EnvType.CLIENT)
@@ -32,7 +31,7 @@ public class ErrorScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
 
         errorMessage.render(matrices, mouseX, mouseY, delta);

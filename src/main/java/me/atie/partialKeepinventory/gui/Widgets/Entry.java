@@ -3,10 +3,9 @@ package me.atie.partialKeepinventory.gui.Widgets;
 import me.atie.partialKeepinventory.gui.ParentSettingsScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Box;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -48,9 +47,10 @@ public abstract class Entry {
         this.getScrollDistance = supplier;
     }
 
-    public abstract void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
+    public abstract void render(DrawContext matrices, int mouseX, int mouseY, float delta);
 
     protected abstract void updateDimensions(int windowWidth);
+
 
     public abstract <T extends Element & Selectable> List<T> getSelectables();
 

@@ -213,7 +213,7 @@ public abstract class PlayerInventoryMixin {
                 catch (Exception e) {
                     String ErrorMessage = "Failed loading custom expression: \"" + CONFIG.getInvExpression() + "\"\nResorting to percentage based drop behaviour";
                     PartialKeepInventory.LOGGER.error(ErrorMessage + "\n" + e.getMessage());
-                    this.player.getCommandSource().sendFeedback(Text.literal(ErrorMessage).setStyle(Style.EMPTY.withColor(Formatting.RED)), true);
+                    this.player.getCommandSource().sendFeedback(() -> Text.literal(ErrorMessage).setStyle(Style.EMPTY.withColor(Formatting.RED)), true);
                     CONFIG.setPartialKeepinvMode(KeepinvMode.STATIC);
                 }
             }

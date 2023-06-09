@@ -1,7 +1,6 @@
 package me.atie.partialKeepinventory.util;
 
 import me.atie.partialKeepinventory.KeepXPMode;
-import me.atie.partialKeepinventory.PartialKeepInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 

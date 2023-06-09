@@ -3,18 +3,18 @@ package me.atie.partialKeepinventory.gui;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.XpDroprateFormula;
-import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.gui.Widgets.*;
+import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.text.GuiText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -49,7 +49,7 @@ public class XpSettingsScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
 
         heading.render(matrices, mouseX, mouseY, delta);
@@ -206,7 +206,7 @@ class XpCustomSettingScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta){
+    public void render(DrawContext matrices, int mouseX, int mouseY, float delta){
         this.renderBackground(matrices);
         heading.render(matrices, mouseX, mouseY, delta);
         textHeader.render(matrices, mouseX, mouseY, delta);
