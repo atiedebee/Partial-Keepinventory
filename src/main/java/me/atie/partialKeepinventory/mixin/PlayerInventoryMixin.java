@@ -140,7 +140,7 @@ public abstract class PlayerInventoryMixin {
 
         switch(dropAction){
             case DROP:
-                this.player.dropItem(dropStack, false);
+                this.player.dropItem(dropStack, true, false);
                 // fallthrough
             case DESTROY:
                 dropItemStack.decrement(dropAmount);
