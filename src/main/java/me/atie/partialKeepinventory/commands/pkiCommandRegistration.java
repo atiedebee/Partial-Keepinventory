@@ -4,12 +4,15 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.sun.jdi.connect.Connector;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.formula.XpDroprateFormula;
+import me.atie.partialKeepinventory.rules.*;
 import me.atie.partialKeepinventory.settings.pkiSettings;
+import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -20,6 +23,8 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 
 import java.util.Collection;
+import java.util.Locale;
+import java.util.Optional;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -531,6 +536,50 @@ public class pkiCommandRegistration {
                                         )
                                 )
                         )
+                        .then(literal("rule")
+                                .then(literal("group")
+                                        .then(literal("create")// Add a rule group with the the drop action and modifier
+                                                .then(argument("name", StringArgumentType.word())
+                                                        .then(argument("modifier", IntegerArgumentType.integer(0))
+                                                                .then(argument("drop action", StringArgumentType.word())
+                                                                        .executes(pkiCommandRegistration::addRuleGroup)
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                        .then(literal("remove")// Add a rule group with the the drop action and modifier
+                                                .then(argument("name", StringArgumentType.word())
+                                                        .executes(pkiCommandRegistration::removeRuleGroup)
+                                                )
+                                        )
+                                        .then(literal("list")
+                                                .then(argument("group name", StringArgumentType.word())
+                                                        .executes( ctx -> {
+                                                            String group = StringArgumentType.getString(ctx, "group name");
+                                                            RuleGroup ruleGroup = CONFIG.ruleGroups.get(group);
+                                                            ctx.getSource().sendMessage(Text.literal("  " + ruleGroup.name));
+                                                            for( var rule: ruleGroup.rules ){
+                                                                ctx.getSource().sendMessage(Text.literal("| " + rule.left.name + " " + rule.comparison.toString() + " " + rule.right.toString()));
+                                                            }
+                                                            ctx.getSource().sendMessage(Text.literal("\\_>   " + ruleGroup.dropAction.toString().toLowerCase(Locale.ROOT) + " " + ruleGroup.modifier));
+
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
+                                )
+                                .then(literal("add")// Add a rule to an existing group
+                                        .then(argument("group name", StringArgumentType.word())
+                                                .then(argument("variable", StringArgumentType.word())
+                                                        .then(argument("comparison", StringArgumentType.word())
+                                                                .then(argument("value", StringArgumentType.word())
+                                                                        .executes(pkiCommandRegistration::addRule)
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
                         .then(literal("help")
                                 .then(literal("inv-mode")
                                         .executes(ctx -> sendHelpMessage(ctx, modeTextHelp))
@@ -567,5 +616,128 @@ public class pkiCommandRegistration {
                 )
         );
 
+    }
+
+
+    private static int removeRuleGroup(CommandContext<ServerCommandSource> ctx) {
+        String group = StringArgumentType.getString(ctx, "name");
+
+        if( CONFIG.ruleGroups.remove(group) == null ){
+            String error = "Failed removing group: group doesn't exist.";
+            ctx.getSource().sendMessage(Text.literal(error));
+            PartialKeepInventory.LOGGER.error(error);
+            return 0;
+        }
+        String success = "Successfully removed group '" + group + "'.";
+        ctx.getSource().sendMessage(Text.literal(success));
+        PartialKeepInventory.LOGGER.info(success);
+
+        return 1;
+    }
+    private static int addRuleGroup(CommandContext<ServerCommandSource> ctx) {
+        String group = StringArgumentType.getString(ctx, "name");
+        int modifier = IntegerArgumentType.getInteger(ctx, "modifier");
+        String action = StringArgumentType.getString(ctx, "drop action");
+
+        PartialKeepInventory.LOGGER.info("Checking presence");
+        if( CONFIG.ruleGroups.containsKey(group) ){
+            String error = "Failed adding group: group already exists. Consider removing it with '/pki rulegroup remove <name>'";
+            ctx.getSource().sendMessage(Text.literal(error));
+            PartialKeepInventory.LOGGER.error(error);
+            return 0;
+        }
+
+        PartialKeepInventory.LOGGER.info("Parsing drop action");
+        Optional<InventoryUtil.DropAction> dropActionOptional = InventoryUtil.DropAction.fromString(action);
+        if( dropActionOptional.isEmpty() ){
+            String error = "Failed adding group: invalid drop action. Expected one of 'keep', 'drop', 'destroy', 'none'";
+            ctx.getSource().sendMessage(Text.literal(error));
+            PartialKeepInventory.LOGGER.error(error);
+            return 0;
+        }
+
+        PartialKeepInventory.LOGGER.info("adding rulegroup");
+        CONFIG.ruleGroups.put(group, new RuleGroup(group, dropActionOptional.get(), modifier/100.0f) );
+        String success = "Successfully added group '" + group + "'";
+        ctx.getSource().sendMessage(Text.literal(success));
+        PartialKeepInventory.LOGGER.info(success);
+        return 1;
+    }
+
+    private static int addRule(CommandContext<ServerCommandSource> ctx) {
+        String group = StringArgumentType.getString(ctx, "group name");
+        String variable = StringArgumentType.getString(ctx, "variable");
+        String comparison = StringArgumentType.getString(ctx, "comparison");
+        String value = StringArgumentType.getString(ctx, "value");
+
+        RuleGroup ruleGroup = CONFIG.ruleGroups.get(group);
+        if( ruleGroup == null ){
+            String error = "Failed adding rule: group '" + group + "' doesn't exist.";
+            PartialKeepInventory.LOGGER.error(error);
+            ctx.getSource().sendMessage(Text.literal(error));
+            return 0;
+        }
+
+        RuleVariable ruleVariable = RuleVariables.variables.get(variable);
+        if( ruleVariable == null ){
+            String error = "Failed adding rule: '" + variable +"' is not a valid variable.";
+            PartialKeepInventory.LOGGER.error(error);
+            ctx.getSource().sendMessage(Text.literal(error));
+            return 0;
+        }
+
+        Optional<RuleComparison> ruleComparisonOptional = RuleComparison.fromString(comparison);
+        if( ruleComparisonOptional.isEmpty() ){
+            String error = "Failed adding rule: '" + comparison +"' is not a valid operator.";
+            PartialKeepInventory.LOGGER.error(error);
+            ctx.getSource().sendMessage(Text.literal(error));
+            return 0;
+        }
+        RuleComparison ruleComparison = ruleComparisonOptional.get();
+
+        RuleType ruleType = ruleVariable.type;
+        if( !ruleType.canBeComparedUsing(ruleComparison) ){
+            String error = "Failed adding rule: cannot compare variable with type '" + ruleType.name() + "' using " + comparison;
+            PartialKeepInventory.LOGGER.error(error);
+            ctx.getSource().sendMessage(Text.literal(error));
+            return 0;
+        }
+
+//        To whoever is reading this: I'm sorry
+        RuleType valueType;
+        Object ruleValue;
+        if( value.matches("^\\d+%?$") ){
+            if( value.matches("^\\d+\\.\\d+$")){
+                ruleValue = Float.parseFloat(value);
+                valueType = RuleType.Float;
+            }else {
+
+                if( value.lastIndexOf('%') > 0 ){
+                    ruleValue = Integer.parseInt(value);
+                    valueType = RuleType.Percentage;
+                }else {
+                    ruleValue = Integer.parseInt(value);
+                    valueType = RuleType.Number;
+                }
+            }
+        }else if( value.equals("true") || value.equals("false") ){
+            ruleValue = value.charAt(0) == 't';
+            valueType = RuleType.Boolean;
+        }else{
+            ruleValue = value;
+            valueType = RuleType.String;
+        }
+
+        if( !valueType.equals(ruleVariable.type) ){
+            String error = "Failed adding rule: type of value " + value + "(" + valueType.name() + ") is not the same as the variable type '" + ruleVariable.type.name() + "'";
+            PartialKeepInventory.LOGGER.error(error);
+            ctx.getSource().sendMessage(Text.literal(error));
+            return 0;
+        }
+
+        DropRule rule = new DropRule(ruleVariable, ruleComparison, ruleValue);
+        ruleGroup.addRule(rule);
+        ctx.getSource().sendMessage(Text.literal("Added rule " + ruleVariable.name + " " + ruleComparison.toString() + " " + ruleValue.toString() + " to group " + group ));
+        return 1;
     }
 }

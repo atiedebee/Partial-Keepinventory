@@ -9,6 +9,7 @@ import me.atie.partialKeepinventory.formula.XpDroprateFormula;
 import me.atie.partialKeepinventory.impl.Impl;
 import me.atie.partialKeepinventory.network.Identifiers;
 import me.atie.partialKeepinventory.network.ServerListeners;
+import me.atie.partialKeepinventory.rules.RuleGroup;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -23,6 +24,7 @@ import net.minecraft.world.World;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,6 +34,9 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi{
     // ----- Compatibility related -----
     public pkiVersion configVersion = null;
     public boolean validSettings = false;
+
+    // ----- Rule Groups -----
+    public LinkedHashMap<String, RuleGroup> ruleGroups = new LinkedHashMap<>();
 
     // ----- Implementation Settings -----
     protected List<pkiSettingsApi> implementationSettings;

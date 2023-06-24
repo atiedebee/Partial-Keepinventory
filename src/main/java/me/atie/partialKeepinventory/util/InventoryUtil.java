@@ -3,6 +3,9 @@ package me.atie.partialKeepinventory.util;
 import me.atie.partialKeepinventory.KeepinvMode;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.apache.commons.collections.functors.NonePredicate;
+
+import java.util.Optional;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 
@@ -39,6 +42,15 @@ public class InventoryUtil {
         return droprate / 100.0;
     }
     public enum DropAction{
-        DROP, KEEP, DESTROY, NONE
+        DROP, KEEP, DESTROY, NONE;
+        public static Optional<DropAction> fromString(String s){
+            return switch(s){
+                case "drop" -> Optional.of(DROP);
+                case "keep" -> Optional.of(KEEP);
+                case "destroy" -> Optional.of(DESTROY);
+                case "none" -> Optional.of(NONE);
+                default -> Optional.empty();
+            };
+        }
     }
 }

@@ -107,7 +107,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity
                     lossForm.compileExpression(CONFIG.getXpLossExpression().toString());
                 }catch(Exception e){
                     // Send error string to player and server.
-                    String errorStr = "Failed compiling drop expression: " + e.getMessage() + "\nResorting to static droprate of 0";
+                    String errorStr = "Failed compiling custom experience drop expression:\n" + e.getMessage() + "\nResorting to static droprate of 0";
                     PartialKeepInventory.LOGGER.error(errorStr);
                     player.getCommandSource().sendFeedback(() -> Text.literal(errorStr).setStyle(Style.EMPTY.withColor(Formatting.RED)), true);
 

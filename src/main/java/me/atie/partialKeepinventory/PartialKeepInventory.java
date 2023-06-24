@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 /*
  * TODO: GUI for trinkets settings
+ * TODO: GUI for rules / groups
+ * TODO: Serializing rules / groups
 * */
 
 public class PartialKeepInventory implements ModInitializer {

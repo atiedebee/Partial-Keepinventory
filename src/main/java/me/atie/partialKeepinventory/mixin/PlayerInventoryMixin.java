@@ -55,12 +55,23 @@ public abstract class PlayerInventoryMixin {
      * @return What percentage of the item should be dropped (where 1.0 == 100%)
      */
     private Pair<Double, DropAction> getDropBehaviour(ItemStack itemStack) {
+        PartialKeepInventory.LOGGER.info("Dropping " + itemStack.getItem().getName());
 
         /* First test out custom drop behaviour*/
         for( var e: Impl.entryPoints.entrySet()){
             Pair<Double, DropAction> behaviour = e.getValue().getDropBehaviour(player, itemStack);
             if( behaviour != null && behaviour.getRight() != DropAction.NONE){
+                PartialKeepInventory.LOGGER.info("Dropping from implementations");
                 return behaviour;
+            }
+        }
+
+        /* Second go through all rules */
+        for( var rule: CONFIG.ruleGroups.entrySet() ){
+            var result = rule.getValue().evaluate(itemStack);
+            if( result.isPresent() ){
+                PartialKeepInventory.LOGGER.info("Dropping from rules");
+                return result.get();
             }
         }
 
