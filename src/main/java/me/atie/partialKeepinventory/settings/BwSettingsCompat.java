@@ -6,6 +6,7 @@ import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.api.pkiSettingsApi;
 import me.atie.partialKeepinventory.impl.Impl;
+import me.atie.partialKeepinventory.rules.RuleGroup;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -48,9 +49,9 @@ public abstract class BwSettingsCompat extends pkiSettings{
         packetWriters.put(v0_2_2, (s, buf) -> BwSettingsCompat.packetWriter_0_2_0(s, v0_2_2, buf));
 
         final pkiVersion v0_3_0 = new pkiVersion(0, 3, 0);
-        packetReaders.put(v0_3_0, BwSettingsCompat::packetReader_0_2_0);
-        nbtReaders.put(v0_3_0, BwSettingsCompat::nbtReader_0_2_0);
-        packetWriters.put(v0_3_0, (s, buf) -> BwSettingsCompat.packetWriter_0_2_0(s, v0_3_0, buf));
+        packetReaders.put(v0_3_0, BwSettingsCompat::packetReader_0_3_0);
+        nbtReaders.put(v0_3_0, BwSettingsCompat::nbtReader_0_3_0);
+        packetWriters.put(v0_3_0, (s, buf) -> BwSettingsCompat.packetWriter_0_3_0(s, v0_3_0, buf));
 
     }
 
@@ -77,9 +78,10 @@ public abstract class BwSettingsCompat extends pkiSettings{
     }
 
 
-
-    // 0.2.0
-    public static void packetWriter_0_2_0(pkiSettings s, pkiVersion v, PacketByteBuf buf) {
+    // =================
+    // ===== 0.2.0 =====
+    // =================
+    private static void basePacketWriter_0_2_0(pkiSettings s, pkiVersion v, PacketByteBuf buf){
         v.writePacket(buf);
 
         buf.writeBoolean(s.enableMod);
@@ -94,6 +96,9 @@ public abstract class BwSettingsCompat extends pkiSettings{
         buf.writeString(s.xpDropExpression.toString());
         buf.writeString(s.xpLossExpression.toString());
 
+    }
+
+    public static void implPacketWriter_0_2_0(pkiSettings s, PacketByteBuf buf){
         for( pkiSettingsApi setting: s.implementationSettings ){
             PacketByteBuf implBuf = PacketByteBufs.create();
             setting.packetWriter(implBuf);
@@ -103,10 +108,15 @@ public abstract class BwSettingsCompat extends pkiSettings{
             buf.writeString(setting.getModId());
             buf.writeBytes(implBuf);
         }
-
     }
 
-    public static void packetReader_0_2_0(pkiSettings s, PacketByteBuf buf) {
+    public static void packetWriter_0_2_0(pkiSettings s, pkiVersion v, PacketByteBuf buf) {
+        basePacketWriter_0_2_0(s, v, buf);
+        implPacketWriter_0_2_0(s, buf);
+    }
+
+
+    private static void basePacketReader_0_2_0(pkiSettings s, PacketByteBuf buf){
         s.enableMod = buf.readBoolean();
         final byte[] droprates = buf.readByteArray(7);
         s.inventoryDroprate = droprates[0];
@@ -124,10 +134,12 @@ public abstract class BwSettingsCompat extends pkiSettings{
 
         s.xpDropExpression = new StringBuffer(buf.readString());
         s.xpLossExpression = new StringBuffer(buf.readString());
+    }
 
+    private static void implPacketReader_0_2_0(pkiSettings s, PacketByteBuf buf){
         while( buf.readerIndex() < buf.readableBytes() ) {
             int size = buf.readInt();
-             int index = buf.readerIndex();
+            int index = buf.readerIndex();
 
             String modId = buf.readString();
 
@@ -144,6 +156,11 @@ public abstract class BwSettingsCompat extends pkiSettings{
                 buf.readerIndex(index + size);
             }
         }
+    }
+
+    public static void packetReader_0_2_0(pkiSettings s, PacketByteBuf buf) {
+        basePacketReader_0_2_0(s, buf);
+        implPacketReader_0_2_0(s, buf);
     }
 
 
@@ -179,6 +196,57 @@ public abstract class BwSettingsCompat extends pkiSettings{
         }
         return nbt;
     }
+
+    // =================
+    // ===== 0.3.0 =====
+    // =================
+    public static NbtCompound nbtReader_0_3_0(pkiSettings s, NbtCompound nbt){
+        nbt = nbtReader_0_2_0(s, nbt);
+
+        NbtCompound ruleGroupsCompound = nbt.getCompound("rule groups");
+        PartialKeepInventory.LOGGER.info("Rule groups nbt: " + ruleGroupsCompound.getKeys().toString());
+        for( var key: ruleGroupsCompound.getKeys() ){
+            NbtCompound ruleGroupCompound = ruleGroupsCompound.getCompound(key);
+            PartialKeepInventory.LOGGER.info("Rule group nbt: " + ruleGroupCompound.getKeys().toString());
+            s.ruleGroups.put(key, new RuleGroup(ruleGroupCompound) );
+        }
+
+        return nbt;
+    }
+
+    private static void rulePacketReader_0_3_0(pkiSettings s, PacketByteBuf buf){
+        int ruleGroupCount = buf.readInt();
+        for( int i = 0; i < ruleGroupCount; i++ ){
+            RuleGroup ruleGroup = new RuleGroup(buf);
+            s.ruleGroups.put(ruleGroup.name, ruleGroup);
+        }
+    }
+
+    public static void packetReader_0_3_0(pkiSettings s, PacketByteBuf buf){
+        basePacketReader_0_2_0(s, buf);
+        rulePacketReader_0_3_0(s, buf);
+        implPacketReader_0_2_0(s, buf);
+    }
+
+    private static void rulePacketWriter_0_3_0(pkiSettings s, PacketByteBuf buf){
+        int ruleGroupCount = s.ruleGroups.values().size();
+        RuleGroup[] ruleGroups = new RuleGroup[ruleGroupCount];
+        s.ruleGroups.values().toArray(ruleGroups);
+
+        buf.writeInt(ruleGroupCount);
+        for( var ruleGroup: ruleGroups ){
+            ruleGroup.writePacket(buf);
+        }
+
+    }
+
+    public static void packetWriter_0_3_0(pkiSettings s, pkiVersion v, PacketByteBuf buf){
+        basePacketWriter_0_2_0(s, v, buf);
+        rulePacketWriter_0_3_0(s, buf);
+        implPacketWriter_0_2_0(s, buf);
+    }
+
+
 
 
 

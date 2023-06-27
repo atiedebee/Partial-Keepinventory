@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "partial-keepinv",
-  "version": "0.2.2",
+  "version": "0.3.0",
 
   "name": "Partial Keepinventory",
   "description": "A mod that makes keepinventory a little more flexible",

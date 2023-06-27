@@ -311,6 +311,14 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi{
             nbt.put(setting.getModId(), settingNbt);
         }
 
+        NbtCompound ruleGroupsNbt = new NbtCompound();
+        for( var ruleGroup: ruleGroups.values() ){
+            NbtCompound ruleGroupNbt = new NbtCompound();
+            ruleGroup.writeNbt(ruleGroupNbt);
+            ruleGroupsNbt.put(ruleGroup.name, ruleGroupNbt);
+        }
+        nbt.put("rule groups", ruleGroupsNbt);
+
         return nbt;
     }
 

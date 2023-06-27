@@ -55,8 +55,7 @@ public abstract class PlayerInventoryMixin {
      * @return What percentage of the item should be dropped (where 1.0 == 100%)
      */
     private Pair<Double, DropAction> getDropBehaviour(ItemStack itemStack) {
-        PartialKeepInventory.LOGGER.info("Dropping " + itemStack.getItem().getName());
-
+        double modifier = 1.0;
         /* First test out custom drop behaviour*/
         for( var e: Impl.entryPoints.entrySet()){
             Pair<Double, DropAction> behaviour = e.getValue().getDropBehaviour(player, itemStack);
@@ -69,10 +68,17 @@ public abstract class PlayerInventoryMixin {
         /* Second go through all rules */
         for( var rule: CONFIG.ruleGroups.entrySet() ){
             var result = rule.getValue().evaluate(itemStack);
+
             if( result.isPresent() ){
-                PartialKeepInventory.LOGGER.info("Dropping from rules");
-                return result.get();
+                var res = result.get();
+
+                if( res.getRight().equals( DropAction.NONE )){
+                    modifier *= res.getLeft();
+                }else {
+                    return result.get();
+                }
             }
+
         }
 
         double percentage = switch (CONFIG.getPartialKeepinvMode()) {
@@ -81,6 +87,7 @@ public abstract class PlayerInventoryMixin {
             case RARITY -> dropPercentageFromRarity(itemStack);
             default -> throw new IllegalStateException("Unexpected value: " + CONFIG.getPartialKeepinvMode());
         };
+        percentage *= modifier;
 
         return new Pair<>(percentage, DropAction.DROP);
     }

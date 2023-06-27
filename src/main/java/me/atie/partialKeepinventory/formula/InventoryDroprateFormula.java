@@ -24,6 +24,8 @@ public class InventoryDroprateFormula extends DroprateFormula {
         env.addLazyVariable( "isUncommon",  () -> 0.0);
         env.addLazyVariable( "isCommon", () -> 1.0);
 
+        env.addLazyVariable("durability", () -> 1.0);
+
         env.addLazyVariable( "dropPercent", () -> CONFIG.getInventoryDroprate() / 100.0);
     }
     @Override
@@ -34,6 +36,7 @@ public class InventoryDroprateFormula extends DroprateFormula {
         env.addLazyVariable( "isRare", () -> item.getRarity().equals(Rarity.RARE) ? 1.0 : 0.0);
         env.addLazyVariable( "isUncommon",  () -> item.getRarity().equals(Rarity.UNCOMMON) ? 1.0 : 0.0);
         env.addLazyVariable( "isCommon", () -> item.getRarity().equals(Rarity.COMMON) ? 1.0 : 0.0);
+        env.addLazyVariable("durability", () -> item.getMaxDamage() > 0 ? item.getDamage() / (float)item.getMaxDamage() : 1.0);
 
         env.addLazyVariable( "dropPercent", () -> CONFIG.getInventoryDroprate() / 100.0);
     }

@@ -4,6 +4,10 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.sun.jdi.connect.Connector;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
@@ -15,6 +19,7 @@ import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.GameProfileArgumentType;
+import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
@@ -24,7 +29,9 @@ import net.minecraft.text.TextColor;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -542,18 +549,63 @@ public class pkiCommandRegistration {
                                                 .then(argument("name", StringArgumentType.word())
                                                         .then(argument("modifier", IntegerArgumentType.integer(0))
                                                                 .then(argument("drop action", StringArgumentType.word())
+                                                                    .suggests(new DropActionArgumentSuggestionProvider())
                                                                         .executes(pkiCommandRegistration::addRuleGroup)
                                                                 )
                                                         )
                                                 )
                                         )
-                                        .then(literal("remove")// Add a rule group with the the drop action and modifier
+                                        .then(literal("remove")// remove a rule group
                                                 .then(argument("name", StringArgumentType.word())
+                                                    .suggests(new GroupArgumentSuggestionProvider())
                                                         .executes(pkiCommandRegistration::removeRuleGroup)
+                                                )
+                                        )
+                                        .then(literal("edit")
+                                                .then(argument("group name", StringArgumentType.word())
+                                                    .suggests(new GroupArgumentSuggestionProvider())
+                                                        .then(argument("new name", StringArgumentType.word())
+                                                                .then(argument("modifier", IntegerArgumentType.integer(0))
+                                                                    .then(argument("drop action", StringArgumentType.word())
+                                                                        .suggests(new DropActionArgumentSuggestionProvider())
+                                                                            .executes(ctx -> {
+                                                                                String groupName = StringArgumentType.getString(ctx, "group name");
+                                                                                String newGroupName = StringArgumentType.getString(ctx, "new name");
+                                                                                RuleGroup group = CONFIG.ruleGroups.get(groupName);
+
+                                                                                int modifier = IntegerArgumentType.getInteger(ctx, "modifier");
+
+                                                                                String dropActionName = StringArgumentType.getString(ctx, "drop action");
+                                                                                Optional<InventoryUtil.DropAction> dropAction = InventoryUtil.DropAction.fromString(dropActionName);
+
+                                                                                if( group == null ){
+                                                                                    ctx.getSource().sendMessage(Text.literal("Couldn't modify group: group '" + groupName + "' doesn't exist").setStyle(Style.EMPTY.withColor(0xAA0000)));
+                                                                                    return 0;
+                                                                                }
+                                                                                if( !newGroupName.equals(groupName) && CONFIG.ruleGroups.containsKey(newGroupName) ){
+                                                                                    ctx.getSource().sendMessage(Text.literal("Couldn't modify group: group name '" + newGroupName + "' already exists").setStyle(Style.EMPTY.withColor(0xAA0000)));
+                                                                                    return 0;
+                                                                                }
+
+                                                                                if( dropAction.isEmpty() ){
+                                                                                    ctx.getSource().sendMessage(Text.literal("Couldn't modify group: '" + dropActionName + "' isn't a valid drop action").setStyle(Style.EMPTY.withColor(0xAA0000)));
+                                                                                    return 0;
+                                                                                }
+
+                                                                                group.dropAction = dropAction.get();
+                                                                                group.modifier = modifier/100.0f;
+                                                                                group.name = groupName;
+
+                                                                                return 1;
+                                                                            })
+                                                                    )
+                                                                )
+                                                        )
                                                 )
                                         )
                                         .then(literal("list")
                                                 .then(argument("group name", StringArgumentType.word())
+                                                    .suggests(new GroupArgumentSuggestionProvider())
                                                         .executes( ctx -> {
                                                             String group = StringArgumentType.getString(ctx, "group name");
                                                             RuleGroup ruleGroup = CONFIG.ruleGroups.get(group);
@@ -570,13 +622,45 @@ public class pkiCommandRegistration {
                                 )
                                 .then(literal("add")// Add a rule to an existing group
                                         .then(argument("group name", StringArgumentType.word())
+                                            .suggests(new GroupArgumentSuggestionProvider())
                                                 .then(argument("variable", StringArgumentType.word())
+                                                    .suggests(new VariableArgumentSuggestionProvider())
                                                         .then(argument("comparison", StringArgumentType.word())
+                                                            .suggests(new ComparisonArgumentSuggestionProvider())
                                                                 .then(argument("value", StringArgumentType.word())
+                                                                    .suggests(new ValueArgumentSuggestionProvider())
                                                                         .executes(pkiCommandRegistration::addRule)
                                                                 )
                                                         )
                                                 )
+                                        )
+                                )
+                                .then(literal("remove")// remove a rule from an existing group
+                                        .then(argument("group name", StringArgumentType.word())
+                                                .suggests(new GroupArgumentSuggestionProvider())
+                                                        .then(argument("rule number", IntegerArgumentType.integer(1))
+                                                                .executes(ctx -> {
+                                                                    int number = IntegerArgumentType.getInteger(ctx, "rule number");
+                                                                    String groupString =  StringArgumentType.getString(ctx, "group name");
+                                                                    RuleGroup group = CONFIG.ruleGroups.get(groupString);
+                                                                    if( group == null ){
+                                                                        String error = "Failed removing rule from group '" + groupString + "': group doesn't exist";
+                                                                        ctx.getSource().sendMessage(Text.literal(error));
+                                                                        PartialKeepInventory.LOGGER.error(error);
+                                                                        return 0;
+                                                                    }
+
+                                                                    if( group.rules.size() < number ){
+                                                                        String error = "Failed removing rule from group '" + groupString + "': index out of bounds";
+                                                                        ctx.getSource().sendMessage(Text.literal(error));
+                                                                        PartialKeepInventory.LOGGER.error(error);
+                                                                        return 0;
+                                                                    }
+
+                                                                    group.rules.remove(number - 1);
+                                                                    return 1;
+                                                                })
+                                                        )
                                         )
                                 )
                         )
@@ -739,5 +823,66 @@ public class pkiCommandRegistration {
         ruleGroup.addRule(rule);
         ctx.getSource().sendMessage(Text.literal("Added rule " + ruleVariable.name + " " + ruleComparison.toString() + " " + ruleValue.toString() + " to group " + group ));
         return 1;
+    }
+}
+
+
+class GroupArgumentSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        for( var e: CONFIG.ruleGroups.entrySet() ){
+            builder.suggest(e.getKey());
+        }
+
+        return builder.buildFuture();
+    }
+}
+
+class VariableArgumentSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        for( var e: RuleVariables.variables.keySet() ){
+            builder.suggest(e);
+        }
+        return builder.buildFuture();
+    }
+}
+
+class DropActionArgumentSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        for( var e: InventoryUtil.DropAction.values()){
+            builder.suggest(e.toString().toLowerCase(Locale.ROOT));
+        }
+        return builder.buildFuture();
+    }
+}
+
+class ComparisonArgumentSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        String variableString = StringArgumentType.getString(context, "variable");
+        RuleVariable variable = RuleVariables.variables.get(variableString);
+        if(variable != null){
+            for( var comparison: RuleComparison.values() ) {
+                if( variable.type.canBeComparedUsing(comparison) ) {
+                    builder.suggest(comparison.toArgumentString());
+                }
+            }
+        }
+        return builder.buildFuture();
+    }
+}
+
+class ValueArgumentSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
+    @Override
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        String variableString = StringArgumentType.getString(context, "variable");
+        RuleVariable variable = RuleVariables.variables.get(variableString);
+        if( variable.type == RuleType.Boolean ) {
+            builder.suggest("true");
+            builder.suggest("false");
+        }
+        return builder.buildFuture();
     }
 }

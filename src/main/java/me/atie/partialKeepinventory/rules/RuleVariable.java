@@ -1,16 +1,21 @@
 package me.atie.partialKeepinventory.rules;
 
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
 public class RuleVariable {
+    @NotNull
     public final RuleType type;
+    @NotNull
     private final Function<ItemStack, Object> getValue;
+    @NotNull
     public final CompareRule compare;
+    @NotNull
     public final String name;
 
-    public RuleVariable(String name, RuleType type, Function<ItemStack, Object> getValue, CompareRule compare){
+    public RuleVariable(@NotNull String name, @NotNull RuleType type, @NotNull Function<ItemStack, Object> getValue, @NotNull CompareRule compare){
         this.type = type;
         this.getValue = getValue;
         this.compare = compare;

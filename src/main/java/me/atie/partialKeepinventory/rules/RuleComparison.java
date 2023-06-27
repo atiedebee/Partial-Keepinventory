@@ -24,4 +24,12 @@ public enum RuleComparison {
         };
     }
 
+    public String toArgumentString(){
+        String[] s = {
+                "eq", "ne", "lt", "gt", "le", "ge"
+        };
+        return s[this.ordinal()];
+    }
+
+
 }
