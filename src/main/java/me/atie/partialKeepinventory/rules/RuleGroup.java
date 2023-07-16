@@ -36,15 +36,18 @@ public class RuleGroup {
 
 
     public Optional< Pair<Double, InventoryUtil.DropAction> > evaluate(ItemStack stack){
+//        PartialKeepInventory.LOGGER.info("Evaluating " + stack.getName() + stack.getEnchantments());
         for( var rule: rules){
             try {
                 boolean ret = rule.evaluate(stack);
                 if( !ret ){
-                    PartialKeepInventory.LOGGER.info("Rule failed: " + rule.left.name + " " + rule.comparison.toString() + " " + rule.right.toString());
+//                    PartialKeepInventory.LOGGER.info("Rule failed: " + rule.left.name + " " + rule.comparison.toString() + " " + rule.right.toString());
                     return Optional.empty();
                 }
+//                PartialKeepInventory.LOGGER.info("Rule success: " + rule.left.name + " " + rule.comparison.toString() + " " + rule.right.toString());
+
             } catch (Exception e) {
-                PartialKeepInventory.LOGGER.error("Unable to evaluate rule " + rule.left.name + ", " + e.getMessage());
+//                PartialKeepInventory.LOGGER.error("Unable to evaluate rule " + rule.left.name + ", " + e.getMessage());
                 return Optional.empty();
             }
         }
@@ -73,7 +76,7 @@ public class RuleGroup {
 
         for( var key: ruleKeys ){
             NbtCompound ruleCompound = nbt.getCompound(key);
-            PartialKeepInventory.LOGGER.info("Rule compound nbt: " + ruleCompound.getKeys().toString());
+//            PartialKeepInventory.LOGGER.info("Rule compound nbt: " + ruleCompound.getKeys().toString());
             try {
                 rules.add(DropRule.readNbt(ruleCompound));
             }catch(Exception e){

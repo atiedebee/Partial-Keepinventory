@@ -8,7 +8,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.sun.jdi.connect.Connector;
 import me.atie.partialKeepinventory.KeepXPMode;
 import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
@@ -19,7 +18,6 @@ import me.atie.partialKeepinventory.settings.pkiSettings;
 import me.atie.partialKeepinventory.util.InventoryUtil;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.GameProfileArgumentType;
-import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
@@ -29,7 +27,6 @@ import net.minecraft.text.TextColor;
 
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -610,10 +607,13 @@ public class pkiCommandRegistration {
                                                             String group = StringArgumentType.getString(ctx, "group name");
                                                             RuleGroup ruleGroup = CONFIG.ruleGroups.get(group);
                                                             ctx.getSource().sendMessage(Text.literal("  " + ruleGroup.name));
+
+                                                            int i = 1;
                                                             for( var rule: ruleGroup.rules ){
-                                                                ctx.getSource().sendMessage(Text.literal("| " + rule.left.name + " " + rule.comparison.toString() + " " + rule.right.toString()));
+                                                                ctx.getSource().sendMessage(Text.literal(i + " | " + rule.left.name + " " + rule.comparison.toString() + " " + rule.right.toString()));
+                                                                i++;
                                                             }
-                                                            ctx.getSource().sendMessage(Text.literal("\\_>   " + ruleGroup.dropAction.toString().toLowerCase(Locale.ROOT) + " " + ruleGroup.modifier));
+                                                            ctx.getSource().sendMessage(Text.literal("\\---->   " + ruleGroup.dropAction.toString().toLowerCase(Locale.ROOT) + " " + (ruleGroup.modifier * 100) + "%"));
 
                                                             return 1;
                                                         })

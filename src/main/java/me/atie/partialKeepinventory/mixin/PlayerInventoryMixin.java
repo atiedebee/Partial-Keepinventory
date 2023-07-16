@@ -4,11 +4,12 @@ import me.atie.partialKeepinventory.KeepinvMode;
 import me.atie.partialKeepinventory.PartialKeepInventory;
 import me.atie.partialKeepinventory.formula.InventoryDroprateFormula;
 import me.atie.partialKeepinventory.impl.Impl;
+import me.atie.partialKeepinventory.util.KeyItemStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -22,13 +23,34 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static me.atie.partialKeepinventory.PartialKeepInventory.CONFIG;
 import static me.atie.partialKeepinventory.util.InventoryUtil.*;
+
+
+
+/*
+ * Problem:
+ * Enchanted items, like tools and armor, are being put together with non-enchanted items.
+ *
+ * Possible solutions:
+ *
+ *   1. Use an item stack as the index to the count hashmap.
+ *     - Pros: * Each item that has differences from the others, will easily be dropped in different amounts.
+ *     - Cons: * When there is multiple items that are enchanted with different enchantments, either all of them will
+ *               drop or none of them will drop.
+ *             * Items could be dropped with a chance to solve this, but making this an option makes the mod too complicated while
+ *               also being dependant on the players needs.
+ *             * More items will need to be looped over which decreases performance slightly.
+ *   2. Use a class that stores information
+ *     - Pros: * all items that are similar can be counted together.
+ *     - Cons: * Lots of work to implement
+ *             * More tedious for other people to use the mod
+ *
+ */
+
+
 
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin {
@@ -47,6 +69,12 @@ public abstract class PlayerInventoryMixin {
     private int getInventorySize(){
         return this.main.size() + this.armor.size() + this.offHand.size();
     }
+
+    private KeyItemStack getItemStackAsKey(ItemStack s){
+        return new KeyItemStack(s);
+    }
+
+
 
 
 
@@ -74,13 +102,15 @@ public abstract class PlayerInventoryMixin {
 
                 if( res.getRight().equals( DropAction.NONE )){
                     modifier *= res.getLeft();
+                    PartialKeepInventory.LOGGER.info("Modifying droprate because of rule group " + rule.getValue().name);
                 }else {
+                    PartialKeepInventory.LOGGER.info("Droprate for item " + itemStack.getName() + itemStack.getEnchantments().toString() +"set by rule group " + rule.getValue().name);
                     return result.get();
                 }
             }
 
         }
-
+//        PartialKeepInventory.LOGGER.info("Using normal item droprates for item " + itemStack.getName() + itemStack.getEnchantments());
         double percentage = switch (CONFIG.getPartialKeepinvMode()) {
             case CUSTOM -> inventoryDroprateFormula.getResult(itemStack);
             case STATIC -> CONFIG.getInventoryDroprate() / 100.0;
@@ -97,36 +127,33 @@ public abstract class PlayerInventoryMixin {
      * @param stacks A list of references to item stacks in the inventory
      */
     @SuppressWarnings("UnusedAssignment")
-    private void getItemCounts(HashMap< Item, Pair<ItemStack, DropAction> > itemDropCounter, List<ItemStack> stacks){
+    private void getItemCounts(HashMap< KeyItemStack, Pair<ItemStack, DropAction> > itemDropCounter, List<ItemStack> stacks){
         for (ItemStack stack : stacks) {
-            //for future use, keep this
-            boolean dontDrop = false;
-            if (dontDrop) {
+            if( stack.isEmpty() ){
                 continue;
             }
-
             if ( EnchantmentHelper.hasVanishingCurse(stack) ) {
                 stack = ItemStack.EMPTY;
                 continue;
             }
 
-            if (!stack.isEmpty()) {
-                Item itemAsKey = stack.getItem();
-                int stackCount = stack.getCount();
+            KeyItemStack key = getItemStackAsKey(stack);
+            int stackCount = stack.getCount();
 
-                Pair<ItemStack, DropAction> pair =  itemDropCounter.get(itemAsKey);
-                if( pair == null ) {
-                    pair = new Pair<>(new ItemStack(itemAsKey, 0), DropAction.DROP);
-                    itemDropCounter.put(itemAsKey, pair);
-                }
+            Pair<ItemStack, DropAction> pair =  itemDropCounter.get(key);
+            if( pair == null ) {
+                pair = new Pair<>(new ItemStack(key.item, stackCount), DropAction.DROP);
+                itemDropCounter.put(key, pair);
 
+            } else {
                 ItemStack itemstack = pair.getLeft();
                 itemstack.setCount(itemstack.getCount() + stackCount);
-                itemDropCounter.get(itemAsKey).setLeft(itemstack);
+                itemDropCounter.get(key).setLeft(itemstack);
             }
+            PartialKeepInventory.LOGGER.info("Pair at key " + key + " is now " + pair.getLeft());
         }
 
-        for( Map.Entry<Item, Pair<ItemStack, DropAction>> set : itemDropCounter.entrySet() ){
+        for( Map.Entry<KeyItemStack, Pair<ItemStack, DropAction>> set : itemDropCounter.entrySet() ){
             Pair<ItemStack, DropAction> itemDropBehaviour = set.getValue();
 
             ItemStack itemStack = itemDropBehaviour.getLeft();
@@ -155,7 +182,7 @@ public abstract class PlayerInventoryMixin {
 
         var dropStack = invStack.copy();
         dropStack.setCount(dropAmount);
-
+        PartialKeepInventory.LOGGER.info("Dropping " + dropStack.getCount() + " of item " + dropItemStack.getName() + " using " + dropAction.toString()   );
         switch(dropAction){
             case DROP:
                 this.player.dropItem(dropStack, true, false);
@@ -164,6 +191,7 @@ public abstract class PlayerInventoryMixin {
                 dropItemStack.decrement(dropAmount);
                 invStack.decrement(dropAmount);
                 break;
+            case NONE:
             case KEEP:
             default://Don't do anything
                 break;
@@ -177,17 +205,23 @@ public abstract class PlayerInventoryMixin {
      * @param stacks List of stacks that are references to the stacks in the inventory
      */
     private void dropInventoryEqually(List<ItemStack> stacks) {
-        HashMap<Item, Pair<ItemStack, DropAction>> itemDropCounter;
+        LinkedHashMap<KeyItemStack, Pair<ItemStack, DropAction>> itemDropCounter;
 
-        itemDropCounter = new HashMap<>(stacks.size());
+        itemDropCounter = new LinkedHashMap<>(stacks.size());
 
         getItemCounts(itemDropCounter, stacks);
 
-        for (ItemStack stack : stacks) {
-            Pair<ItemStack, DropAction> entry = itemDropCounter.get(stack.getItem());
+        for( var i: itemDropCounter.entrySet() ){
+            PartialKeepInventory.LOGGER.info( "Got item " + i.getValue().getLeft() + " at key " +  i.getKey() );
+        }
 
+        for (ItemStack stack : stacks) {
+            Pair<ItemStack, DropAction> entry = itemDropCounter.get(getItemStackAsKey(stack));
             if (entry != null) {
+                PartialKeepInventory.LOGGER.info("Got entry for item " + entry.getLeft().getName());
                 dropItems(stack, entry);
+            }else if (stack.getItem() != Items.AIR){
+                PartialKeepInventory.LOGGER.info("Unable to get entry for item " + stack.getName() );
             }
         }
     }
@@ -213,7 +247,6 @@ public abstract class PlayerInventoryMixin {
 
     @Inject(method = "dropAll()V", at = @At("HEAD"), cancellable = true)
     public void dropSome(CallbackInfo ci) {
-
         if( CONFIG.getEnableMod()  ) {
             //if the mod is enabled we make sure we don't have 'dropAll' call dropInventory and friends
             ci.cancel();
@@ -239,7 +272,6 @@ public abstract class PlayerInventoryMixin {
             List<ItemStack> inv = loadInventory();
             dropInventoryEqually(inv);
         }
-
 
     }
 }

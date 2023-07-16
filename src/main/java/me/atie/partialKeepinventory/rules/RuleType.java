@@ -1,7 +1,5 @@
 package me.atie.partialKeepinventory.rules;
 
-import java.lang.reflect.Array;
-
 public enum RuleType {
     Boolean, Number, Percentage, String, Float;
 

@@ -1,5 +1,6 @@
 package me.atie.partialKeepinventory.rules;
 
+import me.atie.partialKeepinventory.PartialKeepInventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
@@ -70,8 +71,12 @@ public class RuleVariables {
                     RuleVariables::compareFloat);
 
             isEnchanted = register("isEnchanted", RuleType.Boolean,
-                    itemStack -> !itemStack.getEnchantments().isEmpty(),
+                    itemStack -> {
+                        PartialKeepInventory.LOGGER.info("Checking if item " + itemStack.getName().toString() + " has enchantments: " + itemStack.getEnchantments().toString());
+                        return !itemStack.getEnchantments().isEmpty();
+                    },
                     RuleVariables::compareBoolean);
+
             isTool = register("isTool", RuleType.Boolean,
                     itemStack -> itemStack.getItem() instanceof ToolItem ,
                     RuleVariables::compareBoolean);
@@ -162,4 +167,8 @@ public class RuleVariables {
             case GreaterEqual -> (float)self >= (float)other;
         };
     }
+
+
+
+
 }

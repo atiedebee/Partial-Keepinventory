@@ -59,17 +59,6 @@ public class pkiSettings extends PersistentState implements pkiSettingsApi{
 
     protected byte epicDroprate = 100;
 
-
-    //    Custom expressions aren't checked on correctness yet. Please test them out in a separate world before adding them.
-//    Percentages are from 0.0 - 1.0
-//    Variables:
-//            - spawnDistance:                distance from player to spawnpoint
-//            - spawnX, spawnY, spawnZ:       spawn coordinates
-//            - playerX, playerY, playerZ:    player coordinates
-//            - rarityPercent:                get droprate from rarity as set in the config.
-//            - isEpic, isRare, isCommon, isUncommon:
-//                                            return 1.0 if true
-//            - dropPercent:                  inventory droprate as set in the config
     protected StringBuffer invExpression = new StringBuffer();
 
     // ----- XP -----
